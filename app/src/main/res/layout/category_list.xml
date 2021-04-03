@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:cardview="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    cardview:strokeColor="?attr/strokeColor"
+    cardview:strokeWidth="1dp"
+    cardview:cardCornerRadius="5dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginRight="5dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="210dp"
+            android:layout_marginStart="10dp"
+            android:layout_height="40dp"
+            android:text="Title"
+            android:gravity="center_vertical"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/modify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toEndOf="@id/title"
+            android:layout_toRightOf="@id/title"
+            android:src="@drawable/ic_modify" />
+
+        <ImageButton
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="76dp"
+            android:layout_marginLeft="76dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toEndOf="@id/title"
+            android:layout_toRightOf="@id/title"
+            android:src="@drawable/ic_delete" />
+    </RelativeLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

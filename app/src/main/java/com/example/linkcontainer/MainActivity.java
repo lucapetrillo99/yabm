@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements Filterable {
         super.onResume();
         archiveUrl();
         bookmarks.clear();
-        bookmarks = db.getBookmarksByCategory("Default");
+        bookmarks = db.getAllBookmarks();
         initSwipe((String) toolbar.getTitle());
         setAdapter();
     }

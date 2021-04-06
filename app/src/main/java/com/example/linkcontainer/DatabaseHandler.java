@@ -237,7 +237,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     bookmark.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
                     bookmark.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
                     bookmark.setCategory(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
-
                     bookmarks.add(bookmark);
 
                 } while (cursor.moveToNext());
@@ -272,6 +271,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
         return result;
+    }
+
+    public boolean updateCategory(String category, String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor c = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
+                " where " + KEY_NAME + " = ?", new String[]{category});
+
+        if (c.moveToFirst()) {
+            return false;
+        } else {
+            Cursor cursor = db.rawQuery(" Update " + TABLE_CATEGORY + " set " +
+                            KEY_NAME + " = ? " + " where " + CATEGORY_ID + " = ? ",
+                    new String[] {category, id});
+
+            cursor.close();
+            return true;
+        }
     }
 
 }

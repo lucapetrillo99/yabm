@@ -105,6 +105,8 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     boolean result = db.addCategory(input.getText().toString());
                     if (result) {
                         categories.add(input.getText().toString());
+                        Toast.makeText(InsertLink.this,
+                                "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(InsertLink.this,
                                 "Categoria già esistente!", Toast.LENGTH_LONG).show();

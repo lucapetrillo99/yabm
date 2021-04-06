@@ -111,8 +111,21 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         alertbox.setPositiveButton("OK", (arg0, arg1) -> {
             if (isModify) {
-                categories.set(position, input.getText().toString());
-                notifyItemChanged(position);
+                String category = input.getText().toString();
+                if (!categories.get(position).equals(category)) {
+
+                    String id = db.getCategoryId(categories.get(position));
+                    boolean result = db.updateCategory(category, id);
+                    if (result) {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
+                        categories.set(position, category);
+                        notifyItemChanged(position);
+                    } else {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                    }
+                }
             } else {
                 boolean result = db.addCategory(input.getText().toString());
                 if (result) {

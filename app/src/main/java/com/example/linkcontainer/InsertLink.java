@@ -17,10 +17,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -55,6 +57,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         inputLink = findViewById(R.id.insert_link);
         ImageButton newCategory = findViewById(R.id.new_category);
         bookmark = new Bookmark();
+        ImageButton add_remainder = findViewById(R.id.add_remainder);
 
         Intent intent = getIntent();
         if(intent.getExtras() != null){
@@ -111,6 +114,42 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     }
                 });
                 alertbox.setNegativeButton("Annulla", (arg0, arg1) -> { });
+                alertbox.show();
+            }
+        });
+
+        add_remainder.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                LayoutInflater layoutInflater = LayoutInflater.from(InsertLink.this);
+                View dialogView = layoutInflater.inflate(R.layout.date_time_picker, null);
+                androidx.appcompat.app.AlertDialog.Builder alertbox = new androidx.appcompat.app.AlertDialog.Builder(InsertLink.this);
+                Button next = dialogView.findViewById(R.id.next);
+                DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
+                alertbox.setView(dialogView);
+
+                next.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        datePicker.setVisibility(View.INVISIBLE);
+                        timePicker.setVisibility(View.VISIBLE);
+                        next.setText("Conferma");
+
+                        // TODO CAMBIARE NOME INDIETRO
+                        // TODO AGGIUNGERE METODO INSERIMENTO DATA
+                        // TODO AGGIUNGERE CONTROLLO DATA
+                    }
+                });
+//                alertbox.setPositiveButton("OK", (arg0, arg1) -> {
+//                    boolean result = db.addCategory(input.getText().toString());
+//                    if (result) {
+//                        categories.add(input.getText().toString());
+//                    } else {
+//                        Toast.makeText(InsertLink.this,
+//                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
+//                    }
+//                });
                 alertbox.show();
             }
         });

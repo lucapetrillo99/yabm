@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -30,6 +33,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -41,7 +45,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private DatabaseHandler db;
     private Bookmark bookmark;
     private ArrayList<String> categories;
-
+    private boolean isPressed = false;
+    private int pressedCounter = 0;
+    private int notificationId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,35 +128,78 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
-                LayoutInflater layoutInflater = LayoutInflater.from(InsertLink.this);
-                View dialogView = layoutInflater.inflate(R.layout.date_time_picker, null);
-                androidx.appcompat.app.AlertDialog.Builder alertbox = new androidx.appcompat.app.AlertDialog.Builder(InsertLink.this);
-                Button next = dialogView.findViewById(R.id.next);
+                final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
                 DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
                 TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
-                alertbox.setView(dialogView);
+                Button cancelButton = dialogView.findViewById(R.id.previous);
+                Button confirmButton = dialogView.findViewById(R.id.next);
+                alert.setView(dialogView);
 
-                next.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View view) {
-                        datePicker.setVisibility(View.INVISIBLE);
-                        timePicker.setVisibility(View.VISIBLE);
-                        next.setText("Conferma");
-
-                        // TODO CAMBIARE NOME INDIETRO
-                        // TODO AGGIUNGERE METODO INSERIMENTO DATA
-                        // TODO AGGIUNGERE CONTROLLO DATA
+                final AlertDialog alertDialog = alert.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cancelButton.setText("Annulla");
+                        if (isPressed) {
+                            datePicker.setVisibility(View.VISIBLE);
+                            timePicker.setVisibility(View.INVISIBLE);
+                            confirmButton.setText("Avanti");
+                            isPressed = false;
+                            pressedCounter = 0;
+                        } else {
+                            alertDialog.dismiss();
+                        }
                     }
                 });
-//                alertbox.setPositiveButton("OK", (arg0, arg1) -> {
-//                    boolean result = db.addCategory(input.getText().toString());
-//                    if (result) {
-//                        categories.add(input.getText().toString());
-//                    } else {
-//                        Toast.makeText(InsertLink.this,
-//                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
-//                    }
-//                });
-                alertbox.show();
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        confirmButton.setText("Conferma");
+                        cancelButton.setText("Indietro");
+                        datePicker.setVisibility(View.INVISIBLE);
+                        timePicker.setVisibility(View.VISIBLE);
+                        isPressed = true;
+                        pressedCounter ++;
+                        if (pressedCounter == 2) {
+                            pressedCounter ++;
+                            Intent intent = new Intent(InsertLink.this, AlarmReceiver.class);
+                            intent.putExtra("notificationId", notificationId);
+                            intent.putExtra("todo", "TODO");
+
+                            PendingIntent alarmIntent = PendingIntent.getBroadcast(
+                                    InsertLink.this, 0, intent,
+                                    PendingIntent.FLAG_CANCEL_CURRENT);
+
+                            AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                            int hour = timePicker.getCurrentHour();
+                            int minute = timePicker.getCurrentMinute();
+
+                            int day = datePicker.getDayOfMonth();
+                            int month = datePicker.getMonth();
+                            int year = datePicker.getYear();
+
+                            Calendar startTime = Calendar.getInstance();
+                            startTime.set(Calendar.HOUR_OF_DAY, hour);
+                            startTime.set(Calendar.MINUTE, minute);
+                            startTime.set(Calendar.SECOND, 0);
+                            startTime.set(Calendar.DAY_OF_MONTH, day);
+                            startTime.set(Calendar.MONTH, month);
+                            startTime.set(Calendar.YEAR, year);
+
+                            long alarmStartTime = startTime.getTimeInMillis();
+                            alarm.set(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
+
+                            Toast.makeText(getApplicationContext(),
+                                    "Promemoria impostato correttamente", Toast.LENGTH_LONG)
+                                    .show();
+                        }
+
+                    }
+                });
+                alertDialog.show();
             }
         });
     }

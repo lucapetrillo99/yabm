@@ -5,10 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -34,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_IMAGE = "image";
     private static final String KEY_CATEGORY = "category";
+    private static final String KEY_REMINDER = "reminder";
 
     // TAGS Table - column names
     private static final String KEY_NAME = "name";
@@ -48,6 +47,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
+            + KEY_REMINDER + " LONG,"
             + KEY_CATEGORY + " INTEGER ," + " FOREIGN KEY ("+KEY_CATEGORY+")" +
             " REFERENCES "+TABLE_CATEGORY+"("+CATEGORY_ID+"));";
 
@@ -100,6 +100,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_DESCRIPTION, bookmark.getDescription());
             values.put(KEY_IMAGE, bookmark.getImage());
             values.put(KEY_CATEGORY, bookmark.getCategory());
+            values.put(KEY_REMINDER, bookmark.getReminder());
             db.insert(TABLE_BOOKMARK, null, values);
 
             return true;

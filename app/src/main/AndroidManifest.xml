@@ -27,5 +27,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        <receiver android:name=".AlarmReceiver" />
     </application>
 </manifest>

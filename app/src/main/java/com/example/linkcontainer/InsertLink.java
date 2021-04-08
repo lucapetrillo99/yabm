@@ -1,13 +1,17 @@
 package com.example.linkcontainer;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -17,17 +21,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -39,7 +50,13 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private DatabaseHandler db;
     private Bookmark bookmark;
     private ArrayList<String> categories;
-
+    private boolean isPressed = false;
+    private int pressedCounter = 0;
+    private int year, month, day, hour, minute;
+    private long alarmStartTime;
+    private boolean setRemainder = true;
+    private static final int DATE_ERROR = -1;
+    private static final int TIME_ERROR = -2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +72,11 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         inputLink = findViewById(R.id.insert_link);
         ImageButton newCategory = findViewById(R.id.new_category);
         bookmark = new Bookmark();
+        ImageButton addRemainder = findViewById(R.id.add_remainder);
+        TextView date = findViewById(R.id.inserted_date);
+        ImageButton modifyRemainder = findViewById(R.id.modify_reminder);
+        ImageButton removeRemainder = findViewById(R.id.remove_reminder);
+
 
         Intent intent = getIntent();
         if(intent.getExtras() != null){
@@ -114,6 +136,199 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 });
                 alertbox.setNegativeButton("Annulla", (arg0, arg1) -> { });
                 alertbox.show();
+            }
+        });
+
+        addRemainder.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
+                DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
+                Button cancelButton = dialogView.findViewById(R.id.previous);
+                Button confirmButton = dialogView.findViewById(R.id.next);
+
+                alert.setView(dialogView);
+
+                final AlertDialog alertDialog = alert.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cancelButton.setText("Annulla");
+                        if (isPressed) {
+                            datePicker.setVisibility(View.VISIBLE);
+                            timePicker.setVisibility(View.INVISIBLE);
+                            confirmButton.setText("Avanti");
+                            isPressed = false;
+                            pressedCounter = 0;
+                        } else {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        confirmButton.setText("Conferma");
+                        cancelButton.setText("Indietro");
+                        datePicker.setVisibility(View.INVISIBLE);
+                        timePicker.setVisibility(View.VISIBLE);
+                        isPressed = true;
+                        pressedCounter ++;
+                        if (pressedCounter > 1) {
+
+                            hour = timePicker.getCurrentHour();
+                            minute = timePicker.getCurrentMinute();
+
+                            day = datePicker.getDayOfMonth();
+                            month = datePicker.getMonth();
+                            year = datePicker.getYear();
+
+                            try {
+                                int result = setCalendar();
+
+                                if (result == DATE_ERROR) {
+                                    Toast.makeText(getApplicationContext(),
+                                            "La data non è valida", Toast.LENGTH_LONG)
+                                            .show();
+
+                                } else if (result == TIME_ERROR){
+                                    Toast.makeText(getApplicationContext(),
+                                            "L'orario non è valido", Toast.LENGTH_LONG)
+                                            .show();
+                                } else {
+                                    date.setText( DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+
+                                    addRemainder.setVisibility(View.INVISIBLE);
+                                    date.setVisibility(View.VISIBLE);
+                                    modifyRemainder.setVisibility(View.VISIBLE);
+                                    removeRemainder.setVisibility(View.VISIBLE);
+
+                                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+                                    Toast.makeText(getApplicationContext(),
+                                            "Promemoria impostato correttamente", Toast.LENGTH_LONG)
+                                            .show();
+
+                                    alertDialog.dismiss();
+                                }
+                            } catch (ParseException e) {
+                                Toast.makeText(getApplicationContext(),
+                                        "Qualcosa è andato storto!\n Prova più tardi", Toast.LENGTH_LONG)
+                                        .show();
+                                alertDialog.dismiss();
+                            }
+                        }
+                    }
+                });
+                alertDialog.show();
+            }
+        });
+
+        modifyRemainder.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
+                View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
+                DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
+                Button cancelButton = dialogView.findViewById(R.id.previous);
+                Button confirmButton = dialogView.findViewById(R.id.next);
+
+                pressedCounter = 0;
+
+                datePicker.updateDate(year, month, day);
+                timePicker.setHour(hour);
+                timePicker.setMinute(minute);
+
+                alert.setView(dialogView);
+
+                final AlertDialog alertDialog = alert.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cancelButton.setText("Annulla");
+                        if (isPressed) {
+                            datePicker.setVisibility(View.VISIBLE);
+                            timePicker.setVisibility(View.INVISIBLE);
+                            confirmButton.setText("Avanti");
+                            isPressed = false;
+                            pressedCounter = 0;
+                        } else {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        confirmButton.setText("Conferma");
+                        cancelButton.setText("Indietro");
+                        datePicker.setVisibility(View.INVISIBLE);
+                        timePicker.setVisibility(View.VISIBLE);
+                        isPressed = true;
+                        pressedCounter ++;
+                        if (pressedCounter > 1) {
+
+                            hour = timePicker.getCurrentHour();
+                            minute = timePicker.getCurrentMinute();
+                            day = datePicker.getDayOfMonth();
+                            month = datePicker.getMonth();
+                            year = datePicker.getYear();
+
+                            try {
+                                int result = setCalendar();
+
+                                if (result == DATE_ERROR) {
+                                    Toast.makeText(getApplicationContext(),
+                                            "La data non è valida", Toast.LENGTH_LONG)
+                                            .show();
+
+                                } else if (result == TIME_ERROR){
+                                    Toast.makeText(getApplicationContext(),
+                                            "L'orario non è valido", Toast.LENGTH_LONG)
+                                            .show();
+                                } else {
+                                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+
+                                    Toast.makeText(getApplicationContext(),
+                                            "Promemoria modificato correttamente", Toast.LENGTH_LONG)
+                                            .show();
+
+                                    alertDialog.dismiss();
+                                }
+                            } catch (ParseException e) {
+                                Toast.makeText(getApplicationContext(),
+                                        "Qualcosa è andato storto!\n Prova più tardi", Toast.LENGTH_LONG)
+                                        .show();
+                                alertDialog.dismiss();
+                            }
+                        }
+                    }
+                });
+                alertDialog.show();
+            }
+        });
+
+        removeRemainder.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View view) {
+                addRemainder.setVisibility(View.VISIBLE);
+                date.setVisibility(View.INVISIBLE);
+                modifyRemainder.setVisibility(View.INVISIBLE);
+                removeRemainder.setVisibility(View.INVISIBLE);
+                Toast.makeText(getApplicationContext(),
+                        "Promemoria eliminato", Toast.LENGTH_LONG)
+                        .show();
+                setRemainder = false;
             }
         });
     }
@@ -179,21 +394,27 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         }
                         bookmark.setLink(link);
                         bookmark.setCategory(categoryId);
+                        bookmark.setReminder(alarmStartTime);
                         boolean queryResult = db.addBookmark(bookmark);
 
-                        Log.i("IAHD", String.valueOf(queryResult));
-
                         if (queryResult) {
+                            if (setRemainder) {
+                                if (bookmark.getTitle() != null) {
+                                    setReminder(bookmark.getTitle());
+                                } else {
+                                    setReminder(link);
+
+                                }
+                            }
                             intent = new Intent(InsertLink.this, MainActivity.class);
                             loadingDialog.dismissLoading();
                             startActivity(intent);
                             finish();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Segnalibro già presente!", Toast.LENGTH_LONG)
-                                .show();
-                    }
-
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Segnalibro già presente!", Toast.LENGTH_LONG)
+                                    .show();
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(),
                                 "Errore!", Toast.LENGTH_LONG)
@@ -205,5 +426,49 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                     error.getMessage(), Toast.LENGTH_LONG)
                                     .show();
                         });
+    }
+
+    private void setReminder(String message) {
+        Intent intent = new Intent(InsertLink.this, AlarmReceiver.class);
+        final int notificationId = 0;
+        intent.putExtra("notificationId", notificationId);
+        intent.putExtra("message", message);
+
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(
+                InsertLink.this, 0, intent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        alarm.set(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
+
+    }
+
+    private int setCalendar() throws ParseException {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        Calendar startTime = Calendar.getInstance();
+        Date currentDate = dateFormat.parse(dateFormat.format(startTime.getTime()));
+        Date currentTime = timeFormat.parse(timeFormat.format(startTime.getTime()));
+        startTime.set(Calendar.HOUR_OF_DAY, hour);
+        startTime.set(Calendar.MINUTE, minute);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.DAY_OF_MONTH, day);
+        startTime.set(Calendar.MONTH, month);
+        startTime.set(Calendar.YEAR, year);
+
+        Date insertedDate = dateFormat.parse(dateFormat.format(startTime.getTime()));
+        Date insertedTime = timeFormat.parse(timeFormat.format(startTime.getTime()));
+
+        alarmStartTime = startTime.getTimeInMillis();
+
+        if (insertedDate.compareTo(currentDate) < 0) {
+            return DATE_ERROR;
+        } else if (insertedDate.compareTo(currentDate) == 0 && (insertedTime.compareTo(currentTime) < 0)) {
+            return TIME_ERROR;
+        } else {
+            return 0;
+        }
     }
 }

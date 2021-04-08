@@ -1,5 +1,7 @@
 package com.example.linkcontainer;
 
+import java.util.Date;
+
 public class Bookmark {
 
     String link;
@@ -7,14 +9,16 @@ public class Bookmark {
     String description;
     String image;
     String category;
+    long reminder;
 
-    public Bookmark(String link, String category,String title, String description, String image) {
+    public Bookmark(String link, String category,String title, String description, String image, 
+                    long reminder) {
         this.link = link;
         this.category = category;
         this.title = title;
         this.description = description;
         this.image = image;
-
+        this.reminder = reminder;
     }
 
     public Bookmark() {}
@@ -57,5 +61,13 @@ public class Bookmark {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public long getReminder() {
+        return reminder;
+    }
+
+    public void setReminder(long reminder) {
+        this.reminder = reminder;
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -105,7 +106,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             return true;
         }
-
     }
 
     public boolean addCategory(String category) {
@@ -192,12 +192,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     Bookmark bookmark = new Bookmark();
+                    bookmark.setId(cursor.getString(cursor.getColumnIndex(BOOKMARK_ID)));
                     bookmark.setLink(cursor.getString(cursor.getColumnIndex(KEY_LINK)));
                     bookmark.setTitle(cursor.getString(cursor.getColumnIndex(KEY_TITLE)));
                     bookmark.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
                     bookmark.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
                     bookmark.setCategory(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
-
+                    bookmark.setReminder(cursor.getLong(cursor.getColumnIndex(KEY_REMINDER)));
                     bookmarks.add(bookmark);
                 } while (cursor.moveToNext());
             }
@@ -213,7 +214,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{categoryName});
 
         if (cursor.moveToFirst())
-            return cursor.getString(cursor.getColumnIndex("category_id"));
+            return cursor.getString(cursor.getColumnIndex(CATEGORY_ID));
+        else
+            return null;
+    }
+
+    public String getCategoryById(String categoryId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select " + KEY_NAME + " from " + TABLE_CATEGORY +
+                        " where " + CATEGORY_ID + " = ?",
+                new String[]{categoryId});
+
+        if (cursor.moveToFirst())
+            return cursor.getString(cursor.getColumnIndex(KEY_NAME));
         else
             return null;
     }
@@ -233,11 +246,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     Bookmark bookmark = new Bookmark();
+                    bookmark.setId(cursor.getString(cursor.getColumnIndex(BOOKMARK_ID)));
                     bookmark.setLink(cursor.getString(cursor.getColumnIndex(KEY_LINK)));
                     bookmark.setTitle(cursor.getString(cursor.getColumnIndex(KEY_TITLE)));
                     bookmark.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
                     bookmark.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
                     bookmark.setCategory(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
+                    bookmark.setReminder(cursor.getLong(cursor.getColumnIndex(KEY_REMINDER)));
                     bookmarks.add(bookmark);
 
                 } while (cursor.moveToNext());
@@ -277,7 +292,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean updateCategory(String category, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor c = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
+        Cursor c = db.rawQuery("Select " + KEY_NAME + " from " + TABLE_CATEGORY +
                 " where " + KEY_NAME + " = ?", new String[]{category});
 
         if (c.moveToFirst()) {
@@ -292,4 +307,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public boolean updateBookmark(Bookmark bookmark) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_LINK, bookmark.getLink());
+        values.put(KEY_TITLE, bookmark.getTitle());
+        values.put(KEY_DESCRIPTION, bookmark.getDescription());
+        values.put(KEY_IMAGE, bookmark.getImage());
+        values.put(KEY_CATEGORY, bookmark.getCategory());
+        values.put(KEY_REMINDER, bookmark.getReminder());
+        
+        int result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
+                new String[] { String.valueOf(bookmark.getId()) });
+
+        return result == 1;
+    }
 }

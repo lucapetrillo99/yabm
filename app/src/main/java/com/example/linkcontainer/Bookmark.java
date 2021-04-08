@@ -1,9 +1,11 @@
 package com.example.linkcontainer;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Bookmark {
+public class Bookmark implements Serializable {
 
+    String id;
     String link;
     String title;
     String description;
@@ -11,8 +13,10 @@ public class Bookmark {
     String category;
     long reminder;
 
-    public Bookmark(String link, String category,String title, String description, String image, 
-                    long reminder) {
+    public Bookmark(String id, String link, String category,String title, String description,
+                    String image, long reminder) {
+
+        this.id = id;
         this.link = link;
         this.category = category;
         this.title = title;
@@ -69,5 +73,13 @@ public class Bookmark {
 
     public void setReminder(long reminder) {
         this.reminder = reminder;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

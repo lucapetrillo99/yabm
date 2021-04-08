@@ -294,7 +294,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                             "L'orario non è valido", Toast.LENGTH_LONG)
                                             .show();
                                 } else {
-                                    date.setText( DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+                                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
 
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria modificato correttamente", Toast.LENGTH_LONG)
@@ -329,7 +329,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 setRemainder = false;
             }
         });
-
     }
 
     private void confirmDialog(String link, String categoryId) {
@@ -393,10 +392,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         }
                         bookmark.setLink(link);
                         bookmark.setCategory(categoryId);
+                        bookmark.setReminder(alarmStartTime);
                         boolean queryResult = db.addBookmark(bookmark);
 
                         if (queryResult) {
-
                             if (setRemainder) {
                                 if (bookmark.getTitle() != null) {
                                     setReminder(bookmark.getTitle());
@@ -409,12 +408,11 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                             loadingDialog.dismissLoading();
                             startActivity(intent);
                             finish();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Segnalibro già presente!", Toast.LENGTH_LONG)
-                                .show();
-                    }
-
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Segnalibro già presente!", Toast.LENGTH_LONG)
+                                    .show();
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(),
                                 "Errore!", Toast.LENGTH_LONG)

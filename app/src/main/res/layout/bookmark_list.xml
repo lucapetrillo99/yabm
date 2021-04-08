@@ -88,6 +88,19 @@
                 android:adjustViewBounds="true">
             </ImageView>
 
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="50dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:visibility="invisible">
+            </CheckBox>
+
         </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 

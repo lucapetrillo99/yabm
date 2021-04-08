@@ -21,6 +21,7 @@ import android.view.SubMenu;
 import android.view.View;
 import androidx.appcompat.widget.SearchView;
 
+import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
@@ -48,7 +49,9 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     private ArrayList<String> categories;
     private ArrayList<Bookmark> allBookmarks;
     private ArrayList<Bookmark> archivedUrl;
+    private ArrayList<Bookmark> selectedBookmarks;
     public boolean isContextualMenuEnable = false;
+    int counter = 0;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
 
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
-        toolbarTitle = findViewById(R.id.title);
+        toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Tutti i segnalibri");
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.recycler_view);
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         bookmarks = new ArrayList<>(db.getAllBookmarks());
         archivedUrl = new ArrayList<>();
         allBookmarks = new ArrayList<>(bookmarks);
+        selectedBookmarks = new ArrayList<>();
         setAdapter();
         initSwipe((String) toolbar.getTitle());
 
@@ -122,26 +126,30 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.categories) {
-            activityIntent = new Intent(MainActivity.this, Categories.class);
-            startActivity(activityIntent);
+        switch (id) {
+            case R.id.categories:
+                activityIntent = new Intent(MainActivity.this, Categories.class);
+                startActivity(activityIntent);
+                break;
+            case R.id.search:
+                SearchView searchView = (SearchView) item.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
 
-        } else if (id == R.id.search) {
-            SearchView searchView = (SearchView) item.getActionView();
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    getFilter().filter(newText);
-                    return false;
-                }
-            });
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        getFilter().filter(newText);
+                        return false;
+                    }
+                });
+                break;
+            case R.id.delete:
+                recyclerAdapter.removeBookmark(selectedBookmarks);
+                removeContextualActionMode();
         }
-
         for (String category: categories) {
             if(item.getTitle() == category) {
                 if(item.getTitle().equals("Archiviati")) {
@@ -305,7 +313,35 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     @Override
     public boolean onLongClick(View v) {
         isContextualMenuEnable = true;
+        toolbar.getMenu().clear();
+        toolbar.inflateMenu(R.menu.contextual_menu);
+        recyclerAdapter.notifyDataSetChanged();
 
         return true;
+    }
+
+    public void makeSelection(View view, int position) {
+        if (((CheckBox)view).isChecked()) {
+            selectedBookmarks.add(bookmarks.get(position));
+            counter ++;
+        } else {
+            selectedBookmarks.remove(bookmarks.get(position));
+            counter --;
+        }
+        updateCounter();
+    }
+
+    public void updateCounter() {
+        toolbarTitle.setText(String.valueOf(counter));
+    }
+
+    private void removeContextualActionMode() {
+        isContextualMenuEnable = false;
+        toolbarTitle.setText("Tutti i segnalibri");
+        toolbar.getMenu().clear();
+        toolbar.inflateMenu(R.menu.menu);
+        counter = 0;
+        selectedBookmarks.clear();
+        recyclerAdapter.notifyDataSetChanged();
     }
 }

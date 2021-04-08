@@ -64,7 +64,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert_link);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        TextView toolbarTitle = findViewById(R.id.title);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Nuovo Segnalibro");
         setSupportActionBar(toolbar);
         db = DatabaseHandler.getInstance(getApplicationContext());

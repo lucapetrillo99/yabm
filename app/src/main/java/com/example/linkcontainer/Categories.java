@@ -38,7 +38,7 @@ public class Categories extends AppCompatActivity {
         setContentView(R.layout.activity_categories);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        TextView toolbarTitle = findViewById(R.id.title);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Categorie");
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.recycler_view);

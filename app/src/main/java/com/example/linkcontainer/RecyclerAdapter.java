@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,11 +46,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         this.mainActivity = mainActivity;
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
       TextView link, title, description;
       ImageView image;
       ImageButton shareButton;
       View view;
+      CheckBox checkbox;
 
         public MyViewHolder(final View itemView, MainActivity mainActivity) {
             super(itemView);
@@ -57,6 +59,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
             image = itemView.findViewById(R.id.image);
+            checkbox = itemView.findViewById(R.id.checkbox);
             shareButton = itemView.findViewById(R.id.share);
             view = itemView;
             view.setOnLongClickListener(mainActivity);
@@ -78,6 +81,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         String text = "<a href=" + bookmarks.get(position).getLink() + ">" + bookmarks.get(position).getLink()  +" </a>";
         holder.link.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
         holder.title.setText(bookmarks.get(position).getTitle());
+
+        if (mainActivity.isContextualMenuEnable) {
+            holder.checkbox.setVisibility(View.VISIBLE);
+            holder.image.setVisibility(View.INVISIBLE);
+        } else {
+            holder.checkbox.setVisibility(View.INVISIBLE);
+            holder.image.setVisibility(View.VISIBLE);
+        }
 
         if (description != null) {
             if (description.length() > DESCRIPTION_MAX_LENGTH) {
@@ -133,7 +144,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View v) {
                 db = DatabaseHandler.getInstance(mainActivity);
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
                 Intent intent = new Intent(mainActivity, InsertLink.class);
@@ -142,6 +153,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 mainActivity.startActivity(intent);
             }
         });
+
+        holder.checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.makeSelection(v, position);
+            }
+        });
+    }
+
+    public void removeBookmark(ArrayList<Bookmark> selectedBookmarks) {
+        for (Bookmark bookmark: selectedBookmarks) {
+            bookmarks.remove(bookmark);
+            notifyDataSetChanged();
+        }
     }
 
     @Override

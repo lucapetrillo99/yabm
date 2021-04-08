@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -36,6 +37,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     private static final int DESCRIPTION_MAX_LENGTH = 80;
     private ArrayList<Bookmark> bookmarks;
     private Context context;
+    private DatabaseHandler db;
 
     public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, Context context) {
         this.bookmarks = bookmarkList;
@@ -70,7 +72,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         String description = bookmarks.get(position).getDescription();
         String text = "<a href=" + bookmarks.get(position).getLink() + ">" + bookmarks.get(position).getLink()  +" </a>";
-//        holder.link.setText(bookmarks.get(position).getLink());
         holder.link.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
         holder.title.setText(bookmarks.get(position).getTitle());
 
@@ -138,6 +139,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             }
         });
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                db = DatabaseHandler.getInstance(context);
+                String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                Intent intent = new Intent(context, InsertLink.class);
+                intent.putExtra("bookmark", bookmarks.get(position));
+                intent.putExtra("category", category);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

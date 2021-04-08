@@ -38,25 +38,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText inputLink;
-    private Intent intent;
     private String category;
     private DatabaseHandler db;
     private Bookmark bookmark;
     private ArrayList<String> categories;
+    private Spinner dropdown;
     private boolean isPressed = false;
     private int pressedCounter = 0;
     private int year, month, day, hour, minute;
     private long alarmStartTime;
-    private boolean setRemainder = true;
+    private boolean setRemainder = false;
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
+    private boolean isModified = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         getSupportActionBar().setTitle("Nuovo segnalibro");
         db = DatabaseHandler.getInstance(getApplicationContext());
 
-        Spinner dropdown = findViewById(R.id.spinner1);
+        dropdown = findViewById(R.id.spinner1);
         dropdown.setOnItemSelectedListener(this);
         inputLink = findViewById(R.id.insert_link);
         ImageButton newCategory = findViewById(R.id.new_category);
@@ -77,17 +77,30 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         ImageButton modifyRemainder = findViewById(R.id.modify_reminder);
         ImageButton removeRemainder = findViewById(R.id.remove_reminder);
 
-
-        Intent intent = getIntent();
-        if(intent.getExtras() != null){
-            inputLink.setText(intent.getStringExtra("url"));
-        }
-
         categories = db.getCategories();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, categories);
         dropdown.setAdapter(adapter);
+
+        Intent intent = getIntent();
+        if(intent.getExtras() != null){
+            if (intent.getStringExtra("url") != null) {
+                inputLink.setText(intent.getStringExtra("url"));
+            } else if (intent.getSerializableExtra("bookmark") != null) {
+                isModified = true;
+                bookmark = (Bookmark) intent.getSerializableExtra("bookmark");
+                String category = intent.getStringExtra("category");
+                addRemainder.setVisibility(View.INVISIBLE);
+                date.setVisibility(View.VISIBLE);
+                modifyRemainder.setVisibility(View.VISIBLE);
+                removeRemainder.setVisibility(View.VISIBLE);
+
+                inputLink.setText(bookmark.getLink());
+                setSpinnerItem(category);
+                date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.reminder));
+            }
+        }
 
         FloatingActionButton fab = findViewById(R.id.insert_link_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -333,15 +346,36 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         });
     }
 
+    public void setSpinnerItem(String category) {
+        Log.i("ibfiud", "Categoria:" + category);
+        for (int i = 0; i <  dropdown.getCount(); i ++) {
+            Log.i("ibfiud", (String) dropdown.getItemAtPosition(i));
+            if(dropdown.getItemAtPosition(i).equals(category)) {
+                dropdown.setSelection(i);
+                return;
+            }
+        }
+    }
+
     private void confirmDialog(String link, String categoryId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Sei sicuro di voler inserire il link?")
-                .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    getUrlInformations(link, categoryId);
-                });
+        if (isModified) {
+            builder.setMessage("Sei sicuro di voler modificare il segnalibro?")
+                    .setCancelable(false)
+                    .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
+                    .setPositiveButton("Sì", (dialogInterface, i) -> {
+                        getUrlInformations(link, categoryId);
+                    });
+        } else {
+            builder.setMessage("Sei sicuro di voler inserire il segnalibro?")
+                    .setCancelable(false)
+                    .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
+                    .setPositiveButton("Sì", (dialogInterface, i) -> {
+                        getUrlInformations(link, categoryId);
+                    });
+        }
+
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -395,35 +429,21 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         bookmark.setLink(link);
                         bookmark.setCategory(categoryId);
                         bookmark.setReminder(alarmStartTime);
-                        boolean queryResult = db.addBookmark(bookmark);
 
-                        if (queryResult) {
-                            if (setRemainder) {
-                                if (bookmark.getTitle() != null) {
-                                    setReminder(bookmark.getTitle());
-                                } else {
-                                    setReminder(link);
+                        insertBookmark();
+                        loadingDialog.dismissLoading();
 
-                                }
-                            }
-                            intent = new Intent(InsertLink.this, MainActivity.class);
-                            loadingDialog.dismissLoading();
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Segnalibro già presente!", Toast.LENGTH_LONG)
-                                    .show();
-                        }
                     } else {
+                        loadingDialog.dismissLoading();
                         Toast.makeText(getApplicationContext(),
                                 "Errore!", Toast.LENGTH_LONG)
                                 .show();
                     }
                         },
                         error -> {
+                            loadingDialog.dismissLoading();
                             Toast.makeText(getApplicationContext(),
-                                    error.getMessage(), Toast.LENGTH_LONG)
+                                    "QUA!" + error.getMessage(), Toast.LENGTH_LONG)
                                     .show();
                         });
     }
@@ -469,6 +489,57 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             return TIME_ERROR;
         } else {
             return 0;
+        }
+    }
+
+    private void insertBookmark() {
+        boolean queryResult;
+
+        Intent intent;
+        if (isModified) {
+            queryResult = db.updateBookmark(bookmark);
+
+            if (queryResult) {
+                if (setRemainder) {
+                    if (bookmark.getTitle() != null) {
+                        setReminder(bookmark.getTitle());
+                    } else {
+                        setReminder(bookmark.getLink());
+                    }
+                }
+                Toast.makeText(getApplicationContext(),
+                        "Segnalibro modificato!", Toast.LENGTH_LONG)
+                        .show();
+                intent = new Intent(InsertLink.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "Impossibilie modificare il segnalibro!\nRiprova più tardi",
+                        Toast.LENGTH_LONG).show();
+            }
+        } else {
+            queryResult = db.addBookmark(bookmark);
+
+            if (queryResult) {
+                if (setRemainder) {
+                    if (bookmark.getTitle() != null) {
+                        setReminder(bookmark.getTitle());
+                    } else {
+                        setReminder(bookmark.getLink());
+                    }
+                }
+                Toast.makeText(getApplicationContext(),
+                        "Segnalibro aggiunto!", Toast.LENGTH_LONG)
+                        .show();
+                intent = new Intent(InsertLink.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "Segnalibro già presente!", Toast.LENGTH_LONG)
+                        .show();
+            }
         }
     }
 }

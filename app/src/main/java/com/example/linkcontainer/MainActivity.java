@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements Filterable {
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
-    private String url;
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private ArrayList<String> categories;

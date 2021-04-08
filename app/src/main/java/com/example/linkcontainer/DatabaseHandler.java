@@ -257,16 +257,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 } while (cursor.moveToNext());
             }
-
         }
         return bookmarks;
     }
 
-    public boolean deleteBookmark(String url) {
+    public boolean deleteBookmark(String link) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         return db.delete(TABLE_BOOKMARK, KEY_LINK + " = ?",
-                new String[]{url}) > 0;
+                new String[]{link}) > 0;
     }
 
     public boolean deleteCategory(String category) {
@@ -317,7 +316,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_IMAGE, bookmark.getImage());
         values.put(KEY_CATEGORY, bookmark.getCategory());
         values.put(KEY_REMINDER, bookmark.getReminder());
-        
+
         int result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
                 new String[] { String.valueOf(bookmark.getId()) });
 

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -22,35 +23,43 @@ import androidx.appcompat.widget.SearchView;
 
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MainActivity extends AppCompatActivity implements Filterable {
+public class MainActivity extends AppCompatActivity implements Filterable, View.OnLongClickListener {
     private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     private Toolbar toolbar;
+    private TextView toolbarTitle;
     private FloatingActionButton fab;
     private ArrayList<String> categories;
     private ArrayList<Bookmark> allBookmarks;
     private ArrayList<Bookmark> archivedUrl;
+    public boolean isContextualMenuEnable = false;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
+        toolbarTitle = findViewById(R.id.title);
+        toolbarTitle.setText("Tutti i segnalibri");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Tutte i segnalibri");
         recyclerView = findViewById(R.id.recycler_view);
 
         db = DatabaseHandler.getInstance(getApplicationContext());
@@ -221,7 +230,10 @@ public class MainActivity extends AppCompatActivity implements Filterable {
 
         builder.setMessage("Sei sicuro di voler eliminare il link?")
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
+                .setNegativeButton("No", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                    recyclerAdapter.notifyDataSetChanged();
+                })
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     if (db.deleteBookmark(url)) {
                         bookmarks.remove(position);
@@ -289,4 +301,11 @@ public class MainActivity extends AppCompatActivity implements Filterable {
             recyclerAdapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public boolean onLongClick(View v) {
+        isContextualMenuEnable = true;
+
+        return true;
+    }
 }

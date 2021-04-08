@@ -6,13 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".Categories">
 
-    <androidx.appcompat.widget.Toolbar
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/toolbar"
-        android:background="@color/design_default_color_primary_dark"
-        tools:ignore="MissingConstraints">
-    </androidx.appcompat.widget.Toolbar>
+    <include
+        layout="@layout/toolbar">
+    </include>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

@@ -1,5 +1,6 @@
 package com.example.linkcontainer;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -36,27 +37,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     private static final int DESCRIPTION_MAX_LENGTH = 80;
     private ArrayList<Bookmark> bookmarks;
-    private Context context;
+    private MainActivity mainActivity;
     private DatabaseHandler db;
 
-    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, Context context) {
+    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
-        this.context = context;
-
+        this.mainActivity = mainActivity;
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
       TextView link, title, description;
       ImageView image;
       ImageButton shareButton;
+      View view;
 
-        public MyViewHolder(final View view) {
-            super(view);
-            link = view.findViewById(R.id.url);
-            title = view.findViewById(R.id.title);
-            description = view.findViewById(R.id.description);
-            image = view.findViewById(R.id.image);
-            shareButton = view.findViewById(R.id.share);
+        public MyViewHolder(final View itemView, MainActivity mainActivity) {
+            super(itemView);
+            link = itemView.findViewById(R.id.url);
+            title = itemView.findViewById(R.id.title);
+            description = itemView.findViewById(R.id.description);
+            image = itemView.findViewById(R.id.image);
+            shareButton = itemView.findViewById(R.id.share);
+            view = itemView;
+            view.setOnLongClickListener(mainActivity);
         }
     }
 
@@ -64,7 +67,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.bookmark_list, parent, false);
-        return new MyViewHolder(itemView);
+
+        return new MyViewHolder(itemView, mainActivity);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -92,11 +96,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         holder.link.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(bookmarks.get(position).getLink()));
-            context.startActivity(i);
+            mainActivity.startActivity(i);
         });
 
         holder.image.setOnClickListener(v -> {
-                final Dialog nagDialog = new Dialog(context);
+                final Dialog nagDialog = new Dialog(mainActivity);
                 nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 nagDialog.setCancelable(true);
                 nagDialog.setContentView(R.layout.preview_image);
@@ -116,18 +120,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 nagDialog.getWindow().setLayout(1000, 600);
             });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(context, "Testo copiato negli appunti", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
         holder.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -135,19 +127,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
                 shareIntent.setType("text/plain");
-                context.startActivity(shareIntent);
+                mainActivity.startActivity(shareIntent);
             }
         });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                db = DatabaseHandler.getInstance(context);
+                db = DatabaseHandler.getInstance(mainActivity);
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(context, InsertLink.class);
+                Intent intent = new Intent(mainActivity, InsertLink.class);
                 intent.putExtra("bookmark", bookmarks.get(position));
                 intent.putExtra("category", category);
-                context.startActivity(intent);
+                mainActivity.startActivity(intent);
             }
         });
     }

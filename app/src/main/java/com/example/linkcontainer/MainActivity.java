@@ -141,12 +141,14 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 });
                 break;
             case R.id.delete:
-                recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
-                removeContextualActionMode();
+                if (counter > 0) {
+                    contextualModeDialog(DELETE_OPTION);
+                }
                 break;
             case R.id.archive:
-                recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
-                removeContextualActionMode();
+                if (counter > 0) {
+                    contextualModeDialog(ARCHIVE_OPTION);
+                }
                 break;
             case R.id.select_all:
                 if (!areAllSelected) {
@@ -376,5 +378,56 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         if (isContextualMenuEnable) {
             removeContextualActionMode();
         }
+    }
+
+    private void contextualModeDialog(int operation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String message;
+        String bookmarkQuestion;
+        String deletedQuestion;
+        String bookmarkMessage;
+
+        if (operation == DELETE_OPTION) {
+            message = "Sei sicuro di voler eliminare ";
+            if (counter > 1) {
+                bookmarkQuestion = " segnalibri?";
+                deletedQuestion = " eliminati!";
+                bookmarkMessage = "Segnalibri";
+            }
+             else {
+                bookmarkQuestion = " segnalibro?";
+                deletedQuestion = " eliminato!";
+                bookmarkMessage = "Segnalibro";
+            }
+        } else {
+            message = "Sei sicuro di voler archiviare ";
+            if (counter > 1) {
+                bookmarkQuestion = " segnalibri?";
+                deletedQuestion = " archiviati!";
+                bookmarkMessage = "Segnalibri";
+            } else {
+                bookmarkQuestion = " segnalibro?";
+                deletedQuestion = " archiviato!";
+                bookmarkMessage = "Segnalibro";
+
+            }
+        }
+        builder.setMessage(message + counter + bookmarkQuestion)
+                .setCancelable(false)
+                .setNegativeButton("No", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                })
+                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    if (operation == DELETE_OPTION) {
+                        recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
+                    } else {
+                        recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                    }
+                    Toast.makeText(getApplicationContext(), bookmarkMessage + deletedQuestion, Toast.LENGTH_LONG).show();
+                    removeContextualActionMode();
+
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

@@ -1,25 +1,18 @@
 package com.example.linkcontainer;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -70,7 +62,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.bookmark_list, parent, false);
-
+        db = DatabaseHandler.getInstance(mainActivity);
         return new MyViewHolder(itemView, mainActivity);
     }
 
@@ -145,7 +137,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db = DatabaseHandler.getInstance(mainActivity);
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
                 Intent intent = new Intent(mainActivity, InsertLink.class);
                 intent.putExtra("bookmark", bookmarks.get(position));
@@ -162,11 +153,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         });
     }
 
-    public void removeBookmark(ArrayList<Bookmark> selectedBookmarks) {
-        for (Bookmark bookmark: selectedBookmarks) {
-            bookmarks.remove(bookmark);
-            notifyDataSetChanged();
-        }
+    public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
+       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation);
+       updateBookmarks.execute();
+       notifyDataSetChanged();
     }
 
     @Override
@@ -177,4 +167,47 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             return bookmarks.size();
         }
     }
+
+    private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
+        private final int operation;
+        private final ArrayList<Bookmark> list;
+
+        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation) {
+            this.list = bookmarks;
+            this.operation = operation;
+        }
+
+        boolean result = true;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (operation == 1) {
+                for (Bookmark selectedBookmark : list) {
+                    bookmarks.remove(selectedBookmark);
+                    result = db.deleteBookmark(selectedBookmark.id);
+                    if (!result) {
+                        break;
+                    }
+                }
+            } else {
+                for (Bookmark selectedBookmark : list) {
+                    bookmarks.remove(selectedBookmark);
+                    result = db.addToArchive(selectedBookmark.id);
+                    if (!result) {
+                        break;
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (!result) {
+                Toast.makeText(mainActivity, "Impossibile eliminare i segnalibri!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

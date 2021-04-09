@@ -126,7 +126,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public void addToArchive(String url) {
+    public boolean addToArchive(String bookmarkId) {
+        int result = 0;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY + " where "
                 + KEY_NAME + " = ?", new String[]{"Archiviati"});
@@ -136,9 +137,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_CATEGORY, id);
 
-            db.update(TABLE_BOOKMARK, values, KEY_LINK + " = ?",
-                    new String[] { url });
+            result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
+                    new String[] { bookmarkId });
+
+        } else {
+            return false;
         }
+        return result == 1;
     }
 
     public ArrayList<String> getCategories() {
@@ -151,7 +156,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-
                 categories.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
             } while (cursor.moveToNext());
         }
@@ -261,11 +265,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return bookmarks;
     }
 
-    public boolean deleteBookmark(String link) {
+    public boolean deleteBookmark(String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        return db.delete(TABLE_BOOKMARK, KEY_LINK + " = ?",
-                new String[]{link}) > 0;
+        return db.delete(TABLE_BOOKMARK, BOOKMARK_ID + " = ?",
+                new String[]{id}) > 0;
     }
 
     public boolean deleteCategory(String category) {

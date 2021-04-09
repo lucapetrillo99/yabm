@@ -10,16 +10,16 @@
     </item>
 
     <item
-        android:id="@+id/share"
-        android:title="Share"
-        android:icon="@drawable/ic_share1"
+        android:id="@+id/archive"
+        android:title="Archive"
+        android:icon="@drawable/ic_archive"
         app:showAsAction="ifRoom">
     </item>
 
     <item
-        android:id="@+id/archive"
-        android:title="Archive"
-        android:icon="@drawable/ic_archive"
+        android:id="@+id/select_all"
+        android:title="Share"
+        android:icon="@drawable/ic_select_all"
         app:showAsAction="ifRoom">
     </item>
 

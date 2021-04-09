@@ -34,6 +34,8 @@ import java.util.Collection;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class MainActivity extends AppCompatActivity implements Filterable, View.OnLongClickListener {
+    private static final int DELETE_OPTION = 1;
+    private static final int ARCHIVE_OPTION = 2;
     private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     private ArrayList<Bookmark> selectedBookmarks;
     public boolean isContextualMenuEnable = false;
     private int counter = 0;
+    private String previousCategory;
+    public boolean areAllSelected = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -137,14 +141,26 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 });
                 break;
             case R.id.delete:
-                recyclerAdapter.updateBookmarks(selectedBookmarks, 1);
+                recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
                 removeContextualActionMode();
                 break;
             case R.id.archive:
-                recyclerAdapter.updateBookmarks(selectedBookmarks, 2);
+                recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
                 removeContextualActionMode();
                 break;
-            case R.id.share:
+            case R.id.select_all:
+                if (!areAllSelected) {
+                    areAllSelected = true;
+                    selectedBookmarks.addAll(bookmarks);
+                    counter = bookmarks.size();
+                } else {
+                    areAllSelected = false;
+                    selectedBookmarks.removeAll(bookmarks);
+                    counter = 0;
+                }
+                updateCounter();
+                recyclerAdapter.notifyDataSetChanged();
+
                 break;
         }
 
@@ -310,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
 
     @Override
     public boolean onLongClick(View v) {
+        previousCategory = toolbarTitle.getText().toString();
         isContextualMenuEnable = true;
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.contextual_menu);
@@ -335,9 +352,8 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
 
     @SuppressLint("SetTextI18n")
     private void removeContextualActionMode() {
-
         isContextualMenuEnable = false;
-        toolbarTitle.setText("Tutti i segnalibri");
+        toolbarTitle.setText(previousCategory);
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.menu);
         addFilterCategories();
@@ -348,13 +364,17 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     }
 
     private void addFilterCategories() {
-        toolbar.getMenu().addSubMenu(Menu.NONE, R.id.filter, Menu.NONE,"Menu1");
-
         SubMenu subMenu = toolbar.getMenu().findItem(R.id.filter).getSubMenu();
         subMenu.clear();
         for (int i = 0; i < categories.size(); i ++) {
             subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        if (isContextualMenuEnable) {
+            removeContextualActionMode();
+        }
     }
 }

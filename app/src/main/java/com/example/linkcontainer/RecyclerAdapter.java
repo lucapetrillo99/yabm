@@ -1,5 +1,6 @@
 package com.example.linkcontainer;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -151,6 +152,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 mainActivity.makeSelection(v, position);
             }
         });
+
+        if (mainActivity.areAllSelected) {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(true);
+            }
+        } else {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(false);
+            }
+        }
     }
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
@@ -168,6 +179,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
         private final int operation;
         private final ArrayList<Bookmark> list;
@@ -176,6 +188,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             this.list = bookmarks;
             this.operation = operation;
         }
+
 
         boolean result = true;
         @Override

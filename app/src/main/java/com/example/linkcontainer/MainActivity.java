@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.categories:
-                activityIntent = new Intent(MainActivity.this, Categories.class);
+            case R.id.settings:
+                activityIntent = new Intent(MainActivity.this, Settings.class);
                 startActivity(activityIntent);
                 break;
             case R.id.search:

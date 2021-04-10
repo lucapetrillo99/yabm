@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LinkContainer">
+        <activity android:name=".Settings"></activity>
         <activity android:name=".Categories" />
         <activity android:name=".InsertLink" />
         <activity android:name=".MainActivity">
@@ -27,6 +28,8 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
         <receiver android:name=".AlarmReceiver" />
     </application>
+
 </manifest>

@@ -36,6 +36,8 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class MainActivity extends AppCompatActivity implements Filterable, View.OnLongClickListener {
     private static final int DELETE_OPTION = 1;
     private static final int ARCHIVE_OPTION = 2;
+    private static final String CATEGORY = "category";
+    private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
     private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
@@ -57,16 +59,23 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = DatabaseHandler.getInstance(getApplicationContext());
+        SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
+        String result = settingsManager.getCategory();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Tutti i segnalibri");
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.recycler_view);
 
-        db = DatabaseHandler.getInstance(getApplicationContext());
+        if (result.equals(ALL_BOOKMARKS)) {
+            bookmarks = new ArrayList<>(db.getAllBookmarks());
+        } else {
+            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result));
+        }
+        toolbarTitle.setText(result);
         archiveUrl();
-        bookmarks = new ArrayList<>(db.getAllBookmarks());
+
         archivedUrl = new ArrayList<>();
         allBookmarks = new ArrayList<>(bookmarks);
         selectedBookmarks = new ArrayList<>();
@@ -178,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 bookmarks.clear();
                 bookmarks = db.getBookmarksByCategory((String)item.getTitle());
                 setAdapter();
-            } else if (item.getTitle().equals("Tutti i segnalibri")){
+            } else if (item.getTitle().equals(ALL_BOOKMARKS)){
                 toolbarTitle.setText(item.getTitle());
                 fab.setVisibility(View.VISIBLE);
                 archiveUrl();
@@ -284,10 +293,10 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     public void onResume() {
         super.onResume();
         archiveUrl();
-        bookmarks.clear();
-        bookmarks = db.getAllBookmarks();
-        initSwipe((String) toolbar.getTitle());
-        setAdapter();
+//        bookmarks.clear();
+//        bookmarks = db.getAllBookmarks();
+//        initSwipe((String) toolbar.getTitle());
+//        setAdapter();
     }
 
     @Override
@@ -382,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     private void addFilterCategories() {
         SubMenu subMenu = toolbar.getMenu().findItem(R.id.filter).getSubMenu();
         subMenu.clear();
+        subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
         for (int i = 0; i < categories.size(); i ++) {
             subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
         }

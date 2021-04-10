@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ public class FeedbackActivity extends AppCompatActivity {
     private EditText subject;
     private EditText text;
     private static final String MAIL = "lucapetrillo0@gmail.com";
+    private String finalInformation;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -39,6 +41,8 @@ public class FeedbackActivity extends AppCompatActivity {
             }
         });
 
+        getDeviceInformation();
+
         FloatingActionButton buttonSend = findViewById(R.id.send_mail);
 
         buttonSend.setOnClickListener(v -> {
@@ -53,11 +57,12 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     private void sendMail() {
+        getDeviceInformation();
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{MAIL});
         intent.putExtra(Intent.EXTRA_SUBJECT, subject.getText().toString());
-        intent.putExtra(Intent.EXTRA_TEXT, text.getText().toString());
+        intent.putExtra(Intent.EXTRA_TEXT, text.getText().toString() + "\n\n\n" + finalInformation);
         startActivity(Intent.createChooser(intent, "Scegli una applicazione"));
     }
 
@@ -70,5 +75,16 @@ public class FeedbackActivity extends AppCompatActivity {
                 .setPositiveButton("Sì", (dialogInterface, i) -> finish());
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void getDeviceInformation() {
+        String brand = Build.BRAND;
+        String model = Build.MODEL;
+        int sdk = Build.VERSION.SDK_INT;
+        String product = Build.PRODUCT;
+        String version = Build.VERSION.RELEASE;
+
+        finalInformation = brand + " " + model + " (" + product + ")" + " Android " + version + " "
+                + sdk;
     }
 }

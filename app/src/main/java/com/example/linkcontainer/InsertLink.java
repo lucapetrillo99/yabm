@@ -402,7 +402,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            Intent intent = new Intent(InsertLink.this, Categories.class);
+            Intent intent = new Intent(InsertLink.this, Settings.class);
             startActivity(intent);
             finish();
         return true;

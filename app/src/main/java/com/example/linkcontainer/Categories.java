@@ -64,9 +64,9 @@ public class Categories extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem categories = menu.findItem(R.id.categories);
+//        MenuItem categories = menu.findItem(R.id.categories);
         MenuItem filter = menu.findItem(R.id.filter);
-        categories.setVisible(false);
+//        categories.setVisible(false);
         filter.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }

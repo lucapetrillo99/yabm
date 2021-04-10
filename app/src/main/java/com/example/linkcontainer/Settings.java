@@ -140,7 +140,8 @@ public class Settings extends AppCompatActivity {
 
     private void feedbackClickListener() {
         sendFeedback.setOnClickListener(v -> {
-            // TODO FEEDBACK IMPLEMENTATION
+            Intent intent = new Intent(Settings.this, FeedbackActivity.class);
+            startActivity(intent);
         });
     }
 

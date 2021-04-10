@@ -1,23 +1,19 @@
 package com.example.linkcontainer;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -36,27 +31,31 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     private static final int DESCRIPTION_MAX_LENGTH = 80;
     private ArrayList<Bookmark> bookmarks;
-    private Context context;
+    private MainActivity mainActivity;
     private DatabaseHandler db;
 
-    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, Context context) {
+    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
-        this.context = context;
-
+        this.mainActivity = mainActivity;
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
       TextView link, title, description;
       ImageView image;
       ImageButton shareButton;
+      View view;
+      CheckBox checkbox;
 
-        public MyViewHolder(final View view) {
-            super(view);
-            link = view.findViewById(R.id.url);
-            title = view.findViewById(R.id.title);
-            description = view.findViewById(R.id.description);
-            image = view.findViewById(R.id.image);
-            shareButton = view.findViewById(R.id.share);
+        public MyViewHolder(final View itemView, MainActivity mainActivity) {
+            super(itemView);
+            link = itemView.findViewById(R.id.url);
+            title = itemView.findViewById(R.id.title);
+            description = itemView.findViewById(R.id.description);
+            image = itemView.findViewById(R.id.image);
+            checkbox = itemView.findViewById(R.id.checkbox);
+            shareButton = itemView.findViewById(R.id.share);
+            view = itemView;
+            view.setOnLongClickListener(mainActivity);
         }
     }
 
@@ -64,7 +63,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.bookmark_list, parent, false);
-        return new MyViewHolder(itemView);
+        db = DatabaseHandler.getInstance(mainActivity);
+        return new MyViewHolder(itemView, mainActivity);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -74,6 +74,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         String text = "<a href=" + bookmarks.get(position).getLink() + ">" + bookmarks.get(position).getLink()  +" </a>";
         holder.link.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
         holder.title.setText(bookmarks.get(position).getTitle());
+
+        if (mainActivity.isContextualMenuEnable) {
+            holder.checkbox.setVisibility(View.VISIBLE);
+            holder.image.setVisibility(View.INVISIBLE);
+        } else {
+            holder.checkbox.setVisibility(View.INVISIBLE);
+            holder.image.setVisibility(View.VISIBLE);
+        }
 
         if (description != null) {
             if (description.length() > DESCRIPTION_MAX_LENGTH) {
@@ -92,11 +100,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         holder.link.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(bookmarks.get(position).getLink()));
-            context.startActivity(i);
+            mainActivity.startActivity(i);
         });
 
         holder.image.setOnClickListener(v -> {
-                final Dialog nagDialog = new Dialog(context);
+                final Dialog nagDialog = new Dialog(mainActivity);
                 nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 nagDialog.setCancelable(true);
                 nagDialog.setContentView(R.layout.preview_image);
@@ -116,18 +124,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 nagDialog.getWindow().setLayout(1000, 600);
             });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(context, "Testo copiato negli appunti", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
         holder.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -135,21 +131,43 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
                 shareIntent.setType("text/plain");
-                context.startActivity(shareIntent);
+                mainActivity.startActivity(shareIntent);
             }
         });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
-                db = DatabaseHandler.getInstance(context);
+            public void onClick(View v) {
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(context, InsertLink.class);
+                Intent intent = new Intent(mainActivity, InsertLink.class);
                 intent.putExtra("bookmark", bookmarks.get(position));
                 intent.putExtra("category", category);
-                context.startActivity(intent);
+                mainActivity.startActivity(intent);
             }
         });
+
+        holder.checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.makeSelection(v, position);
+            }
+        });
+
+        if (mainActivity.areAllSelected) {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(true);
+            }
+        } else {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(false);
+            }
+        }
+    }
+
+    public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
+       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation);
+       updateBookmarks.execute();
+       notifyDataSetChanged();
     }
 
     @Override
@@ -160,4 +178,49 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             return bookmarks.size();
         }
     }
+
+    @SuppressLint("StaticFieldLeak")
+    private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
+        private final int operation;
+        private final ArrayList<Bookmark> list;
+
+        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation) {
+            this.list = bookmarks;
+            this.operation = operation;
+        }
+
+
+        boolean result = true;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (operation == 1) {
+                for (Bookmark selectedBookmark : list) {
+                    bookmarks.remove(selectedBookmark);
+                    result = db.deleteBookmark(selectedBookmark.id);
+                    if (!result) {
+                        break;
+                    }
+                }
+            } else {
+                for (Bookmark selectedBookmark : list) {
+                    bookmarks.remove(selectedBookmark);
+                    result = db.addToArchive(selectedBookmark.id);
+                    if (!result) {
+                        break;
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (!result) {
+                Toast.makeText(mainActivity, "Impossibile eliminare i segnalibri!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }

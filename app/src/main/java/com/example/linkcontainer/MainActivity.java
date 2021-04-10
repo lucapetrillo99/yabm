@@ -4,53 +4,64 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import androidx.appcompat.widget.SearchView;
 
+import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MainActivity extends AppCompatActivity implements Filterable {
+public class MainActivity extends AppCompatActivity implements Filterable, View.OnLongClickListener {
+    private static final int DELETE_OPTION = 1;
+    private static final int ARCHIVE_OPTION = 2;
     private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     private Toolbar toolbar;
+    private TextView toolbarTitle;
     private FloatingActionButton fab;
     private ArrayList<String> categories;
     private ArrayList<Bookmark> allBookmarks;
     private ArrayList<Bookmark> archivedUrl;
+    private ArrayList<Bookmark> selectedBookmarks;
+    public boolean isContextualMenuEnable = false;
+    private int counter = 0;
+    private String previousCategory;
+    public boolean areAllSelected = false;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
+        toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("Tutti i segnalibri");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Tutte i segnalibri");
         recyclerView = findViewById(R.id.recycler_view);
 
         db = DatabaseHandler.getInstance(getApplicationContext());
@@ -58,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements Filterable {
         bookmarks = new ArrayList<>(db.getAllBookmarks());
         archivedUrl = new ArrayList<>();
         allBookmarks = new ArrayList<>(bookmarks);
+        selectedBookmarks = new ArrayList<>();
+        categories = db.getAllCategories();
         setAdapter();
         initSwipe((String) toolbar.getTitle());
 
@@ -98,39 +111,59 @@ public class MainActivity extends AppCompatActivity implements Filterable {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem filterMenu = menu.findItem(R.id.filter);
-        SubMenu subMenu = filterMenu.getSubMenu();
-
-        subMenu.add(0, 0,  Menu.NONE, "Tutti i segnalibri");
-        categories = db.getAllCategories();
-        for (int i = 0; i < categories.size(); i ++) {
-            subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
-        }
+        addFilterCategories();
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.categories) {
-            activityIntent = new Intent(MainActivity.this, Categories.class);
-            startActivity(activityIntent);
+        switch (id) {
+            case R.id.categories:
+                activityIntent = new Intent(MainActivity.this, Categories.class);
+                startActivity(activityIntent);
+                break;
+            case R.id.search:
+                SearchView searchView = (SearchView) item.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
 
-        } else if (id == R.id.search) {
-            SearchView searchView = (SearchView) item.getActionView();
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        getFilter().filter(newText);
+                        return false;
+                    }
+                });
+                break;
+            case R.id.delete:
+                if (counter > 0) {
+                    contextualModeDialog(DELETE_OPTION);
                 }
+                break;
+            case R.id.archive:
+                if (counter > 0) {
+                    contextualModeDialog(ARCHIVE_OPTION);
+                }
+                break;
+            case R.id.select_all:
+                if (!areAllSelected) {
+                    areAllSelected = true;
+                    selectedBookmarks.addAll(bookmarks);
+                    counter = bookmarks.size();
+                } else {
+                    areAllSelected = false;
+                    selectedBookmarks.removeAll(bookmarks);
+                    counter = 0;
+                }
+                updateCounter();
+                recyclerAdapter.notifyDataSetChanged();
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    getFilter().filter(newText);
-                    return false;
-                }
-            });
+                break;
         }
 
         for (String category: categories) {
@@ -140,13 +173,13 @@ public class MainActivity extends AppCompatActivity implements Filterable {
                 } else {
                     fab.setVisibility(View.VISIBLE);
                 }
-                toolbar.setTitle(item.getTitle());
+                toolbarTitle.setText(item.getTitle());
                 archiveUrl();
                 bookmarks.clear();
                 bookmarks = db.getBookmarksByCategory((String)item.getTitle());
                 setAdapter();
             } else if (item.getTitle().equals("Tutti i segnalibri")){
-                toolbar.setTitle(item.getTitle());
+                toolbarTitle.setText(item.getTitle());
                 fab.setVisibility(View.VISIBLE);
                 archiveUrl();
                 bookmarks.clear();
@@ -193,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements Filterable {
 
                         break;
                     case ItemTouchHelper.RIGHT:
-                        confirmDialog(bookmarks.get(position).getLink(), position);
+                        confirmDialog(bookmarks.get(position).getId(), position);
                         break;
                 }
             }
@@ -216,14 +249,17 @@ public class MainActivity extends AppCompatActivity implements Filterable {
     }
 
 
-    private void confirmDialog(String url, int position) {
+    private void confirmDialog(String id, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage("Sei sicuro di voler eliminare il link?")
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
+                .setNegativeButton("No", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                    recyclerAdapter.notifyDataSetChanged();
+                })
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    if (db.deleteBookmark(url)) {
+                    if (db.deleteBookmark(id)) {
                         bookmarks.remove(position);
                         allBookmarks.remove(position);
                         recyclerAdapter.notifyItemRemoved(position);
@@ -240,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements Filterable {
         if (archivedUrl != null) {
             if (archivedUrl.size() > 0){
                 for (int i = 0; i < archivedUrl.size(); i++)
-                    db.addToArchive(archivedUrl.get(i).getLink());
+                    db.addToArchive(archivedUrl.get(i).getId());
             }
         }
     }
@@ -289,4 +325,125 @@ public class MainActivity extends AppCompatActivity implements Filterable {
             recyclerAdapter.notifyDataSetChanged();
         }
     };
+
+    @Override
+    public boolean onLongClick(View v) {
+        previousCategory = toolbarTitle.getText().toString();
+        isContextualMenuEnable = true;
+        toolbar.getMenu().clear();
+        toolbar.inflateMenu(R.menu.contextual_menu);
+        MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
+        if (previousCategory.equals("Archiviati")) {
+            archive.setVisible(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeContextualActionMode();
+            }
+        });
+        recyclerAdapter.notifyDataSetChanged();
+
+        return true;
+    }
+
+    public void makeSelection(View view, int position) {
+        if (((CheckBox)view).isChecked()) {
+            selectedBookmarks.add(bookmarks.get(position));
+            counter ++;
+        } else {
+            selectedBookmarks.remove(bookmarks.get(position));
+            counter --;
+        }
+        updateCounter();
+    }
+
+    public void updateCounter() {
+        toolbarTitle.setText(String.valueOf(counter));
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void removeContextualActionMode() {
+        isContextualMenuEnable = false;
+        areAllSelected = false;
+        toolbarTitle.setText(previousCategory);
+        toolbar.getMenu().clear();
+        toolbar.setNavigationIcon(null);
+        toolbar.inflateMenu(R.menu.menu);
+        addFilterCategories();
+        counter = 0;
+        selectedBookmarks.clear();
+        recyclerAdapter.notifyDataSetChanged();
+
+    }
+
+    private void addFilterCategories() {
+        SubMenu subMenu = toolbar.getMenu().findItem(R.id.filter).getSubMenu();
+        subMenu.clear();
+        for (int i = 0; i < categories.size(); i ++) {
+            subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isContextualMenuEnable) {
+            removeContextualActionMode();
+        } else {
+            finish();
+        }
+    }
+
+    private void contextualModeDialog(int operation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String message;
+        String bookmarkQuestion;
+        String deletedQuestion;
+        String bookmarkMessage;
+
+        if (operation == DELETE_OPTION) {
+            message = "Sei sicuro di voler eliminare ";
+            if (counter > 1) {
+                bookmarkQuestion = " segnalibri?";
+                deletedQuestion = " eliminati!";
+                bookmarkMessage = "Segnalibri";
+            }
+             else {
+                bookmarkQuestion = " segnalibro?";
+                deletedQuestion = " eliminato!";
+                bookmarkMessage = "Segnalibro";
+            }
+        } else {
+            message = "Sei sicuro di voler archiviare ";
+            if (counter > 1) {
+                bookmarkQuestion = " segnalibri?";
+                deletedQuestion = " archiviati!";
+                bookmarkMessage = "Segnalibri";
+            } else {
+                bookmarkQuestion = " segnalibro?";
+                deletedQuestion = " archiviato!";
+                bookmarkMessage = "Segnalibro";
+
+            }
+        }
+        builder.setMessage(message + counter + bookmarkQuestion)
+                .setCancelable(false)
+                .setNegativeButton("No", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                })
+                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    if (operation == DELETE_OPTION) {
+                        recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
+                    } else {
+                        recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                    }
+                    Toast.makeText(getApplicationContext(), bookmarkMessage + deletedQuestion, Toast.LENGTH_LONG).show();
+                    removeContextualActionMode();
+
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

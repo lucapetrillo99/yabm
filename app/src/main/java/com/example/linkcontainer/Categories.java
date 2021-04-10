@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -22,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Categories extends AppCompatActivity {
-    private Toolbar toolbar;
     private RecyclerView recyclerView;
     private CategoriesAdapter categoriesAdapter;
     private DatabaseHandler db;
@@ -30,14 +31,16 @@ public class Categories extends AppCompatActivity {
     private ArrayList<String> allCategories;
     private FloatingActionButton insertCategory;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_categories);
 
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("Categorie");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Default");
         recyclerView = findViewById(R.id.recycler_view);
         insertCategory = findViewById(R.id.add_button);
 

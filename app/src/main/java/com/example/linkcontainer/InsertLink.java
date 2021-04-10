@@ -52,19 +52,21 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private boolean isPressed = false;
     private int pressedCounter = 0;
     private int year, month, day, hour, minute;
-    private long alarmStartTime;
+    private long alarmStartTime = -1;
     private boolean setRemainder = false;
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
     private boolean isModified = false;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert_link);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("Nuovo Segnalibro");
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Nuovo segnalibro");
         db = DatabaseHandler.getInstance(getApplicationContext());
 
         dropdown = findViewById(R.id.spinner1);

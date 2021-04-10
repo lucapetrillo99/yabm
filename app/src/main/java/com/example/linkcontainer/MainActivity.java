@@ -332,6 +332,18 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         isContextualMenuEnable = true;
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.contextual_menu);
+        MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
+        if (previousCategory.equals("Archiviati")) {
+            archive.setVisible(false);
+        }
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeContextualActionMode();
+            }
+        });
         recyclerAdapter.notifyDataSetChanged();
 
         return true;
@@ -355,8 +367,10 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     @SuppressLint("SetTextI18n")
     private void removeContextualActionMode() {
         isContextualMenuEnable = false;
+        areAllSelected = false;
         toolbarTitle.setText(previousCategory);
         toolbar.getMenu().clear();
+        toolbar.setNavigationIcon(null);
         toolbar.inflateMenu(R.menu.menu);
         addFilterCategories();
         counter = 0;
@@ -377,6 +391,8 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     public void onBackPressed() {
         if (isContextualMenuEnable) {
             removeContextualActionMode();
+        } else {
+            finish();
         }
     }
 

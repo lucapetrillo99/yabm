@@ -9,19 +9,18 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import static java.security.AccessController.getContext;
-
 public class Settings extends AppCompatActivity {
+    private static final String THEME = "theme";
+    private static final String CATEGORY = "category";
     private Toolbar toolbar;
     private TextView toolbarTitle;
     private RelativeLayout themeSetting;
@@ -53,7 +52,9 @@ public class Settings extends AppCompatActivity {
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { }
+            public void onClick(View v) {
+                finish();
+            }
         });
 
         setApplicationInfo();
@@ -78,12 +79,15 @@ public class Settings extends AppCompatActivity {
 
     private void themeClickListener() {
         themeSetting.setOnClickListener(v -> {
-            int checkedItem = 0;
+            SettingsManager themeManager = new SettingsManager(getApplicationContext(), THEME);
+            int checkedItem = themeManager.getTheme();
 
             String[] themes = { "Default", "Chiaro", "Scuro" };
             AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
-            builder.setSingleChoiceItems(themes, checkedItem, (dialog, which) -> {
-                // TODO THEME IMPLEMENTATION
+            builder.setSingleChoiceItems(themes, checkedItem, (dialog, choice) -> {
+                if (themeManager.getTheme() != choice) {
+                    themeManager.setTheme(choice);
+                }
                 dialog.dismiss();
             });
             builder.show();
@@ -99,17 +103,25 @@ public class Settings extends AppCompatActivity {
 
     private void starListClickListener() {
         startList.setOnClickListener(v -> {
+            SettingsManager categoryManager = new SettingsManager(getApplicationContext(), CATEGORY);
             int checkedItem = 0;
-
+            String category = categoryManager.getCategory();
             ArrayList<String> list = new ArrayList<>();
             list.add("Tutti i segnalibri");
             list.addAll(db.getAllCategories());
 
-            String[] categories = list.toArray(new String[0]);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).equals(category)) {
+                    checkedItem = i;
+                }
+            }
 
+            String[] categories = list.toArray(new String[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
-            builder.setSingleChoiceItems(categories, checkedItem, (dialog, which) -> {
-                // TODO THEME IMPLEMENTATION
+            builder.setSingleChoiceItems(categories, checkedItem, (dialog, choice) -> {
+                if (!categoryManager.getCategory().equals(categories[choice])) {
+                    categoryManager.setCategory(categories[choice]);
+                }
                 dialog.dismiss();
             });
             builder.show();
@@ -127,7 +139,7 @@ public class Settings extends AppCompatActivity {
     }
 
     private void feedbackClickListener() {
-        categoriesSetting.setOnClickListener(v -> {
+        sendFeedback.setOnClickListener(v -> {
             // TODO FEEDBACK IMPLEMENTATION
         });
     }

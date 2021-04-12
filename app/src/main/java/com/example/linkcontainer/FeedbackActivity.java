@@ -41,8 +41,6 @@ public class FeedbackActivity extends AppCompatActivity {
             }
         });
 
-        getDeviceInformation();
-
         FloatingActionButton buttonSend = findViewById(R.id.send_mail);
 
         buttonSend.setOnClickListener(v -> {
@@ -86,5 +84,15 @@ public class FeedbackActivity extends AppCompatActivity {
 
         finalInformation = brand + " " + model + " (" + product + ")" + " Android " + version + " "
                 + sdk;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (subject.getText().toString().isEmpty() && text.getText().toString().isEmpty()) {
+            finish();
+
+        } else {
+            confirmDialog();
+        }
     }
 }

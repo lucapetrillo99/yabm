@@ -26,7 +26,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
 
     private static final int DESCRIPTION_MAX_LENGTH = 80;
@@ -109,19 +108,20 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 nagDialog.setCancelable(true);
                 nagDialog.setContentView(R.layout.preview_image);
                 ImageView ivPreview = nagDialog.findViewById(R.id.preview_image);
+                ImageButton closeButton = nagDialog.findViewById(R.id.close_button);
                 Picasso.get().load(bookmarks.get(position).getImage())
                         .fit()
-                        .centerCrop()
+                        .centerInside()
                         .into(ivPreview);
 
-                ivPreview.setOnClickListener(new View.OnClickListener() {
+            closeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View arg0) {
                         nagDialog.dismiss();
                     }
                 });
                 nagDialog.show();
-                nagDialog.getWindow().setLayout(1000, 600);
+                nagDialog.getWindow().setLayout(1000, 1200);
             });
 
         holder.shareButton.setOnClickListener(new View.OnClickListener() {

@@ -67,6 +67,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Nuovo Segnalibro");
         setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());
 
         dropdown = findViewById(R.id.spinner1);
@@ -110,6 +111,17 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 inputLink.setText(bookmark.getLink());
             }
         }
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (inputLink.getText().toString().isEmpty()) {
+                    finish();
+                } else {
+                    exitConfirmDialog();
+                }
+            }
+        });
 
         FloatingActionButton fab = findViewById(R.id.insert_link_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -547,6 +559,29 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         "Segnalibro già presente!", Toast.LENGTH_LONG)
                         .show();
             }
+        }
+    }
+
+    private void exitConfirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno perssi")
+                .setCancelable(false)
+                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
+                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    finish();
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (inputLink.getText().toString().isEmpty()) {
+            finish();
+        } else {
+            exitConfirmDialog();
         }
     }
 }

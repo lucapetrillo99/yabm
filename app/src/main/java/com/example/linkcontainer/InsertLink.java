@@ -93,14 +93,21 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 isModified = true;
                 bookmark = (Bookmark) intent.getSerializableExtra("bookmark");
                 String category = intent.getStringExtra("category");
-                addRemainder.setVisibility(View.INVISIBLE);
-                date.setVisibility(View.VISIBLE);
-                modifyRemainder.setVisibility(View.VISIBLE);
-                removeRemainder.setVisibility(View.VISIBLE);
+                if (bookmark.getReminder() != -1) {
+                    addRemainder.setVisibility(View.INVISIBLE);
+                    date.setVisibility(View.VISIBLE);
+                    modifyRemainder.setVisibility(View.VISIBLE);
+                    removeRemainder.setVisibility(View.VISIBLE);
 
+                    setSpinnerItem(category);
+                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.reminder));
+                } else {
+                    addRemainder.setVisibility(View.VISIBLE);
+                    date.setVisibility(View.INVISIBLE);
+                    modifyRemainder.setVisibility(View.INVISIBLE);
+                    removeRemainder.setVisibility(View.INVISIBLE);
+                }
                 inputLink.setText(bookmark.getLink());
-                setSpinnerItem(category);
-                date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.reminder));
             }
         }
 

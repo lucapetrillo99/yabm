@@ -20,8 +20,6 @@ import android.view.View;
 import androidx.appcompat.widget.SearchView;
 
 import android.widget.CheckBox;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +27,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MainActivity extends AppCompatActivity implements Filterable, View.OnLongClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private static final int DELETE_OPTION = 1;
     private static final int ARCHIVE_OPTION = 2;
     private static final String CATEGORY = "category";
@@ -48,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     private TextView noBookmarks;
     private FloatingActionButton fab;
     private ArrayList<String> categories;
-    private ArrayList<Bookmark> allBookmarks;
     private ArrayList<Bookmark> archivedUrl;
     private ArrayList<Bookmark> selectedBookmarks;
     private int counter = 0;
@@ -80,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         archiveUrl();
 
         archivedUrl = new ArrayList<>();
-        allBookmarks = new ArrayList<>(bookmarks);
         selectedBookmarks = new ArrayList<>();
         categories = db.getAllCategories();
         setAdapter();
@@ -148,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        getFilter().filter(newText);
+                        recyclerAdapter.getFilter().filter(newText);
                         return false;
                     }
                 });
@@ -275,7 +270,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     if (db.deleteBookmark(id)) {
                         bookmarks.remove(position);
-                        allBookmarks.remove(position);
                         recyclerAdapter.notifyItemRemoved(position);
                         Toast.makeText(getApplicationContext(), "Segnalibro eliminato", Toast.LENGTH_LONG).show();
                     } else {
@@ -302,41 +296,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         setBookmarksLabel();
     }
 
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
 
-    Filter filter = new Filter(){
-        @Override
-        protected Filter.FilterResults performFiltering(CharSequence constraint) {
-            ArrayList<Bookmark> filteredBookmarks = new ArrayList<>();
-
-            if (constraint.toString().isEmpty()) {
-                filteredBookmarks.addAll(allBookmarks);
-            } else {
-                for (Bookmark bookmark: allBookmarks) {
-                    if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
-                    || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
-                    || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        filteredBookmarks.add(bookmark);
-                    }
-                }
-            }
-
-            FilterResults filterResults = new FilterResults();
-            filterResults.values = filteredBookmarks;
-
-            return filterResults;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            bookmarks.clear();
-            bookmarks.addAll((Collection<? extends Bookmark>) results.values);
-            recyclerAdapter.notifyDataSetChanged();
-        }
-    };
 
     @Override
     public boolean onLongClick(View v) {

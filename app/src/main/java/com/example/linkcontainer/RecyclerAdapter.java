@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,17 +27,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
 
     private static final int DESCRIPTION_MAX_LENGTH = 80;
     private ArrayList<Bookmark> bookmarks;
     private MainActivity mainActivity;
     private DatabaseHandler db;
+    private ArrayList<Bookmark> allBookmarks;
 
     public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
         this.mainActivity = mainActivity;
+        this.allBookmarks = new ArrayList<>(bookmarks);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -225,5 +230,41 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             }
         }
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter = new Filter(){
+        @Override
+        protected Filter.FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<Bookmark> filteredBookmarks = new ArrayList<>();
+
+            if (constraint.toString().isEmpty()) {
+                filteredBookmarks.addAll(allBookmarks);
+            } else {
+                for (Bookmark bookmark: allBookmarks) {
+                    if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                            || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
+                            || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        filteredBookmarks.add(bookmark);
+                    }
+                }
+            }
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredBookmarks;
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            bookmarks.clear();
+            bookmarks.addAll((Collection<? extends Bookmark>) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
 }

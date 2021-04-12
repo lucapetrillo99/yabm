@@ -202,7 +202,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         isPressed = true;
                         pressedCounter ++;
                         if (pressedCounter > 1) {
-
                             hour = timePicker.getCurrentHour();
                             minute = timePicker.getCurrentMinute();
 
@@ -234,7 +233,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria impostato correttamente", Toast.LENGTH_LONG)
                                             .show();
-
+                                    setRemainder = true;
                                     alertDialog.dismiss();
                                 }
                             } catch (ParseException e) {
@@ -298,7 +297,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         isPressed = true;
                         pressedCounter ++;
                         if (pressedCounter > 1) {
-
                             hour = timePicker.getCurrentHour();
                             minute = timePicker.getCurrentMinute();
                             day = datePicker.getDayOfMonth();
@@ -323,7 +321,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria modificato correttamente", Toast.LENGTH_LONG)
                                             .show();
-
+                                    setRemainder = true;
                                     alertDialog.dismiss();
                                 }
                             } catch (ParseException e) {

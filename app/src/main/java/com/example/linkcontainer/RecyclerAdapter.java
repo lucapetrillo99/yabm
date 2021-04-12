@@ -135,16 +135,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             }
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(mainActivity, InsertLink.class);
-                intent.putExtra("bookmark", bookmarks.get(position));
-                intent.putExtra("category", category);
-                mainActivity.startActivity(intent);
-            }
-        });
+        if (!mainActivity.isArchiveModeEnabled) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                    Intent intent = new Intent(mainActivity, InsertLink.class);
+                    intent.putExtra("bookmark", bookmarks.get(position));
+                    intent.putExtra("category", category);
+                    mainActivity.startActivity(intent);
+                }
+            });
+        }
+
 
         holder.checkbox.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -38,4 +38,15 @@
             tools:ignore="MissingConstraints" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/no_bookmarks"
+        android:layout_marginTop="80dp"
+        android:text="Al momento non hai segnalibri"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:visibility="invisible" />
+
 </RelativeLayout>

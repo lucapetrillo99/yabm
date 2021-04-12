@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -45,14 +46,15 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     private RecyclerAdapter recyclerAdapter;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private TextView noBookmarks;
     private FloatingActionButton fab;
     private ArrayList<String> categories;
     private ArrayList<Bookmark> allBookmarks;
     private ArrayList<Bookmark> archivedUrl;
     private ArrayList<Bookmark> selectedBookmarks;
-    public boolean isContextualMenuEnable = false;
     private int counter = 0;
     private String previousCategory;
+    public boolean isContextualMenuEnable = false;
     public boolean areAllSelected = false;
 
     @SuppressLint("SetTextI18n")
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
+        noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
         if (result.equals(ALL_BOOKMARKS)) {
@@ -99,9 +102,11 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
             startActivity(activityIntent);
         });
 
+        setBookmarksLabel();
     }
 
     private void setAdapter() {
+        setBookmarksLabel();
         recyclerAdapter = new RecyclerAdapter(bookmarks, MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -128,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         switch (id) {
             case R.id.settings:
                 activityIntent = new Intent(MainActivity.this, Settings.class);
@@ -171,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 }
                 updateCounter();
                 recyclerAdapter.notifyDataSetChanged();
-
                 break;
         }
 
@@ -290,13 +293,11 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
         }
     }
 
+    @SuppressLint("SetTextI18n")
     public void onResume() {
         super.onResume();
         archiveUrl();
-//        bookmarks.clear();
-//        bookmarks = db.getAllBookmarks();
-//        initSwipe((String) toolbar.getTitle());
-//        setAdapter();
+        setBookmarksLabel();
     }
 
     @Override
@@ -435,7 +436,6 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                 bookmarkQuestion = " segnalibro?";
                 deletedQuestion = " archiviato!";
                 bookmarkMessage = "Segnalibro";
-
             }
         }
         builder.setMessage(message + counter + bookmarkQuestion)
@@ -449,11 +449,20 @@ public class MainActivity extends AppCompatActivity implements Filterable, View.
                     } else {
                         recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
                     }
-                    Toast.makeText(getApplicationContext(), bookmarkMessage + deletedQuestion, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), bookmarkMessage + deletedQuestion,
+                            Toast.LENGTH_LONG).show();
                     removeContextualActionMode();
 
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void setBookmarksLabel(){
+        if (bookmarks.size() == 0) {
+            noBookmarks.setVisibility(View.VISIBLE);
+        } else {
+            noBookmarks.setVisibility(View.INVISIBLE);
+        }
     }
 }

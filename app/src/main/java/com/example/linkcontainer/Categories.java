@@ -41,6 +41,15 @@ public class Categories extends AppCompatActivity {
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Categorie");
         setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         recyclerView = findViewById(R.id.recycler_view);
         insertCategory = findViewById(R.id.add_button);
 
@@ -64,9 +73,7 @@ public class Categories extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-//        MenuItem categories = menu.findItem(R.id.categories);
         MenuItem filter = menu.findItem(R.id.filter);
-//        categories.setVisible(false);
         filter.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }

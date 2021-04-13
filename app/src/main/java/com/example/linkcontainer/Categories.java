@@ -80,19 +80,27 @@ public class Categories extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+        int id = item.getItemId();
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                categoriesAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
+        if (id == R.id.settings) {
+            Intent activityIntent = new Intent(Categories.this, Settings.class);
+            startActivity(activityIntent);
+        } else {
+            SearchView searchView = (SearchView) item.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    categoriesAdapter.getFilter().filter(newText);
+                    return false;
+                }
+            });
+        }
+
         return true;
     }
 

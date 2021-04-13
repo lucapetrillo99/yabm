@@ -2,11 +2,17 @@ package com.example.linkcontainer;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +23,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -106,6 +113,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(bookmarks.get(position).getLink()));
             mainActivity.startActivity(i);
+        });
+
+        holder.link.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDialog(position);
+                return false;
+            }
         });
 
         holder.image.setOnClickListener(v -> {
@@ -279,5 +294,40 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             notifyDataSetChanged();
         }
     };
+
+    public void showDialog(int position) {
+        final Dialog dialog = new Dialog(mainActivity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet);
+
+        TextView openLink = dialog.findViewById(R.id.open_link);
+        TextView copyLink = dialog.findViewById(R.id.copy_link);
+
+        openLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(bookmarks.get(position).getLink()));
+                mainActivity.startActivity(i);
+            }
+        });
+
+        copyLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(mainActivity.getApplicationContext(), "Link copiato negli appunti", Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+    }
 
 }

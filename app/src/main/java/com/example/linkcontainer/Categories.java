@@ -115,6 +115,18 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                     contextualModeDialog();
                 }
                 break;
+            case R.id.select_all:
+                if (!areAllSelected) {
+                    areAllSelected = true;
+                    selectedCategories.addAll(categories);
+                    counter = categories.size() - 1;
+                } else {
+                    areAllSelected = false;
+                    selectedCategories.removeAll(categories);
+                    counter = 0;
+                }
+                updateCounter();
+                categoriesAdapter.notifyDataSetChanged();
         }
         return true;
     }
@@ -150,17 +162,19 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
     @Override
     public boolean onLongClick(View v) {
-        isContextualMenuEnable = true;
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.contextual_menu);
-        MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
-        MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
-        archive.setVisible(false);
-        unarchive.setVisible(false);
-        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+        if (categories.size() > 1) {
+            isContextualMenuEnable = true;
+            toolbar.getMenu().clear();
+            toolbar.inflateMenu(R.menu.contextual_menu);
+            MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
+            MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
+            archive.setVisible(false);
+            unarchive.setVisible(false);
+            toolbar.setNavigationIcon(R.drawable.ic_back_button);
+            toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
+            categoriesAdapter.notifyDataSetChanged();
+        }
 
-        toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
-        categoriesAdapter.notifyDataSetChanged();
         return false;
     }
 

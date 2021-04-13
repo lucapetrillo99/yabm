@@ -34,6 +34,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_IMAGE = "image";
     private static final String KEY_CATEGORY = "category";
     private static final String KEY_REMINDER = "reminder";
+    private static final String KEY_PREVIOUS_CATEGORY = "prev_category";
+
 
     // TAGS Table - column names
     private static final String KEY_NAME = "name";
@@ -48,7 +50,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
-            + KEY_REMINDER + " LONG,"
+            + KEY_REMINDER + " LONG,"  + KEY_PREVIOUS_CATEGORY + " TEXT,"
             + KEY_CATEGORY + " INTEGER ," + " FOREIGN KEY ("+KEY_CATEGORY+")" +
             " REFERENCES "+TABLE_CATEGORY+"("+CATEGORY_ID+"));";
 
@@ -126,8 +128,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public boolean addToArchive(String bookmarkId) {
-        int result = 0;
+    public boolean addToArchive(String bookmarkId, String category) {
+        int result;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY + " where "
                 + KEY_NAME + " = ?", new String[]{"Archiviati"});
@@ -136,7 +138,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String id = c.getString(c.getColumnIndex(CATEGORY_ID));
             ContentValues values = new ContentValues();
             values.put(KEY_CATEGORY, id);
+            values.put(KEY_PREVIOUS_CATEGORY, category);
+            result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
+                    new String[] { bookmarkId });
 
+        } else {
+            return false;
+        }
+        return result == 1;
+    }
+
+    public boolean removeFromArchive(String bookmarkId) {
+        int result;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery("Select " + KEY_PREVIOUS_CATEGORY + " from " + TABLE_BOOKMARK + " where "
+                + BOOKMARK_ID + " = ?", new String[]{bookmarkId});
+
+        if (c.moveToFirst()) {
+            String id = c.getString(c.getColumnIndex(KEY_PREVIOUS_CATEGORY));
+            ContentValues values = new ContentValues();
+            values.put(KEY_CATEGORY, id);
+            values.put(KEY_PREVIOUS_CATEGORY, (byte[]) null);
             result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
                     new String[] { bookmarkId });
 

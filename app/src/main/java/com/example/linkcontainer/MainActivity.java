@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -33,6 +34,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private static final int DELETE_OPTION = 1;
     private static final int ARCHIVE_OPTION = 2;
+    private static final int UNARCHIVE_OPTION = 3;
     private static final String CATEGORY = "category";
     private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
     private Intent activityIntent;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private FloatingActionButton fab;
     private ArrayList<String> categories;
     private ArrayList<Bookmark> archivedUrl;
+    private ArrayList<Bookmark> removedFromArchive;
     private ArrayList<Bookmark> selectedBookmarks;
     private int counter = 0;
     private String previousCategory;
@@ -74,12 +77,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         toolbarTitle.setText(result);
         archiveUrl();
+        unarchiveBookmark();
 
         archivedUrl = new ArrayList<>();
         selectedBookmarks = new ArrayList<>();
+        removedFromArchive = new ArrayList<>();
         categories = db.getAllCategories();
         setAdapter();
-        initSwipe((String) toolbar.getTitle());
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -102,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     private void setAdapter() {
         setBookmarksLabel();
+        initSwipe();
         recyclerAdapter = new RecyclerAdapter(bookmarks, MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -158,6 +163,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     contextualModeDialog(ARCHIVE_OPTION);
                 }
                 break;
+            case R.id.unarchive:
+                if (counter > 0) {
+                    contextualModeDialog(UNARCHIVE_OPTION);
+                }
+                break;
             case R.id.select_all:
                 if (!areAllSelected) {
                     areAllSelected = true;
@@ -184,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 }
                 toolbarTitle.setText(item.getTitle());
                 archiveUrl();
+                unarchiveBookmark();
                 bookmarks.clear();
                 bookmarks = db.getBookmarksByCategory((String)item.getTitle());
                 setAdapter();
@@ -191,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 toolbarTitle.setText(item.getTitle());
                 fab.setVisibility(View.VISIBLE);
                 archiveUrl();
+                unarchiveBookmark();
                 bookmarks.clear();
                 bookmarks = db.getAllBookmarks();
                 setAdapter();
@@ -199,14 +211,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         return true;
     }
 
-    public void initSwipe(String pageCategory) {
-        int swapDirs = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+    public void initSwipe() {
 
-        if (pageCategory.equals("Archiviati")) {
-            swapDirs = ItemTouchHelper.RIGHT;
-        }
-
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, swapDirs) {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -220,19 +227,31 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
+                        if(toolbarTitle.getText().toString().equals("Archiviati")) {
+                            Bookmark disarchivedBookmark = bookmarks.get(position);
+                            removedFromArchive.add(bookmarks.get(position));
+                            bookmarks.remove(position);
+                            recyclerAdapter.notifyItemRemoved(position);
 
-                        Bookmark archivedBookmark = bookmarks.get(position);
-                        archivedUrl.add(bookmarks.get(position));
-                        bookmarks.remove(position);
-                        recyclerAdapter.notifyItemRemoved(position);
+                            Snackbar.make(recyclerView, disarchivedBookmark.getLink() + " rimosso dall'archivio.", Snackbar.LENGTH_LONG)
+                                    .setAction("Annulla", v -> {
+                                        removedFromArchive.remove(removedFromArchive.lastIndexOf(disarchivedBookmark));
+                                        bookmarks.add(position, disarchivedBookmark);
+                                        recyclerAdapter.notifyItemInserted(position);
+                                    }).show();
+                        } else {
+                            Bookmark archivedBookmark = bookmarks.get(position);
+                            archivedUrl.add(bookmarks.get(position));
+                            bookmarks.remove(position);
+                            recyclerAdapter.notifyItemRemoved(position);
 
-                        Snackbar.make(recyclerView, archivedBookmark.getLink() + " archiviato.", Snackbar.LENGTH_LONG)
-                                .setAction("Annulla", v -> {
-                                    archivedUrl.remove(archivedUrl.lastIndexOf(archivedBookmark));
-                                    bookmarks.add(position, archivedBookmark);
-                                    recyclerAdapter.notifyItemInserted(position);
-                                }).show();
-
+                            Snackbar.make(recyclerView, archivedBookmark.getLink() + " archiviato.", Snackbar.LENGTH_LONG)
+                                    .setAction("Annulla", v -> {
+                                        archivedUrl.remove(archivedUrl.lastIndexOf(archivedBookmark));
+                                        bookmarks.add(position, archivedBookmark);
+                                        recyclerAdapter.notifyItemInserted(position);
+                                    }).show();
+                        }
                         break;
                     case ItemTouchHelper.RIGHT:
                         confirmDialog(bookmarks.get(position).getId(), position);
@@ -242,15 +261,27 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                        .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                        .addSwipeRightActionIcon(R.drawable.ic_actions)
-                        .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                        .addSwipeLeftActionIcon(R.drawable.ic_archive)
-                        .create()
-                        .decorate();
+                if(toolbarTitle.getText().toString().equals("Archiviati")) {
+                    new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
+                            .addSwipeRightActionIcon(R.drawable.ic_actions)
+                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
+                            .addSwipeLeftActionIcon(R.drawable.ic_unarchive)
+                            .create()
+                            .decorate();
 
+                } else {
+                    new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
+                            .addSwipeRightActionIcon(R.drawable.ic_actions)
+                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
+                            .addSwipeLeftActionIcon(R.drawable.ic_archive)
+                            .create()
+                            .decorate();
+
+                }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
@@ -284,7 +315,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if (archivedUrl != null) {
             if (archivedUrl.size() > 0){
                 for (int i = 0; i < archivedUrl.size(); i++)
-                    db.addToArchive(archivedUrl.get(i).getId());
+                    db.addToArchive(archivedUrl.get(i).getId(), archivedUrl.get(i).getCategory());
+            }
+        }
+    }
+
+    public void unarchiveBookmark() {
+        if (removedFromArchive != null) {
+            if (removedFromArchive.size() > 0){
+                for (int i = 0; i < removedFromArchive.size(); i++)
+                    db.removeFromArchive(removedFromArchive.get(i).getId());
             }
         }
     }
@@ -296,8 +336,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         setBookmarksLabel();
     }
 
-
-
     @Override
     public boolean onLongClick(View v) {
         previousCategory = toolbarTitle.getText().toString();
@@ -305,8 +343,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.contextual_menu);
         MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
+        MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
         if (previousCategory.equals("Archiviati")) {
             archive.setVisible(false);
+            unarchive.setVisible(true);
         }
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
@@ -371,47 +411,69 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     private void contextualModeDialog(int operation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String message;
-        String bookmarkQuestion;
-        String deletedQuestion;
-        String bookmarkMessage;
+        String message = null;
+        String bookmarkQuestion = null;
+        String deletedQuestion = null;
+        String bookmarkMessage = null;
 
-        if (operation == DELETE_OPTION) {
-            message = "Sei sicuro di voler eliminare ";
-            if (counter > 1) {
-                bookmarkQuestion = " segnalibri?";
-                deletedQuestion = " eliminati!";
-                bookmarkMessage = "Segnalibri";
-            }
-             else {
-                bookmarkQuestion = " segnalibro?";
-                deletedQuestion = " eliminato!";
-                bookmarkMessage = "Segnalibro";
-            }
-        } else {
-            message = "Sei sicuro di voler archiviare ";
-            if (counter > 1) {
-                bookmarkQuestion = " segnalibri?";
-                deletedQuestion = " archiviati!";
-                bookmarkMessage = "Segnalibri";
-            } else {
-                bookmarkQuestion = " segnalibro?";
-                deletedQuestion = " archiviato!";
-                bookmarkMessage = "Segnalibro";
-            }
+        switch (operation) {
+            case DELETE_OPTION:
+                message = "Sei sicuro di voler eliminare ";
+                if (counter > 1) {
+                    bookmarkQuestion = " segnalibri?";
+                    deletedQuestion = " eliminati!";
+                    bookmarkMessage = "Segnalibri";
+                } else {
+                    bookmarkQuestion = " segnalibro?";
+                    deletedQuestion = " eliminato!";
+                    bookmarkMessage = "Segnalibro";
+                }
+                break;
+            case ARCHIVE_OPTION:
+                message = "Sei sicuro di voler archiviare ";
+                if (counter > 1) {
+                    bookmarkQuestion = " segnalibri?";
+                    deletedQuestion = " archiviati!";
+                    bookmarkMessage = "Segnalibri";
+                } else {
+                    bookmarkQuestion = " segnalibro?";
+                    deletedQuestion = " archiviato!";
+                    bookmarkMessage = "Segnalibro";
+                }
+                break;
+            case UNARCHIVE_OPTION:
+                message = "Sei sicuro di voler ripristinare ";
+                if (counter > 1) {
+                    bookmarkQuestion = " segnalibri?";
+                    deletedQuestion = " ripristinati!";
+                    bookmarkMessage = "Segnalibri";
+                } else {
+                    bookmarkQuestion = " segnalibro?";
+                    deletedQuestion = " ripristinato!";
+                    bookmarkMessage = "Segnalibro";
+                }
+                break;
         }
+        String finalBookmarkMessage = bookmarkMessage;
+        String finalDeletedQuestion = deletedQuestion;
         builder.setMessage(message + counter + bookmarkQuestion)
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> {
                     dialogInterface.cancel();
                 })
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    if (operation == DELETE_OPTION) {
-                        recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
-                    } else {
-                        recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                    switch (operation) {
+                        case DELETE_OPTION:
+                            recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
+                            break;
+                        case ARCHIVE_OPTION:
+                            recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                            break;
+                        case UNARCHIVE_OPTION:
+                            recyclerAdapter.updateBookmarks(selectedBookmarks, UNARCHIVE_OPTION);
+                            break;
                     }
-                    Toast.makeText(getApplicationContext(), bookmarkMessage + deletedQuestion,
+                    Toast.makeText(getApplicationContext(), finalBookmarkMessage + finalDeletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();
 

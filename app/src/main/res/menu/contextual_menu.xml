@@ -13,6 +13,13 @@
         android:id="@+id/archive"
         android:title="Archive"
         android:icon="@drawable/ic_archive"
+        app:showAsAction="always">
+    </item>
+
+    <item
+        android:id="@+id/unarchive"
+        android:title="Unarchive"
+        android:icon="@drawable/ic_unarchive"
         app:showAsAction="ifRoom">
     </item>
 

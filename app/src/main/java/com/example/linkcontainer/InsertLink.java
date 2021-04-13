@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -144,33 +145,43 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             }
         });
 
-        newCategory.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-                LayoutInflater layoutInflater = LayoutInflater.from(InsertLink.this);
-                View dialogView = layoutInflater.inflate(R.layout.dialog, null);
-                androidx.appcompat.app.AlertDialog.Builder alertbox = new androidx.appcompat.app.AlertDialog.Builder(InsertLink.this);
-                alertbox.setView(dialogView);
-                final EditText input = dialogView.findViewById(R.id.user_input);
-                TextView title = dialogView.findViewById(R.id.title);
-                title.setText("Nuova categoria");
-                input.setHint("Inserisci la categoria");
+        newCategory.setOnClickListener((View.OnClickListener) view -> {
+            LayoutInflater layoutInflater = LayoutInflater.from(InsertLink.this);
+            View dialogView = layoutInflater.inflate(R.layout.dialog, null);
+            final AlertDialog dialog = new AlertDialog.Builder(InsertLink.this)
+                    .setView(dialogView)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton("Annulla", null)
+                    .setCancelable(false)
+                    .create();
 
-                alertbox.setPositiveButton("OK", (arg0, arg1) -> {
-                    boolean result = db.addCategory(input.getText().toString());
-                    if (result) {
-                        categories.add(input.getText().toString());
-                        Toast.makeText(InsertLink.this,
-                                "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
+            final EditText input = dialogView.findViewById(R.id.user_input);
+            TextView title = dialogView.findViewById(R.id.title);
+            title.setText("Nuova categoria");
+            input.setHint("Inserisci la categoria");
+
+            dialog.setOnShowListener((DialogInterface.OnShowListener) dialogInterface -> {
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(view1 -> {
+                    if (!input.getText().toString().isEmpty()) {
+                        boolean result = db.addCategory(input.getText().toString());
+                        if (result) {
+                            categories.add(input.getText().toString());
+                            dialog.dismiss();
+                            Toast.makeText(InsertLink.this,
+                                    "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(InsertLink.this,
+                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(InsertLink.this,
-                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                                "Inserisci il nome di una categoria!", Toast.LENGTH_LONG).show();
                     }
                 });
-                alertbox.setNegativeButton("Annulla", (arg0, arg1) -> { });
-                alertbox.show();
-            }
+
+            });
+            dialog.show();
         });
 
         addRemainder.setOnClickListener(new View.OnClickListener() {

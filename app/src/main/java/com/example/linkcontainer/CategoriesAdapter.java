@@ -10,13 +10,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -137,12 +140,18 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public void createDialog(int position, boolean isModify, View v) {
         LayoutInflater layoutInflater = LayoutInflater.from(v.getRootView().getContext());
         View dialogView = layoutInflater.inflate(R.layout.dialog, null);
-        AlertDialog.Builder alertbox = new AlertDialog.Builder(v.getRootView().getContext());
-        alertbox.setView(dialogView);
+        final AlertDialog dialog = new AlertDialog.Builder(categoriesActivity)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton("Annulla", null)
+                .setCancelable(false)
+                .create();
+
         final EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
+
         if (isModify) {
-           title.setText("Modifica categoria");
+            title.setText("Modifica categoria");
         } else {
             title.setText("Nuova categoria");
         }
@@ -154,36 +163,49 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             input.setHint("Inserisci la categoria");
         }
 
-        alertbox.setPositiveButton("OK", (arg0, arg1) -> {
-            if (isModify) {
-                String category = input.getText().toString();
-                if (!categories.get(position).equals(category)) {
+        dialog.setOnShowListener((DialogInterface.OnShowListener) dialogInterface -> {
 
-                    String id = db.getCategoryId(categories.get(position));
-                    boolean result = db.updateCategory(category, id);
-                    if (result) {
-                        Toast.makeText(v.getRootView().getContext(),
-                                "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
-                        categories.set(position, category);
-                        notifyItemChanged(position);
+            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                if (isModify) {
+                    String category = input.getText().toString();
+                    if (!categories.get(position).equals(category)) {
+
+                        String id = db.getCategoryId(categories.get(position));
+                        boolean result = db.updateCategory(category, id);
+                        if (result) {
+                            Toast.makeText(v.getRootView().getContext(),
+                                    "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                            categories.set(position, category);
+                            notifyItemChanged(position);
+                        } else {
+                            Toast.makeText(v.getRootView().getContext(),
+                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(v.getRootView().getContext(),
                                 "Categoria già esistente!", Toast.LENGTH_LONG).show();
                     }
-                }
-            } else {
-                boolean result = db.addCategory(input.getText().toString());
-                if (result) {
-                    categories.add(input.getText().toString());
-                    notifyItemInserted(getItemCount());
                 } else {
-                    Toast.makeText(v.getRootView().getContext(),
-                            "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                    if (!input.getText().toString().isEmpty()) {
+                        boolean result = db.addCategory(input.getText().toString());
+                        if (result) {
+                            dialog.dismiss();
+                            categories.add(input.getText().toString());
+                            notifyItemInserted(getItemCount());
+                        } else {
+                            Toast.makeText(v.getRootView().getContext(),
+                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Inserisci il nome di una categoria!", Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
+            });
         });
-        alertbox.setNegativeButton("Annulla", (arg0, arg1) -> { });
-        alertbox.show();
+        dialog.show();
     }
 
     @SuppressLint("StaticFieldLeak")

@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -33,24 +35,29 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         implements Filterable {
     private ArrayList<String> categories;
     private DatabaseHandler db;
-    private Context context;
+    private Categories categoriesActivity;
     private ArrayList<String> allCategories;
 
-    public CategoriesAdapter(ArrayList<String> categories, Context context) {
+    public CategoriesAdapter(ArrayList<String> categories, Categories categoriesActivity) {
         this.categories = categories;
-        this.context = context;
+        this.categoriesActivity = categoriesActivity;
         this.allCategories = new ArrayList<>(categories);
     }
 
     static class categoriesViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageButton modify, delete;
+        CheckBox checkbox;
+        View view;
 
-        public categoriesViewHolder(@NonNull View itemView) {
+        public categoriesViewHolder(@NonNull View itemView, Categories categoriesActivity) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             modify = itemView.findViewById(R.id.modify);
             delete = itemView.findViewById(R.id.delete);
+            checkbox = itemView.findViewById(R.id.checkbox);
+            view = itemView;
+            view.setOnLongClickListener(categoriesActivity);
         }
     }
 
@@ -59,24 +66,62 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public categoriesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.category_list, parent, false);
-        return new categoriesViewHolder(view);
+        return new categoriesViewHolder(view, categoriesActivity);
     }
 
     @Override
     public void onBindViewHolder(@NonNull categoriesViewHolder holder, int position){
 
-        db = DatabaseHandler.getInstance(context);
+        db = DatabaseHandler.getInstance(categoriesActivity);
 
         holder.title.setText(categories.get(position));
 
-        if (categories.get(position).equals("Default")) {
-            holder.modify.setVisibility(INVISIBLE);
+        if (categoriesActivity.isContextualMenuEnable) {
+            if (categories.get(position).equals("Default")) {
+                holder.checkbox.setVisibility(View.INVISIBLE);
+            }else {
+                holder.checkbox.setVisibility(View.VISIBLE);
+            }
+            holder.modify.setVisibility(View.INVISIBLE);
             holder.delete.setVisibility(INVISIBLE);
+
+        } else {
+            holder.checkbox.setVisibility(View.INVISIBLE);
+            if (categories.get(position).equals("Default")) {
+                holder.modify.setVisibility(INVISIBLE);
+                holder.delete.setVisibility(INVISIBLE);
+            } else {
+                holder.modify.setVisibility(View.VISIBLE);
+                holder.delete.setVisibility(View.VISIBLE);
+            }
         }
 
         holder.modify.setOnClickListener(v -> createDialog(position, true, v));
 
         holder.delete.setOnClickListener(v -> confirmDialog(position, v));
+
+        holder.checkbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                categoriesActivity.makeSelection(v, position);
+            }
+        });
+
+        if (categoriesActivity.areAllSelected) {
+            for (int i = 0; i < categories.size(); i++) {
+                holder.checkbox.setChecked(true);
+            }
+        } else {
+            for (int i = 0; i < categories.size(); i++) {
+                holder.checkbox.setChecked(false);
+            }
+        }
+    }
+
+    public void updateCategories(ArrayList<String> selectedCategories) {
+        UpdateCategories updateCategories = new UpdateCategories(selectedCategories);
+        updateCategories.execute();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -139,6 +184,38 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         });
         alertbox.setNegativeButton("Annulla", (arg0, arg1) -> { });
         alertbox.show();
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class UpdateCategories extends AsyncTask<Void, Void, Void> {
+        private final ArrayList<String> list;
+
+        public UpdateCategories(ArrayList<String> categories) {
+            this.list = categories;
+        }
+
+        boolean result = true;
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            for (String selectedCategory : list) {
+                categories.remove(selectedCategory);
+                result = db.deleteCategory(selectedCategory);
+                if (!result) {
+                    break;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (!result) {
+                Toast.makeText(categoriesActivity, "Impossibile eliminare i segnalibri!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void confirmDialog(int position, View v) {

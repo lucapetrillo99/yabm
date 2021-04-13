@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -152,8 +153,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 }
             });
         }
-
-
+        
         holder.checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -201,22 +201,35 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         boolean result = true;
         @Override
         protected Void doInBackground(Void... voids) {
-            if (operation == 1) {
-                for (Bookmark selectedBookmark : list) {
-                    bookmarks.remove(selectedBookmark);
-                    result = db.deleteBookmark(selectedBookmark.id);
-                    if (!result) {
-                        break;
+
+            switch (operation) {
+                case 1:
+                    for (Bookmark selectedBookmark : list) {
+                        bookmarks.remove(selectedBookmark);
+                        result = db.deleteBookmark(selectedBookmark.id);
+                        if (!result) {
+                            break;
+                        }
                     }
-                }
-            } else {
-                for (Bookmark selectedBookmark : list) {
-                    bookmarks.remove(selectedBookmark);
-                    result = db.addToArchive(selectedBookmark.id);
-                    if (!result) {
-                        break;
+                    break;
+                case 2:
+                    for (Bookmark selectedBookmark : list) {
+                        bookmarks.remove(selectedBookmark);
+                        result = db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
+                        if (!result) {
+                            break;
+                        }
                     }
-                }
+                    break;
+                case 3:
+                    for (Bookmark selectedBookmark : list) {
+                        bookmarks.remove(selectedBookmark);
+                        result = db.removeFromArchive(selectedBookmark.getId());
+                        if (!result) {
+                            break;
+                        }
+                    }
+                    break;
             }
             return null;
         }

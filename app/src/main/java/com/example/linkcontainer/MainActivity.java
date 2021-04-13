@@ -24,6 +24,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         setSupportActionBar(toolbar);
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
+
 
         if (result.equals(ALL_BOOKMARKS)) {
             bookmarks = new ArrayList<>(db.getAllBookmarks());

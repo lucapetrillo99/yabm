@@ -299,16 +299,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
                 datePicker.setMinDate(calendar.getTimeInMillis());
                 timePicker.setIs24HourView(true);
-                if (bookmark != null) {
-                    if (bookmark.getReminder() != -1 && bookmark.getReminder() != 0) {
-                        datePicker.setMinDate(bookmark.getReminder());
-                    } else {
-                        datePicker.setMinDate(calendar.getTimeInMillis());
-                    }
-                } else {
-                    datePicker.setMinDate(calendar.getTimeInMillis());
-                }
-
                 alert.setView(dialogView);
 
                 final AlertDialog alertDialog = alert.create();

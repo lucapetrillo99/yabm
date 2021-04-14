@@ -34,6 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     removeRemainder.setVisibility(View.VISIBLE);
 
                     setSpinnerItem(category);
-                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.reminder));
+                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.getReminder()));
                 } else {
                     addRemainder.setVisibility(View.VISIBLE);
                     date.setVisibility(View.INVISIBLE);
@@ -188,6 +189,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
                 final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
                 DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
@@ -195,6 +197,8 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Button cancelButton = dialogView.findViewById(R.id.previous);
                 Button confirmButton = dialogView.findViewById(R.id.next);
 
+                datePicker.setMinDate(calendar.getTimeInMillis());
+                timePicker.setIs24HourView(true);
                 alert.setView(dialogView);
 
                 final AlertDialog alertDialog = alert.create();
@@ -277,6 +281,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
                 final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
                 View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
                 DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
@@ -286,9 +291,20 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
                 pressedCounter = 0;
 
-                datePicker.updateDate(year, month, day);
-                timePicker.setHour(hour);
-                timePicker.setMinute(minute);
+                datePicker.setMinDate(calendar.getTimeInMillis());
+                timePicker.setIs24HourView(true);
+
+                Log.i("OIFJOIS", String.valueOf(bookmark.getReminder()));
+
+                if (bookmark != null) {
+                    if (bookmark.getReminder() != -1 && bookmark.getReminder() != 0) {
+                        datePicker.setMinDate(bookmark.getReminder());
+                    } else {
+                        datePicker.setMinDate(calendar.getTimeInMillis());
+                    }
+                } else {
+                    datePicker.setMinDate(calendar.getTimeInMillis());
+                }
 
                 alert.setView(dialogView);
 
@@ -377,9 +393,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     }
 
     public void setSpinnerItem(String category) {
-        Log.i("ibfiud", "Categoria:" + category);
         for (int i = 0; i <  dropdown.getCount(); i ++) {
-            Log.i("ibfiud", (String) dropdown.getItemAtPosition(i));
             if(dropdown.getItemAtPosition(i).equals(category)) {
                 dropdown.setSelection(i);
                 return;
@@ -595,4 +609,5 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             exitConfirmDialog();
         }
     }
+
 }

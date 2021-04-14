@@ -499,11 +499,12 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         });
     }
 
-    private void setReminder(String message) {
+    private void setReminder(String message, String link) {
         Intent intent = new Intent(InsertLink.this, AlarmReceiver.class);
         final int notificationId = 0;
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("message", message);
+        intent.putExtra("link", link);
 
         PendingIntent alarmIntent = PendingIntent.getBroadcast(
                 InsertLink.this, 0, intent,
@@ -551,9 +552,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             if (queryResult) {
                 if (setRemainder) {
                     if (bookmark.getTitle() != null) {
-                        setReminder(bookmark.getTitle());
+                        setReminder(bookmark.getTitle(), bookmark.getLink());
                     } else {
-                        setReminder(bookmark.getLink());
+                        setReminder(bookmark.getLink(), bookmark.getLink());
                     }
                 }
                 Toast.makeText(getApplicationContext(),
@@ -572,9 +573,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             if (queryResult) {
                 if (setRemainder) {
                     if (bookmark.getTitle() != null) {
-                        setReminder(bookmark.getTitle());
+                        setReminder(bookmark.getTitle(), bookmark.getLink());
                     } else {
-                        setReminder(bookmark.getLink());
+                        setReminder(bookmark.getLink(), bookmark.getLink());
                     }
                 }
                 Toast.makeText(getApplicationContext(),

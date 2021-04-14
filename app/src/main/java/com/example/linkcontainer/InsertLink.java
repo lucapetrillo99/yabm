@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private EditText inputLink;
+    private TextView reminderTitle;
     private String category;
     private DatabaseHandler db;
     private Bookmark bookmark;
@@ -75,6 +76,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         dropdown = findViewById(R.id.spinner1);
         dropdown.setOnItemSelectedListener(this);
         inputLink = findViewById(R.id.insert_link);
+        reminderTitle = findViewById(R.id.reminder_title);
         ImageButton newCategory = findViewById(R.id.new_category);
         bookmark = new Bookmark();
         ImageButton addRemainder = findViewById(R.id.add_remainder);
@@ -103,6 +105,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     removeRemainder.setVisibility(View.VISIBLE);
 
                     setSpinnerItem(category);
+                    reminderTitle.setText("Promemoria inserito:");
                     date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.getReminder()));
                 } else {
                     addRemainder.setVisibility(View.VISIBLE);
@@ -256,6 +259,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                     modifyRemainder.setVisibility(View.VISIBLE);
                                     removeRemainder.setVisibility(View.VISIBLE);
 
+                                    reminderTitle.setText("Promemoria inserito:");
                                     date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria impostato correttamente", Toast.LENGTH_LONG)
@@ -356,7 +360,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                             .show();
                                 } else {
                                     date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
-
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria modificato correttamente", Toast.LENGTH_LONG)
                                             .show();
@@ -384,6 +387,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 date.setVisibility(View.INVISIBLE);
                 modifyRemainder.setVisibility(View.INVISIBLE);
                 removeRemainder.setVisibility(View.INVISIBLE);
+                reminderTitle.setText("Inserisci un promemoria:");
                 Toast.makeText(getApplicationContext(),
                         "Promemoria eliminato", Toast.LENGTH_LONG)
                         .show();

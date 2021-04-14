@@ -56,11 +56,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public boolean isContextualMenuEnable = false;
     public boolean areAllSelected = false;
     public boolean isArchiveModeEnabled = false;
+    private static final int SYSTEM_DEFAULT = 0;
+    private static final int LIGHT_MODE = 1;
+    private static final int NIGHT_MODE = 2;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setAppTheme();
         db = DatabaseHandler.getInstance(getApplicationContext());
         SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
         String result = settingsManager.getCategory();
@@ -489,6 +493,21 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             noBookmarks.setVisibility(View.VISIBLE);
         } else {
             noBookmarks.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void setAppTheme() {
+        SettingsManager settingsManager = new SettingsManager(this, "theme");
+        int theme = settingsManager.getTheme();
+        switch (theme) {
+            case NIGHT_MODE:
+                settingsManager.setTheme(NIGHT_MODE);
+                break;
+            case LIGHT_MODE:
+                settingsManager.setTheme(LIGHT_MODE);
+                break;
+            default:
+                settingsManager.setTheme(SYSTEM_DEFAULT);
         }
     }
 }

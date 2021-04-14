@@ -45,7 +45,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private EditText inputLink;
+    private EditText inputLink, title;
     private TextView reminderTitle;
     private String category;
     private DatabaseHandler db;
@@ -76,6 +76,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         dropdown = findViewById(R.id.spinner1);
         dropdown.setOnItemSelectedListener(this);
         inputLink = findViewById(R.id.insert_link);
+        title = findViewById(R.id.insert_title);
         reminderTitle = findViewById(R.id.reminder_title);
         ImageButton newCategory = findViewById(R.id.new_category);
         bookmark = new Bookmark();
@@ -114,6 +115,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     removeRemainder.setVisibility(View.INVISIBLE);
                 }
                 inputLink.setText(bookmark.getLink());
+                title.setText(bookmark.getTitle());
             }
         }
 
@@ -297,9 +299,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
                 datePicker.setMinDate(calendar.getTimeInMillis());
                 timePicker.setIs24HourView(true);
-
-                Log.i("OIFJOIS", String.valueOf(bookmark.getReminder()));
-
                 if (bookmark != null) {
                     if (bookmark.getReminder() != -1 && bookmark.getReminder() != 0) {
                         datePicker.setMinDate(bookmark.getReminder());
@@ -468,11 +467,15 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                             if (element.attr("property").equals("og:image")) {
                                 bookmark.setImage(element.attr("content"));
                             } else if (element.attr("property").equals("og:site_name")) {
-                                bookmark.setTitle(element.attr("content"));
-
+                                if (title.getText().toString().isEmpty()) {
+                                    bookmark.setTitle(element.attr("content"));
+                                }
                             } else if (element.attr("name").equals("description")) {
                                 bookmark.setDescription(element.attr("content"));
                             }
+                        }
+                        if (!title.getText().toString().isEmpty()) {
+                            bookmark.setTitle(title.getText().toString());
                         }
                         bookmark.setLink(link);
                         bookmark.setCategory(categoryId);
@@ -542,11 +545,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     private void insertBookmark() {
         boolean queryResult;
-
         Intent intent;
         if (isModified) {
             queryResult = db.updateBookmark(bookmark);
-
             if (queryResult) {
                 if (setRemainder) {
                     if (bookmark.getTitle() != null) {
@@ -568,7 +569,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             }
         } else {
             queryResult = db.addBookmark(bookmark);
-
             if (queryResult) {
                 if (setRemainder) {
                     if (bookmark.getTitle() != null) {

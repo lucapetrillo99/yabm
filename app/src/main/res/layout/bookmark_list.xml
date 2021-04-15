@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:cardview="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content">
     <com.google.android.material.card.MaterialCardView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:cardview="http://schemas.android.com/tools"
         android:layout_width="360dp"
         android:layout_height="wrap_content"
         cardview:strokeColor="?attr/strokeColor"
         cardview:strokeWidth="1dp"
         cardview:cardCornerRadius="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
+            android:id="@+id/relative_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp">
 
             <TextView
                 android:id="@+id/url"
-                android:layout_width="match_parent"
+                android:layout_width="328dp"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_marginStart="0dp"
                 android:layout_marginLeft="0dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
                 android:gravity="center_vertical"
-                android:text="Url"
                 android:maxLines="1"
+                android:text="Url"
                 android:textSize="17sp"
                 android:textStyle="bold">
             </TextView>
@@ -37,13 +43,15 @@
                 android:layout_width="205dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/url"
-                android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
                 android:layout_marginTop="7dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginRight="25dp"
                 android:layout_toStartOf="@+id/image"
                 android:layout_toLeftOf="@+id/image"
+                android:layout_toRightOf="@+id/bar"
+                android:layout_toEndOf="@+id/bar"
                 android:maxLines="1"
                 android:text="Title"
                 android:textSize="15sp">
@@ -64,13 +72,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="19dp"
-                android:layout_marginRight="19dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_toStartOf="@+id/image"
                 android:layout_toLeftOf="@+id/image"
                 android:layout_toEndOf="@+id/bar"
                 android:layout_toRightOf="@+id/bar"
-                android:maxLines="5"
+                android:maxLines="10"
                 android:text="Description"
                 android:textSize="12sp">
             </TextView>
@@ -106,10 +114,11 @@
 
     <ImageButton
         android:id="@+id/share"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_gravity="bottom"
+        android:layout_gravity="center"
+        android:background="@null"
         android:src="@drawable/ic_share">
     </ImageButton>
 

@@ -21,9 +21,11 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +41,7 @@ import java.util.Collection;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
 
-    private static final int DESCRIPTION_MAX_LENGTH = 80;
+    private static final int DESCRIPTION_MAX_LENGTH = 120;
     private ArrayList<Bookmark> bookmarks;
     private MainActivity mainActivity;
     private DatabaseHandler db;
@@ -57,6 +59,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
       ImageButton shareButton;
       View view;
       CheckBox checkbox;
+      RelativeLayout relativeLayout;
 
         public MyViewHolder(final View itemView, MainActivity mainActivity) {
             super(itemView);
@@ -66,6 +69,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             image = itemView.findViewById(R.id.image);
             checkbox = itemView.findViewById(R.id.checkbox);
             shareButton = itemView.findViewById(R.id.share);
+            relativeLayout = itemView.findViewById(R.id.relative_layout);
             view = itemView;
             view.setOnLongClickListener(mainActivity);
         }
@@ -102,12 +106,48 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             holder.description.setText(description);
         } else {
             holder.description.setText("");
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.relativeLayout.getLayoutParams();
+            layoutParams.height = 250;
+            holder.relativeLayout.setLayoutParams(layoutParams);
         }
 
-        Picasso.get().load(bookmarks.get(position).getImage())
-                .fit()
-                .centerCrop()
-                .into(holder.image);
+        if (bookmarks.get(position).getImage() != null) {
+            Picasso.get().load(bookmarks.get(position).getImage())
+                    .fit()
+                    .centerCrop()
+                    .into(holder.image);
+
+            holder.image.setOnClickListener(v -> {
+                final Dialog nagDialog = new Dialog(mainActivity);
+                nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                nagDialog.setCancelable(true);
+                nagDialog.setContentView(R.layout.preview_image);
+                ImageView ivPreview = nagDialog.findViewById(R.id.preview_image);
+                ImageButton closeButton = nagDialog.findViewById(R.id.close_button);
+                Picasso.get().load(bookmarks.get(position).getImage())
+                        .fit()
+                        .centerInside()
+                        .into(ivPreview);
+
+                closeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        nagDialog.dismiss();
+                    }
+                });
+                nagDialog.show();
+                nagDialog.getWindow().setLayout(1000, 1200);
+            });
+
+        } else {
+            holder.image.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams descriptionLayoutParams = (RelativeLayout.LayoutParams) holder.description.getLayoutParams();
+            RelativeLayout.LayoutParams titleLayoutParams = (RelativeLayout.LayoutParams) holder.title.getLayoutParams();
+            descriptionLayoutParams.height = 200;
+            descriptionLayoutParams.width = 1000;
+            titleLayoutParams.width = 1000;
+            holder.description.setLayoutParams(descriptionLayoutParams);
+        }
 
         holder.link.setOnClickListener(v -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
@@ -122,28 +162,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 return false;
             }
         });
-
-        holder.image.setOnClickListener(v -> {
-                final Dialog nagDialog = new Dialog(mainActivity);
-                nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                nagDialog.setCancelable(true);
-                nagDialog.setContentView(R.layout.preview_image);
-                ImageView ivPreview = nagDialog.findViewById(R.id.preview_image);
-                ImageButton closeButton = nagDialog.findViewById(R.id.close_button);
-                Picasso.get().load(bookmarks.get(position).getImage())
-                        .fit()
-                        .centerInside()
-                        .into(ivPreview);
-
-            closeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View arg0) {
-                        nagDialog.dismiss();
-                    }
-                });
-                nagDialog.show();
-                nagDialog.getWindow().setLayout(1000, 1200);
-            });
 
         holder.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override

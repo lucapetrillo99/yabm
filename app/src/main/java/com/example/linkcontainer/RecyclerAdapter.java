@@ -327,6 +327,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(bookmarks.get(position).getLink()));
                 mainActivity.startActivity(i);
+                dialog.dismiss();
             }
         });
 

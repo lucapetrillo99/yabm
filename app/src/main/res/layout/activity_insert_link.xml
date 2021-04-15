@@ -40,7 +40,6 @@
             android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:hint="Inserisci il link"
-            android:maxLength="50"
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:padding="20dp"
             android:paddingLeft="10dp"

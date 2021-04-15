@@ -464,12 +464,15 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                 bookmark.setDescription(element.attr("content"));
                             }
                         }
-                        if (!title.getText().toString().isEmpty()) {
-                            bookmark.setTitle(title.getText().toString());
-                        }
                         bookmark.setLink(link);
                         bookmark.setCategory(categoryId);
                         bookmark.setReminder(alarmStartTime);
+
+                        if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                            bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                        } else if (!title.getText().toString().isEmpty()) {
+                            bookmark.setTitle(title.getText().toString());
+                        }
 
                         insertBookmark();
                         loadingDialog.dismissLoading();

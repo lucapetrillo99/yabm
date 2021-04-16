@@ -107,7 +107,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
                     setSpinnerItem(category);
                     reminderTitle.setText("Promemoria inserito:");
-                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", bookmark.getReminder()));
+                    date.setText(DateFormat.format("dd/MM/yyyy HH:mm", bookmark.getReminder()));
                 } else {
                     addRemainder.setVisibility(View.VISIBLE);
                     date.setVisibility(View.INVISIBLE);
@@ -254,7 +254,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                             "L'orario non è valido", Toast.LENGTH_LONG)
                                             .show();
                                 } else {
-                                    date.setText( DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+                                    date.setText( DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
 
                                     addRemainder.setVisibility(View.INVISIBLE);
                                     date.setVisibility(View.VISIBLE);
@@ -262,7 +262,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                     removeRemainder.setVisibility(View.VISIBLE);
 
                                     reminderTitle.setText("Promemoria inserito:");
-                                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+                                    date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria impostato correttamente", Toast.LENGTH_LONG)
                                             .show();
@@ -348,7 +348,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                                             "L'orario non è valido", Toast.LENGTH_LONG)
                                             .show();
                                 } else {
-                                    date.setText(DateFormat.format("dd-MM-yyyy hh:mm a", alarmStartTime));
+                                    date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
                                     Toast.makeText(getApplicationContext(),
                                             "Promemoria modificato correttamente", Toast.LENGTH_LONG)
                                             .show();

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-<solid android:color="@color/design_default_color_primary">
+<solid android:color="?attr/colorSurface">
 </solid>
-    <corners android:topLeftRadius="25dp"
-        android:topRightRadius="25dp">
+    <corners android:topLeftRadius="15dp"
+        android:topRightRadius="15dp">
     </corners>
 
     <padding

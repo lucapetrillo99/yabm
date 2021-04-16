@@ -2,6 +2,8 @@ package com.example.linkcontainer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +28,7 @@ public class LoadingDialog {
 
         dialog = builder.create();
         dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     public void dismissLoading() {

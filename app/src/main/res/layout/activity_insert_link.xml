@@ -72,7 +72,7 @@
             android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:hint="Inserisci un titolo"
-            android:maxLength="50"
+            android:maxLength="30"
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"

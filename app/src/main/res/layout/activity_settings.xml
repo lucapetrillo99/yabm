@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -27,7 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_theme">
+            android:src="@drawable/ic_theme"
+            android:contentDescription="Theme">
         </ImageView>
 
         <LinearLayout
@@ -42,7 +42,9 @@
                 android:text="Tema"
                 android:paddingLeft="45dp"
                 android:textSize="18sp"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
             </TextView>
 
         </LinearLayout>
@@ -65,7 +67,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_categories">
+            android:src="@drawable/ic_modify_categories"
+            android:contentDescription="Modify categories">
         </ImageView>
 
         <LinearLayout
@@ -103,7 +106,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_list">
+            android:src="@drawable/ic_start_category"
+            android:contentDescription="Start categories">
         </ImageView>
 
         <LinearLayout
@@ -118,7 +122,9 @@
                 android:text="Lista visualizzata all'avvio"
                 android:paddingLeft="45dp"
                 android:textSize="18sp"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
             </TextView>
 
         </LinearLayout>
@@ -141,7 +147,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_feedback">
+            android:src="@drawable/ic_feedback"
+            android:contentDescription="Feedback">
         </ImageView>
 
         <LinearLayout
@@ -156,7 +163,9 @@
                 android:text="Invia un feedback"
                 android:paddingLeft="45dp"
                 android:textSize="18sp"
-                android:textStyle="bold">
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
             </TextView>
 
         </LinearLayout>
@@ -179,7 +188,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_information">
+            android:src="@drawable/ic_info"
+            android:contentDescription="Info">
         </ImageView>
 
         <LinearLayout
@@ -194,14 +204,18 @@
                 android:paddingLeft="45dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
             </TextView>
 
             <TextView
                 android:id="@+id/version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="45dp">
+                android:paddingLeft="45dp"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
             </TextView>
 
         </LinearLayout>

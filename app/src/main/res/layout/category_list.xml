@@ -27,6 +27,8 @@
             android:gravity="center_vertical"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:maxLines="1"
+            android:layout_marginTop="4dp"
             android:layout_marginLeft="10dp">
         </TextView>
 
@@ -34,25 +36,29 @@
             android:id="@+id/modify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="13dp"
-            android:layout_marginLeft="13dp"
+            android:layout_marginStart="33dp"
+            android:layout_marginLeft="33dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_toEndOf="@id/title"
             android:layout_toRightOf="@id/title"
+            android:background="@null"
+            android:contentDescription="Modify"
+            android:padding="10dp"
             android:src="@drawable/ic_modify" />
 
         <ImageButton
             android:id="@+id/delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="76dp"
-            android:layout_marginLeft="76dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="85dp"
+            android:layout_marginLeft="102dp"
             android:layout_toEndOf="@id/title"
             android:layout_toRightOf="@id/title"
-            android:src="@drawable/ic_delete" />
+            android:background="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="Delete" />
 
         <CheckBox
             android:id="@+id/checkbox"
@@ -66,10 +72,9 @@
             android:layout_marginLeft="76dp"
             android:layout_marginEnd="30dp"
             android:layout_marginRight="30dp"
-            android:visibility="invisible">
+            android:visibility="gone">
         </CheckBox>
 
     </RelativeLayout>
-
 
 </com.google.android.material.card.MaterialCardView>

@@ -158,7 +158,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     .setView(dialogView)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton("Annulla", null)
-                    .setCancelable(false)
                     .create();
 
             final EditText input = dialogView.findViewById(R.id.user_input);

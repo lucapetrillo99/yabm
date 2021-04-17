@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="horizontal" android:layout_width="wrap_content"
-android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@color/black">
+
+    <include
+        layout="@layout/toolbar">
+    </include>
 
 <com.github.chrisbanes.photoview.PhotoView
     android:id="@+id/preview_image"
-    android:padding="10dp"
     android:layout_width="match_parent"
+    android:layout_marginTop="7dp"
     android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:id="@+id/llTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical"
-        android:layout_alignParentEnd="true">
-
-        <ImageButton
-            android:id="@+id/close_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="@null"
-            android:src="@drawable/ic_close" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

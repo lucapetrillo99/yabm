@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -118,25 +119,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     .into(holder.image);
 
             holder.image.setOnClickListener(v -> {
-                final Dialog nagDialog = new Dialog(mainActivity);
-                nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                nagDialog.setCancelable(true);
-                nagDialog.setContentView(R.layout.preview_image);
-                ImageView ivPreview = nagDialog.findViewById(R.id.preview_image);
-                ImageButton closeButton = nagDialog.findViewById(R.id.close_button);
-                Picasso.get().load(bookmarks.get(position).getImage())
-                        .fit()
-                        .centerInside()
-                        .into(ivPreview);
-
-                closeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View arg0) {
-                        nagDialog.dismiss();
-                    }
-                });
-                nagDialog.show();
-                nagDialog.getWindow().setLayout(1000, 1200);
+                ImagePreview imagePreview = ImagePreview.newInstance(bookmarks.get(position)
+                        .getImage(), bookmarks.get(position).getTitle());
+                imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
             });
 
         } else {

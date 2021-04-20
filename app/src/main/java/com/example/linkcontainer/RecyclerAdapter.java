@@ -110,6 +110,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.relativeLayout.getLayoutParams();
             layoutParams.height = 250;
             holder.relativeLayout.setLayoutParams(layoutParams);
+            RelativeLayout.LayoutParams checkboxLayout = (RelativeLayout.LayoutParams) holder.checkbox.getLayoutParams();
+            checkboxLayout.setMargins(0, 25, 10, 0);
+            holder.checkbox.setLayoutParams(checkboxLayout);
         }
 
         if (bookmarks.get(position).getImage() != null) {
@@ -156,6 +159,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
                 shareIntent.setType("text/plain");
                 mainActivity.startActivity(shareIntent);
+                if (mainActivity.isContextualMenuEnable) {
+                    mainActivity.removeContextualActionMode();
+                }
             }
         });
 
@@ -168,6 +174,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     intent.putExtra("bookmark", bookmarks.get(position));
                     intent.putExtra("category", category);
                     mainActivity.startActivity(intent);
+                    if (mainActivity.isContextualMenuEnable) {
+                        mainActivity.removeContextualActionMode();
+                    }
                 }
             });
         }

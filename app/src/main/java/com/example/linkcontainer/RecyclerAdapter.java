@@ -107,12 +107,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             holder.description.setText(description);
         } else {
             holder.description.setText("");
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.relativeLayout.getLayoutParams();
-            layoutParams.height = 250;
-            holder.relativeLayout.setLayoutParams(layoutParams);
-            RelativeLayout.LayoutParams checkboxLayout = (RelativeLayout.LayoutParams) holder.checkbox.getLayoutParams();
-            checkboxLayout.setMargins(0, 25, 10, 0);
-            holder.checkbox.setLayoutParams(checkboxLayout);
         }
 
         if (bookmarks.get(position).getImage() != null) {
@@ -126,8 +120,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                         .getImage(), bookmarks.get(position).getTitle());
                 imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
             });
+        }
 
-        } else {
+        if (description != null && bookmarks.get(position).getImage() == null) {
             holder.image.setVisibility(View.GONE);
             RelativeLayout.LayoutParams descriptionLayoutParams = (RelativeLayout.LayoutParams) holder.description.getLayoutParams();
             RelativeLayout.LayoutParams titleLayoutParams = (RelativeLayout.LayoutParams) holder.title.getLayoutParams();
@@ -135,6 +130,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             descriptionLayoutParams.width = 1000;
             titleLayoutParams.width = 1000;
             holder.description.setLayoutParams(descriptionLayoutParams);
+        } else if (description == null && bookmarks.get(position).getImage() == null) {
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.relativeLayout.getLayoutParams();
+            layoutParams.height = 250;
+            holder.relativeLayout.setLayoutParams(layoutParams);
+            RelativeLayout.LayoutParams checkboxLayout = (RelativeLayout.LayoutParams) holder.checkbox.getLayoutParams();
+            checkboxLayout.setMargins(0, 25, 10, 0);
+            holder.checkbox.setLayoutParams(checkboxLayout);
         }
 
         holder.link.setOnClickListener(v -> {

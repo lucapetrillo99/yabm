@@ -105,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         fab.setOnClickListener(view -> {
             activityIntent = new Intent(MainActivity.this, InsertLink.class);
             startActivity(activityIntent);
+            if (isContextualMenuEnable) {
+                removeContextualActionMode();
+            }
         });
 
         setBookmarksLabel();
@@ -143,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.settings:
                 activityIntent = new Intent(MainActivity.this, Settings.class);
                 startActivity(activityIntent);
+                if (isContextualMenuEnable) {
+                    removeContextualActionMode();
+                }
                 break;
             case R.id.search:
                 SearchView searchView = (SearchView) item.getActionView();
@@ -353,6 +359,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if (previousCategory.equals("Archiviati")) {
             archive.setVisible(false);
             unarchive.setVisible(true);
+        } else {
+            archive.setVisible(true);
+            unarchive.setVisible(false);
         }
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
@@ -382,8 +391,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbarTitle.setText(String.valueOf(counter));
     }
 
-    @SuppressLint("SetTextI18n")
-    private void removeContextualActionMode() {
+    public void removeContextualActionMode() {
         isContextualMenuEnable = false;
         areAllSelected = false;
         toolbarTitle.setText(previousCategory);

@@ -346,6 +346,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         super.onResume();
         archiveUrl();
         setBookmarksLabel();
+        categories.clear();
+        categories = db.getAllCategories();
+        invalidateOptionsMenu();
     }
 
     @Override

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BookmarksManagerActivity">
+
+    <include
+        layout="@layout/toolbar">
+    </include>
+
+    <LinearLayout
+        android:id="@+id/content_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="60dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:padding="20dp"
+        tools:ignore="MissingConstraints,UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_import_description">
+        </ImageView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="40dp"
+            android:layout_marginTop="20dp"
+            android:text="Porta i tuoi segnalilbri sempre con te!"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center">
+        </TextView>
+
+        <View
+            android:id="@+id/bar"
+            android:layout_marginTop="27dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/design_default_color_secondary" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/import_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:layout_marginLeft="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        tools:ignore="MissingConstraints"
+        android:layout_below="@+id/content_description"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_import"
+            android:contentDescription="Import">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="Importa"
+                android:paddingLeft="45dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/export_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:layout_marginLeft="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        tools:ignore="MissingConstraints"
+        android:layout_below="@+id/import_option"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_export"
+            android:contentDescription="Export">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="Esporta"
+                android:paddingLeft="45dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

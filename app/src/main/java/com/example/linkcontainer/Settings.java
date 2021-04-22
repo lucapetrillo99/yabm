@@ -126,8 +126,8 @@ public class Settings extends AppCompatActivity {
     private void importExportClickListener() {
         importExport.setOnClickListener(v -> {
             // TODO CREA CLASSE
-//            Intent intent = new Intent(Settings.this, FeedbackActivity.class);
-//            startActivity(intent);
+            Intent intent = new Intent(Settings.this, BookmarksManagerActivity.class);
+            startActivity(intent);
         });
     }
 

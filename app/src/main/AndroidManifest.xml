@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LinkContainer">
+        <activity android:name=".BookmarksManagerActivity"></activity>
         <activity android:name=".FeedbackActivity" />
         <activity android:name=".Settings" />
         <activity android:name=".Categories" />

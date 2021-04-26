@@ -10,21 +10,16 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class Categories extends AppCompatActivity implements View.OnLongClickListener {
     public boolean areAllSelected = false;
@@ -92,7 +87,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
         switch (id) {
             case R.id.settings:
-                Intent activityIntent = new Intent(Categories.this, Settings.class);
+                Intent activityIntent = new Intent(Categories.this, SettingsActivity.class);
                 startActivity(activityIntent);
                 break;
             case R.id.search:

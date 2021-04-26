@@ -3,6 +3,7 @@
     package="com.example.linkcontainer">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:theme="@style/Theme.LinkContainer">
         <activity android:name=".BookmarksManagerActivity"></activity>
         <activity android:name=".FeedbackActivity" />
-        <activity android:name=".Settings" />
+        <activity android:name=".SettingsActivity" />
         <activity android:name=".Categories" />
         <activity android:name=".InsertLink" />
         <activity android:name=".MainActivity">

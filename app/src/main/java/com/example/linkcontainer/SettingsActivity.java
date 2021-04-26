@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     private static final String THEME = "theme";
     private static final String CATEGORY = "category";
     private RelativeLayout themeSetting;
@@ -78,7 +78,7 @@ public class Settings extends AppCompatActivity {
             int checkedItem = themeManager.getTheme();
 
             String[] themes = { "Default", "Chiaro", "Scuro" };
-            AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(themes, checkedItem, (dialog, choice) -> {
                 if (themeManager.getTheme() != choice) {
                     themeManager.setTheme(choice);
@@ -91,7 +91,7 @@ public class Settings extends AppCompatActivity {
 
     private void categoriesClickListener() {
         categoriesSetting.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.this, Categories.class);
+            Intent intent = new Intent(SettingsActivity.this, Categories.class);
             startActivity(intent);
         });
     }
@@ -112,7 +112,7 @@ public class Settings extends AppCompatActivity {
             }
 
             String[] categories = list.toArray(new String[0]);
-            AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(categories, checkedItem, (dialog, choice) -> {
                 if (!categoryManager.getCategory().equals(categories[choice])) {
                     categoryManager.setCategory(categories[choice]);
@@ -126,7 +126,7 @@ public class Settings extends AppCompatActivity {
     private void importExportClickListener() {
         importExport.setOnClickListener(v -> {
             // TODO CREA CLASSE
-            Intent intent = new Intent(Settings.this, BookmarksManagerActivity.class);
+            Intent intent = new Intent(SettingsActivity.this, BookmarksManagerActivity.class);
             startActivity(intent);
         });
     }
@@ -134,7 +134,7 @@ public class Settings extends AppCompatActivity {
     private void backupClickListener() {
         backup.setOnClickListener(v -> {
             // TODO CREA CLASSE
-//            Intent intent = new Intent(Settings.this, FeedbackActivity.class);
+//            Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
 //            startActivity(intent);
         });
     }
@@ -151,7 +151,7 @@ public class Settings extends AppCompatActivity {
 
     private void feedbackClickListener() {
         sendFeedback.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.this, FeedbackActivity.class);
+            Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
             startActivity(intent);
         });
     }

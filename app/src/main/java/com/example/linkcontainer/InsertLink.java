@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,7 +33,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -436,7 +434,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            Intent intent = new Intent(InsertLink.this, Settings.class);
+            Intent intent = new Intent(InsertLink.this, SettingsActivity.class);
             startActivity(intent);
             finish();
         return true;

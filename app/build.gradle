@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.linkcontainer"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -40,6 +40,7 @@ dependencies {
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.1'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'at.blogc:expandabletextview:1.0.5'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

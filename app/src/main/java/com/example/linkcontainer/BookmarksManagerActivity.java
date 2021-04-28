@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,15 +32,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
+    private static final int REQUEST_CODE = 1;
     private static final String IMPORTED = "Importati";
     private static final long ALARM_START_TIME = -1;
     private RelativeLayout importOption;
+    private RelativeLayout exportOption;
     private final Set<String> importedBookmarks = new LinkedHashSet<>();
     private int bookmarksCounter = 0;
     private DatabaseHandler db;
@@ -57,13 +63,15 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         db = DatabaseHandler.getInstance(getApplicationContext());
 
         importOption =  findViewById(R.id.import_option);
+        exportOption =  findViewById(R.id.export_option);
 
-        selectButtonListener();
+        importListener();
+        exportListener();
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void selectButtonListener() {
+    private void importListener() {
         importOption.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
@@ -78,6 +86,18 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void exportListener() {
+        exportOption.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+            } else {
+                createBookmarksFile();
+            }
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
@@ -87,21 +107,26 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 getBookmarksFromUri(uri);
                 importOptionsDialog();
             }
-
-            super.onActivityResult(requestCode, resultCode, data);
+        } else if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                writeBookmarksFile(uri);
+            }
         }
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showMessage();
+                showWarningMessage();
             }
         }
     }
 
-    private void showMessage() {
+    private void showWarningMessage() {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), ""
                 , Snackbar.LENGTH_LONG);
 
@@ -123,8 +148,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     private void getBookmarksFromUri(Uri uri) {
         StringBuilder stringBuilder = new StringBuilder();
-        try (InputStream inputStream =
-                     getContentResolver().openInputStream(uri);
+        try (InputStream inputStream = getContentResolver().openInputStream(uri);
              BufferedReader reader = new BufferedReader(
                      new InputStreamReader(Objects.requireNonNull(inputStream)))) {
             String line;
@@ -132,10 +156,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 stringBuilder.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
+                   .show();
         }
         Document document = Jsoup.parse(stringBuilder.toString());
-
         Elements links =  document.select("a[href]");
 
         for (Element element: links) {
@@ -217,5 +241,54 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
+    private void createBookmarksFile() {
+        final String TITLE = "bookmarks-";
 
+        CharSequence currentTime = DateFormat.format("yyyyMMddHHmm", Calendar.getInstance().getTime());
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/html");
+        intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".html");
+
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    private void writeBookmarksFile(Uri uri) {
+        final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
+                "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
+                "<TITLE>Bookmarks</TITLE>\n" +
+                "<H1>Bookmarks</H1>\n" +
+                "<DL><p>";
+        final String FILE_FOOTER = "</DL><p>";
+        final String INITIAL_FILE_CONTENT = "<DT><A HREF=";
+        final String FINAL_FILE_CONTENT = "</A>";
+        try {
+            ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+            OutputStream outputStream = getContentResolver().openOutputStream(uri);
+            outputStream.write(FILE_HEADER.getBytes());
+            outputStream.write("\n".getBytes());
+
+            for (Bookmark bookmark: bookmarks) {
+                outputStream.write(INITIAL_FILE_CONTENT.getBytes());
+                outputStream.write('"');
+                outputStream.write(bookmark.getLink().getBytes());
+                outputStream.write('"');
+                outputStream.write(">".getBytes());
+                if (bookmark.getDescription() != null) {
+                    outputStream.write(bookmark.getDescription().getBytes());
+                } else if (bookmark.getTitle() != null) {
+                    outputStream.write(bookmark.getTitle().getBytes());
+                } else {
+                    outputStream.write(bookmark.getLink().split("//")[1].split("/")[0]
+                            .getBytes());
+                }
+                outputStream.write(FINAL_FILE_CONTENT.getBytes());
+            }
+            outputStream.write(FILE_FOOTER.getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
 }

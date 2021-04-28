@@ -16,8 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,16 +35,11 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import at.blogc.android.views.ExpandableTextView;
-
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final String IMPORTED = "Importati";
     private static final long ALARM_START_TIME = -1;
     private RelativeLayout importOption;
-    private ExpandableTextView importOptionText;
-    private TextView description;
-    private Button selectButton;
     private final Set<String> importedBookmarks = new LinkedHashSet<>();
     private int bookmarksCounter = 0;
     private DatabaseHandler db;
@@ -64,38 +57,14 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         db = DatabaseHandler.getInstance(getApplicationContext());
 
         importOption =  findViewById(R.id.import_option);
-        importOptionText = findViewById(R.id.expandableTextView);
-        selectButton = findViewById(R.id.select_button);
-        description = findViewById(R.id.description);
-        importOptionText.setInterpolator(new OvershootInterpolator());
 
-        importOptionText.setExpandInterpolator(new OvershootInterpolator());
-        importOptionText.setCollapseInterpolator(new OvershootInterpolator());
-        importOptionText.setAnimationDuration(750L);
-
-        importOptionTextListener();
         selectButtonListener();
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
-    private void importOptionTextListener() {
-        importOption.setOnClickListener(v -> {
-            if (importOptionText.isExpanded()) {
-                importOptionText.collapse();
-                description.setVisibility(View.GONE);
-                selectButton.setVisibility(View.GONE);
-            }
-            else {
-                importOptionText.expand();
-                description.setVisibility(View.VISIBLE);
-                selectButton.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void selectButtonListener() {
-        selectButton.setOnClickListener(v -> {
+        importOption.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
@@ -247,4 +216,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
     }
+
+
 }

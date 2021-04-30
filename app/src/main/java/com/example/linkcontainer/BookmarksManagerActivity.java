@@ -47,8 +47,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
     private final Set<String> importedBookmarks = new LinkedHashSet<>();
+    private final Set<String> descriptions = new LinkedHashSet<>();
     private int bookmarksCounter = 0;
     private DatabaseHandler db;
+    int i = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -164,6 +166,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
         for (Element element: links) {
             importedBookmarks.add(element.attr("href"));
+            descriptions.add(element.text());
         }
     }
 
@@ -214,6 +217,14 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                                         bookmark.setDescription(element.attr("content"));
                                     }
                                 }
+                                if (bookmark.getTitle() == null) {
+                                    bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                }
+                                if (bookmark.getDescription() == null) {
+                                    if (i < descriptions.toArray().length) {
+                                        bookmark.setDescription(descriptions.toArray()[i].toString());
+                                    }
+                                }
                                 bookmark.setLink(link);
                                 bookmark.setCategory(categoryId);
                                 bookmark.setReminder(ALARM_START_TIME);
@@ -225,11 +236,12 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        i ++;
                     }
                     runOnUiThread(() -> {
                         loadingDialog.dismissLoading();
                         Toast.makeText(BookmarksManagerActivity.this, bookmarksCounter +
-                                        " segnalibri importati!",
+                                        " segnalibri importati",
                                 Toast.LENGTH_LONG).show();
                     });
                 }

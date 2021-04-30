@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -24,7 +23,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -144,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int id = item.getItemId();
         switch (id) {
             case R.id.settings:
-                activityIntent = new Intent(MainActivity.this, Settings.class);
+                activityIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(activityIntent);
                 if (isContextualMenuEnable) {
                     removeContextualActionMode();

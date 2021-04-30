@@ -2,30 +2,26 @@ package com.example.linkcontainer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
     private static final String THEME = "theme";
     private static final String CATEGORY = "category";
-    private Toolbar toolbar;
-    private TextView toolbarTitle;
     private RelativeLayout themeSetting;
     private RelativeLayout categoriesSetting;
-    private RelativeLayout startList;
+    private RelativeLayout startCategory;
+    private RelativeLayout importExport;
+    private RelativeLayout backup;
     private RelativeLayout sendFeedback;
     private TextView appVersion;
     private DatabaseHandler db;
@@ -35,8 +31,8 @@ public class Settings extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        toolbar = findViewById(R.id.toolbar);
-        toolbarTitle = findViewById(R.id.toolbar_title);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText("Impostazioni");
         setSupportActionBar(toolbar);
 
@@ -44,23 +40,22 @@ public class Settings extends AppCompatActivity {
 
         themeSetting = findViewById(R.id.theme_setting);
         categoriesSetting = findViewById(R.id.categories_setting);
-        startList = findViewById(R.id.list_setting);
+        startCategory = findViewById(R.id.start_category_setting);
+        importExport = findViewById(R.id.import_export_setting);
+        backup = findViewById(R.id.backup_setting);
         sendFeedback = findViewById(R.id.feedback_setting);
         appVersion = findViewById(R.id.version);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         setApplicationInfo();
         themeClickListener();
         categoriesClickListener();
-        starListClickListener();
+        starCategoryClickListener();
+        importExportClickListener();
+        backupClickListener();
         feedbackClickListener();
 
     }
@@ -83,7 +78,7 @@ public class Settings extends AppCompatActivity {
             int checkedItem = themeManager.getTheme();
 
             String[] themes = { "Default", "Chiaro", "Scuro" };
-            AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(themes, checkedItem, (dialog, choice) -> {
                 if (themeManager.getTheme() != choice) {
                     themeManager.setTheme(choice);
@@ -96,13 +91,13 @@ public class Settings extends AppCompatActivity {
 
     private void categoriesClickListener() {
         categoriesSetting.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.this, Categories.class);
+            Intent intent = new Intent(SettingsActivity.this, Categories.class);
             startActivity(intent);
         });
     }
 
-    private void starListClickListener() {
-        startList.setOnClickListener(v -> {
+    private void starCategoryClickListener() {
+        startCategory.setOnClickListener(v -> {
             SettingsManager categoryManager = new SettingsManager(getApplicationContext(), CATEGORY);
             int checkedItem = 0;
             String category = categoryManager.getCategory();
@@ -117,7 +112,7 @@ public class Settings extends AppCompatActivity {
             }
 
             String[] categories = list.toArray(new String[0]);
-            AlertDialog.Builder builder = new AlertDialog.Builder(Settings.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(categories, checkedItem, (dialog, choice) -> {
                 if (!categoryManager.getCategory().equals(categories[choice])) {
                     categoryManager.setCategory(categories[choice]);
@@ -125,6 +120,22 @@ public class Settings extends AppCompatActivity {
                 dialog.dismiss();
             });
             builder.show();
+        });
+    }
+
+    private void importExportClickListener() {
+        importExport.setOnClickListener(v -> {
+            // TODO CREA CLASSE
+            Intent intent = new Intent(SettingsActivity.this, BookmarksManagerActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void backupClickListener() {
+        backup.setOnClickListener(v -> {
+            // TODO CREA CLASSE
+//            Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
+//            startActivity(intent);
         });
     }
 
@@ -140,7 +151,7 @@ public class Settings extends AppCompatActivity {
 
     private void feedbackClickListener() {
         sendFeedback.setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.this, FeedbackActivity.class);
+            Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
             startActivity(intent);
         });
     }

@@ -15,8 +15,7 @@ public class Utils {
 
         return Observable.fromCallable(() -> {
             try {
-                Document document = Jsoup.connect(url).timeout(0).get();
-                return document;
+                return Jsoup.connect(url).timeout(0).get();
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }

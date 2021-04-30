@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Settings">
+    tools:context=".SettingsActivity">
 
     <include
         layout="@layout/toolbar">
@@ -91,7 +91,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/list_setting"
+        android:id="@+id/start_category_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
@@ -119,7 +119,89 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Lista visualizzata all'avvio"
+                android:text="Categoria visualizzata all'avvio"
+                android:paddingLeft="45dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/import_export_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:layout_marginLeft="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        tools:ignore="MissingConstraints"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_import_export"
+            android:contentDescription="Import export">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="Importa/Esporta"
+                android:paddingLeft="45dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/backup_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:layout_marginLeft="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="10dp"
+        tools:ignore="MissingConstraints"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_backup"
+            android:contentDescription="Backup">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="Backup"
                 android:paddingLeft="45dp"
                 android:textSize="18sp"
                 android:textStyle="bold"

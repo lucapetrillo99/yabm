@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardview="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        cardview:strokeColor="?attr/strokeColor"
+        cardview:strokeWidth="1dp"
+        cardview:cardCornerRadius="5dp"
+        android:background="@color/black"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:id="@+id/relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:padding="20dp">
+
+            <ImageButton
+                android:id="@+id/warning_close_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_close"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:background="@null"
+                cardview:ignore="RtlHardcoded">
+            </ImageButton>
+
+
+            <ImageView
+                android:id="@+id/warning_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/ic_warning">
+            </ImageView>
+
+            <TextView
+                android:id="@+id/warning_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="30dp"
+                android:gravity="center_vertical"
+                android:layout_toEndOf="@+id/warning_image"
+                android:layout_toStartOf="@+id/warning_close_button"
+                android:layout_marginTop="10dp"
+                android:text="Per effettuare l'operazione consenti di accedere alla memoria di archiviazione"
+                android:textColor="@color/white"
+                android:textSize="15sp">
+            </TextView>
+
+            <TextView
+                android:id="@+id/go_to_settings"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/warning_description"
+                android:layout_marginTop="15dp"
+                android:text="Vai a Impostazioni"
+                android:textColor="@color/white"
+                android:layout_alignParentEnd="true">
+            </TextView>
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

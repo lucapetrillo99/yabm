@@ -125,7 +125,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void importExportClickListener() {
         importExport.setOnClickListener(v -> {
-            // TODO CREA CLASSE
             Intent intent = new Intent(SettingsActivity.this, BookmarksManagerActivity.class);
             startActivity(intent);
         });
@@ -133,9 +132,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void backupClickListener() {
         backup.setOnClickListener(v -> {
-            // TODO CREA CLASSE
-//            Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
-//            startActivity(intent);
+            Intent intent = new Intent(SettingsActivity.this, BackupActivity.class);
+            startActivity(intent);
         });
     }
 

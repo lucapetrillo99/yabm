@@ -8,6 +8,7 @@ public class SettingsManager {
     private final SharedPreferences settingsManager;
     private static final String THEME = "theme";
     private static final String CATEGORY = "category";
+    private static final String AUTO_BACKUP = "auto_backup";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
@@ -48,4 +49,13 @@ public class SettingsManager {
         return settingsManager.getString(CATEGORY, ALL_BOOKMARKS);
     }
 
+    public void setAutoBackup(boolean autoBackup) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putBoolean(AUTO_BACKUP, autoBackup);
+        editor.apply();
+    }
+
+    public boolean getAutoBackup() {
+        return settingsManager.getBoolean(AUTO_BACKUP, false);
+    }
 }

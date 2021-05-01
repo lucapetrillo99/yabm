@@ -50,7 +50,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/prova"
+        android:id="@+id/auto_backup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
@@ -109,7 +109,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/create_option"
+        android:id="@+id/create_backup_option"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
@@ -117,7 +117,7 @@
         android:focusable="true"
         android:layout_marginTop="5dp"
         tools:ignore="MissingConstraints"
-        android:layout_below="@+id/prova"
+        android:layout_below="@+id/auto_backup"
         android:layout_marginStart="10dp">
 
         <ImageView
@@ -149,7 +149,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/restore_option"
+        android:id="@+id/restore_backup_option"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
@@ -157,7 +157,7 @@
         android:focusable="true"
         android:layout_marginTop="10dp"
         tools:ignore="MissingConstraints"
-        android:layout_below="@+id/create_option"
+        android:layout_below="@+id/create_backup_option"
         android:layout_marginStart="10dp">
 
         <ImageView

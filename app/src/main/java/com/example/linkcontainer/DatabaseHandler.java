@@ -348,4 +348,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return result == 1;
     }
+
+    public String getDbPath(Context context) {
+        return context.getDatabasePath(DATABASE_NAME).toString();
+    }
 }

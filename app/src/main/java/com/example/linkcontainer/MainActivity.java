@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
@@ -73,6 +74,18 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
+        if (settingsManager.isFirstAccess()) {
+            File folder = new File("/storage/emulated/0/Android" + File.separator +
+                    getString(R.string.app_name));
+            boolean success = true;
+            if (!folder.exists()) {
+                success = folder.mkdirs();
+            }
+            if (!success) {
+                Toast.makeText(getApplicationContext(), "Qualcosa è andato storto!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
 
         if (result.equals(ALL_BOOKMARKS)) {
             bookmarks = new ArrayList<>(db.getAllBookmarks());

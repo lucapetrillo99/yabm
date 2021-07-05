@@ -20,6 +20,7 @@ import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,29 +55,18 @@ public class BackupActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         backupHandler = BackupHandler.getInstance(getApplicationContext());
+        autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
 
         autoBackupSwitch = findViewById(R.id.auto_backup_switch);
         createBackupOption = findViewById(R.id.create_backup_option);
         restoreBackupOption = findViewById(R.id.restore_backup_option);
-
-        autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
-        boolean previousState = autoBackupManager.getAutoBackup();
 
         setAutoBackupSwitch();
         autoBackupListener();
         createBackupListener();
         restoreBackupListener();
 
-        toolbar.setNavigationOnClickListener(v -> {
-            if (previousState != autoBackupManager.getAutoBackup()) {
-                if (autoBackupManager.getAutoBackup()) {
-                    createAutoBackupFile();
-                } else {
-                    cancelAutoBackup();
-                }
-            }
-            finish();
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setAutoBackupSwitch() {
@@ -84,7 +74,15 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void autoBackupListener() {
-        autoBackupSwitch.setOnClickListener(v -> autoBackupManager.setAutoBackup(autoBackupSwitch.isChecked()));
+        autoBackupSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
+            if (isChecked) {
+                createAutoBackupFile();
+                autoBackupManager.setAutoBackup(true);
+            } else {
+                cancelAutoBackup();
+                autoBackupManager.setAutoBackup(false);
+            }
+        });
     }
 
     private void createBackupListener() {

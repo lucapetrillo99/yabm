@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -50,8 +51,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         } else {
             Uri uri = intent.getData();
             BackupHandler.getInstance(context).createBackup(uri);
-            Toast.makeText(context, "Funziona!",
-                    Toast.LENGTH_LONG).show();
         }
 
     }

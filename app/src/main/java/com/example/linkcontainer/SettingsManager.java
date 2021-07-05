@@ -2,6 +2,8 @@ package com.example.linkcontainer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
+
 import androidx.appcompat.app.AppCompatDelegate;
 
 public class SettingsManager {
@@ -9,6 +11,7 @@ public class SettingsManager {
     private static final String THEME = "theme";
     private static final String CATEGORY = "category";
     private static final String AUTO_BACKUP = "auto_backup";
+    private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FIRST_ACCESS = "first_access";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
@@ -68,5 +71,15 @@ public class SettingsManager {
 
     public boolean isFirstAccess() {
         return settingsManager.getBoolean(FIRST_ACCESS, true);
+    }
+
+    public void setAutoBackupUri(String uri) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putString(AUTO_BACKUP_URI, uri);
+        editor.apply();
+    }
+
+    public String getAutoBackupUri() {
+        return settingsManager.getString(AUTO_BACKUP_URI, null);
     }
 }

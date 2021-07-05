@@ -7,6 +7,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -16,7 +19,6 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,7 +26,8 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Calendar;
 
 public class BackupActivity extends AppCompatActivity {
@@ -32,11 +35,13 @@ public class BackupActivity extends AppCompatActivity {
     private static final int RESULT_OK = 1;
     private static final int REQUEST_CODE = 1;
     private static final String AUTO_BACKUP = "auto_backup";
+    private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FILE_EXTENSION = "db";
     private SwitchMaterial autoBackupSwitch;
     private RelativeLayout createBackupOption;
     private RelativeLayout restoreBackupOption;
     private BackupHandler backupHandler;
+    private SettingsManager autoBackupManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,23 +59,31 @@ public class BackupActivity extends AppCompatActivity {
         createBackupOption = findViewById(R.id.create_backup_option);
         restoreBackupOption = findViewById(R.id.restore_backup_option);
 
+        autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
+        boolean previousState = autoBackupManager.getAutoBackup();
+
         setAutoBackupSwitch();
         autoBackupListener();
         createBackupListener();
         restoreBackupListener();
 
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            if (previousState != autoBackupManager.getAutoBackup()) {
+                if (autoBackupManager.getAutoBackup()) {
+                    createAutoBackupFile();
+                } else {
+                    cancelAutoBackup();
+                }
+            }
+            finish();
+        });
     }
 
     private void setAutoBackupSwitch() {
-        SettingsManager autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
-        boolean autoBackup = autoBackupManager.getAutoBackup();
-
-        autoBackupSwitch.setChecked(autoBackup);
+        autoBackupSwitch.setChecked(autoBackupManager.getAutoBackup());
     }
 
     private void autoBackupListener() {
-        SettingsManager autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
         autoBackupSwitch.setOnClickListener(v -> autoBackupManager.setAutoBackup(autoBackupSwitch.isChecked()));
     }
 
@@ -147,6 +160,8 @@ public class BackupActivity extends AppCompatActivity {
         Cursor returnCursor =
                 getContentResolver().query(uri, null, null, null, null);
 
+        returnCursor.close();
+
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         returnCursor.moveToFirst();
 
@@ -165,8 +180,8 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), ""
-                , Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
+                Snackbar.LENGTH_LONG);
 
         View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -182,6 +197,58 @@ public class BackupActivity extends AppCompatActivity {
         customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
         snackbarLayout.addView(customView, 0);
         snackbar.show();
+    }
+
+    private void createAutoBackupFile() {
+        File dir = new File(getFilesDir() + File.separator +
+                getString(R.string.app_name));
+        if(!dir.exists()){
+            dir.mkdir();
+        }
+        try {
+            CharSequence currentTime = DateFormat.format("yyyyMMdd", Calendar.getInstance().getTime());
+            File backupFile = new File(dir, "bookmark-backup" + currentTime + ".db");
+            FileWriter writer = new FileWriter(backupFile);
+            writer.flush();
+            writer.close();
+            Uri uri = Uri.fromFile(backupFile);
+            scheduleAutoBackup(uri);
+            SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
+            settingsManager.setAutoBackupUri(backupFile.getPath());
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(), "Impossibile impostare il backup automatico",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void scheduleAutoBackup(Uri uri) {
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        intent.setData(uri);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+
+        if (alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
+    }
+
+    private void cancelAutoBackup() {
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
+        File file = new File(settingsManager.getAutoBackupUri());
+        Uri uri = Uri.fromFile(file);
+        intent.setData(uri);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+
+        if (alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
+        }
     }
 }
 

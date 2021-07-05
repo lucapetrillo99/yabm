@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
-            File folder = new File("/storage/emulated/0/Android" + File.separator +
+            File folder = new File(getFilesDir() + File.separator +
                     getString(R.string.app_name));
             boolean success = true;
             if (!folder.exists()) {
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 Toast.makeText(getApplicationContext(), "Qualcosa è andato storto!",
                         Toast.LENGTH_LONG).show();
             }
+            settingsManager.setFirstAccess(false);
         }
 
         if (result.equals(ALL_BOOKMARKS)) {

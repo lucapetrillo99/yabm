@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +20,9 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.text.format.DateFormat;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,29 +57,18 @@ public class BackupActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         backupHandler = BackupHandler.getInstance(getApplicationContext());
+        autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
 
         autoBackupSwitch = findViewById(R.id.auto_backup_switch);
         createBackupOption = findViewById(R.id.create_backup_option);
         restoreBackupOption = findViewById(R.id.restore_backup_option);
-
-        autoBackupManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP);
-        boolean previousState = autoBackupManager.getAutoBackup();
 
         setAutoBackupSwitch();
         autoBackupListener();
         createBackupListener();
         restoreBackupListener();
 
-        toolbar.setNavigationOnClickListener(v -> {
-            if (previousState != autoBackupManager.getAutoBackup()) {
-                if (autoBackupManager.getAutoBackup()) {
-                    createAutoBackupFile();
-                } else {
-                    cancelAutoBackup();
-                }
-            }
-            finish();
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setAutoBackupSwitch() {
@@ -84,7 +76,15 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void autoBackupListener() {
-        autoBackupSwitch.setOnClickListener(v -> autoBackupManager.setAutoBackup(autoBackupSwitch.isChecked()));
+        autoBackupSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
+            if (isChecked) {
+                createAutoBackupFile();
+                autoBackupManager.setAutoBackup(true);
+            } else {
+                cancelAutoBackup();
+                autoBackupManager.setAutoBackup(false);
+            }
+        });
     }
 
     private void createBackupListener() {
@@ -112,11 +112,51 @@ public class BackupActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
             } else {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
 
-                startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+                RelativeLayout autoRestore, manualRestore;
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = getLayoutInflater();
+                View view = inflater.inflate(R.layout.restore_backup_dialog, null);
+                builder.setView(view)
+                        .setTitle("Scegli l'operazione")
+                        .setNegativeButton("Annulla", (dialog, which) -> dialog.dismiss());
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                autoRestore = view.findViewById(R.id.auto_restore);
+                manualRestore = view.findViewById(R.id.manual_restore);
+
+                autoRestore.setOnClickListener(a -> {
+                    SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
+                    if (settingsManager.getAutoBackupUri() != null) {
+                        File file = new File(settingsManager.getAutoBackupUri());
+                        Uri uri = Uri.fromFile(file);
+                        int result = backupHandler.restoreBackup(uri);
+                        if (result == RESULT_OK) {
+                            alertDialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Backup ripristinato correttamente",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            alertDialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Impossibile ripristinare il backup",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        alertDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Non sono presenti backup da ripristinare",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                });
+
+                manualRestore.setOnClickListener(m -> {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+
+                    startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+                    alertDialog.dismiss();
+                });
             }
         });
     }

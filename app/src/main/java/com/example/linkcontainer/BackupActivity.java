@@ -252,9 +252,17 @@ public class BackupActivity extends AppCompatActivity {
             writer.flush();
             writer.close();
             Uri uri = Uri.fromFile(backupFile);
-            scheduleAutoBackup(uri);
-            SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
-            settingsManager.setAutoBackupUri(backupFile.getPath());
+            int result = backupHandler.createBackup(uri);
+            if (result == RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "Backup creato correttamente",
+                        Toast.LENGTH_LONG).show();
+                scheduleAutoBackup(uri);
+                SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
+                settingsManager.setAutoBackupUri(backupFile.getPath());
+            } else {
+                Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
+                        Toast.LENGTH_LONG).show();
+            }
         } catch (Exception e){
             Toast.makeText(getApplicationContext(), "Impossibile impostare il backup automatico",
                     Toast.LENGTH_LONG).show();

@@ -145,7 +145,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     private void removeContextualActionMode() {
         isContextualMenuEnable = false;
         areAllSelected = false;
-        toolbarTitle.setText("Categories");
+        toolbarTitle.setText("Categorie");
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
         toolbar.inflateMenu(R.menu.menu);

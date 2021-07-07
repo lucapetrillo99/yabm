@@ -1,9 +1,7 @@
 package com.example.linkcontainer;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.text.InputType;
 import android.util.Log;
@@ -12,22 +10,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,10 +28,10 @@ import static android.view.View.INVISIBLE;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
-    private ArrayList<String> categories;
+    private final ArrayList<String> categories;
     private DatabaseHandler db;
-    private Categories categoriesActivity;
-    private ArrayList<String> allCategories;
+    private final Categories categoriesActivity;
+    private final ArrayList<String> allCategories;
 
     public CategoriesAdapter(ArrayList<String> categories, Categories categoriesActivity) {
         this.categories = categories;
@@ -103,12 +95,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         holder.delete.setOnClickListener(v -> confirmDialog(position, v));
 
-        holder.checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                categoriesActivity.makeSelection(v, position);
-            }
-        });
+        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, position));
 
         if (categoriesActivity.areAllSelected) {
             for (int i = 0; i < categories.size(); i++) {
@@ -129,11 +116,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
     @Override
     public int getItemCount() {
-        if (categories == null) {
-            return 0;
-        } else {
-            return categories.size();
-        }
+        return categories.size();
     }
 
     @SuppressLint("SetTextI18n")
@@ -170,7 +153,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 if (isModify) {
                     String category = input.getText().toString();
                     if (!categories.get(position).equals(category)) {
-
                         String id = db.getCategoryId(categories.get(position));
                         boolean result = db.updateCategory(category, id);
                         if (result) {
@@ -208,7 +190,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         dialog.show();
     }
 
-    @SuppressLint("StaticFieldLeak")
     private class UpdateCategories extends AsyncTask<Void, Void, Void> {
         private final ArrayList<String> list;
 

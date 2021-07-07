@@ -1,6 +1,5 @@
 package com.example.linkcontainer;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -14,18 +13,15 @@ import android.os.Build;
 import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,15 +34,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
 
     private static final int DESCRIPTION_MAX_LENGTH = 120;
-    private ArrayList<Bookmark> bookmarks;
-    private MainActivity mainActivity;
+    private final ArrayList<Bookmark> bookmarks;
+    private final MainActivity mainActivity;
     private DatabaseHandler db;
-    private ArrayList<Bookmark> allBookmarks;
+    private final ArrayList<Bookmark> allBookmarks;
 
     public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
@@ -54,7 +49,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         this.allBookmarks = new ArrayList<>(bookmarks);
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
       TextView link, title, description;
       ImageView image;
       ImageButton shareButton;
@@ -145,50 +140,36 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             mainActivity.startActivity(i);
         });
 
-        holder.link.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                showDialog(position);
-                return false;
-            }
+        holder.link.setOnLongClickListener(v -> {
+            showDialog(position);
+            return false;
         });
 
-        holder.shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
-                shareIntent.setType("text/plain");
-                mainActivity.startActivity(shareIntent);
-                if (mainActivity.isContextualMenuEnable) {
-                    mainActivity.removeContextualActionMode();
-                }
+        holder.shareButton.setOnClickListener(arg0 -> {
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
+            shareIntent.setType("text/plain");
+            mainActivity.startActivity(shareIntent);
+            if (mainActivity.isContextualMenuEnable) {
+                mainActivity.removeContextualActionMode();
             }
         });
 
         if (!mainActivity.isArchiveModeEnabled) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                    Intent intent = new Intent(mainActivity, InsertLink.class);
-                    intent.putExtra("bookmark", bookmarks.get(position));
-                    intent.putExtra("category", category);
-                    mainActivity.startActivity(intent);
-                    if (mainActivity.isContextualMenuEnable) {
-                        mainActivity.removeContextualActionMode();
-                    }
+            holder.itemView.setOnClickListener(v -> {
+                String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                Intent intent = new Intent(mainActivity, InsertLink.class);
+                intent.putExtra("bookmark", bookmarks.get(position));
+                intent.putExtra("category", category);
+                mainActivity.startActivity(intent);
+                if (mainActivity.isContextualMenuEnable) {
+                    mainActivity.removeContextualActionMode();
                 }
             });
         }
         
-        holder.checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainActivity.makeSelection(v, position);
-            }
-        });
+        holder.checkbox.setOnClickListener(v -> mainActivity.makeSelection(v, position));
 
         if (mainActivity.areAllSelected) {
             for (int i = 0; i < bookmarks.size(); i++) {
@@ -216,7 +197,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
     private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
         private final int operation;
         private final ArrayList<Bookmark> list;
@@ -225,7 +205,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             this.list = bookmarks;
             this.operation = operation;
         }
-
 
         boolean result = true;
         @Override
@@ -287,24 +266,36 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                 filteredBookmarks.addAll(allBookmarks);
             } else {
                 for (Bookmark bookmark: allBookmarks) {
-                    if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
-                            || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
-                            || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        filteredBookmarks.add(bookmark);
+                    if (bookmark.getTitle() == null) {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
+                    } else if (bookmark.getDescription() == null) {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
+                    } else {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
                     }
                 }
             }
-
             FilterResults filterResults = new FilterResults();
             filterResults.values = filteredBookmarks;
 
             return filterResults;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             bookmarks.clear();
-            bookmarks.addAll((Collection<? extends Bookmark>) results.values);
+            bookmarks.addAll((ArrayList<Bookmark>) results.values);
             notifyDataSetChanged();
         }
     };
@@ -317,25 +308,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         TextView openLink = dialog.findViewById(R.id.open_link);
         TextView copyLink = dialog.findViewById(R.id.copy_link);
 
-        openLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(bookmarks.get(position).getLink()));
-                mainActivity.startActivity(i);
-                dialog.dismiss();
-            }
+        openLink.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(bookmarks.get(position).getLink()));
+            mainActivity.startActivity(i);
+            dialog.dismiss();
         });
 
-        copyLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(mainActivity.getApplicationContext(), "Link copiato negli appunti", Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-            }
+        copyLink.setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(mainActivity.getApplicationContext(), "Link copiato negli appunti", Toast.LENGTH_LONG).show();
+            dialog.dismiss();
         });
 
         dialog.show();

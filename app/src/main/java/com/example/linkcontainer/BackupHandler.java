@@ -24,7 +24,7 @@ public class BackupHandler {
     }
 
     public BackupHandler(Context context) {
-       this.context = context;
+       this.context = context.getApplicationContext();
        this.db = DatabaseHandler.getInstance(context);
     }
 

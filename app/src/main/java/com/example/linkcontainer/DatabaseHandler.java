@@ -317,19 +317,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean updateCategory(String category, String id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor c = db.rawQuery("Select " + KEY_NAME + " from " + TABLE_CATEGORY +
-                " where " + KEY_NAME + " = ?", new String[]{category});
+        ContentValues values = new ContentValues();
+        values.put(CATEGORY_ID, id);
+        values.put(KEY_NAME, category);
 
-        if (c.moveToFirst()) {
-            return false;
-        } else {
-            Cursor cursor = db.rawQuery(" Update " + TABLE_CATEGORY + " set " +
-                            KEY_NAME + " = ? " + " where " + CATEGORY_ID + " = ? ",
-                    new String[] {category, id});
+        int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
+                new String[] { id });
 
-            cursor.close();
-            return true;
-        }
+        return result == 1;
     }
 
     public boolean updateBookmark(Bookmark bookmark) {

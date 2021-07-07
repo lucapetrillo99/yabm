@@ -1,13 +1,5 @@
 package com.example.linkcontainer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -18,11 +10,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import androidx.appcompat.widget.SearchView;
-
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -248,26 +247,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
-                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getAbsoluteAdapterPosition();
 
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
                         if(toolbarTitle.getText().toString().equals("Archiviati")) {
-                            Bookmark disarchivedBookmark = bookmarks.get(position);
+                            Bookmark unarchivedBookmark = bookmarks.get(position);
                             removedFromArchive.add(bookmarks.get(position));
+                            recyclerAdapter.removeBookmark(position);
                             bookmarks.remove(position);
                             recyclerAdapter.notifyItemRemoved(position);
 
-                            Snackbar.make(recyclerView, disarchivedBookmark.getLink() + " rimosso dall'archivio.", Snackbar.LENGTH_LONG)
+                            Snackbar.make(recyclerView, unarchivedBookmark.getLink() + " rimosso dall'archivio.", Snackbar.LENGTH_LONG)
                                     .setAction("Annulla", v -> {
-                                        removedFromArchive.remove(removedFromArchive.lastIndexOf(disarchivedBookmark));
-                                        bookmarks.add(position, disarchivedBookmark);
+                                        removedFromArchive.remove(removedFromArchive.lastIndexOf(unarchivedBookmark));
+                                        bookmarks.add(position, unarchivedBookmark);
                                         recyclerAdapter.notifyItemInserted(position);
                                     }).show();
                         } else {
                             Bookmark archivedBookmark = bookmarks.get(position);
                             archivedUrl.add(bookmarks.get(position));
                             bookmarks.remove(position);
+                            recyclerAdapter.removeBookmark(position);
                             recyclerAdapter.notifyItemRemoved(position);
 
                             Snackbar.make(recyclerView, archivedBookmark.getLink() + " archiviato.", Snackbar.LENGTH_LONG)
@@ -326,6 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     if (db.deleteBookmark(id)) {
                         bookmarks.remove(position);
+                        recyclerAdapter.removeBookmark(position);
                         recyclerAdapter.notifyItemRemoved(position);
                         Toast.makeText(getApplicationContext(), "Segnalibro eliminato", Toast.LENGTH_LONG).show();
                     } else {
@@ -354,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     }
 
-    @SuppressLint("SetTextI18n")
     public void onResume() {
         super.onResume();
         archiveUrl();
@@ -381,14 +382,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeContextualActionMode();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
         recyclerAdapter.notifyDataSetChanged();
-
         return true;
     }
 
@@ -488,9 +483,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         String finalDeletedQuestion = deletedQuestion;
         builder.setMessage(message + counter + bookmarkQuestion)
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> {
-                    dialogInterface.cancel();
-                })
+                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     switch (operation) {
                         case DELETE_OPTION:

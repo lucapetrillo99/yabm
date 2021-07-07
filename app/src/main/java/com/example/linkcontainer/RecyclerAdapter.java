@@ -300,6 +300,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
     };
 
+    public void removeBookmark(int position) {
+        allBookmarks.remove(position);
+    }
+
     public void showDialog(int position) {
         final Dialog dialog = new Dialog(mainActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

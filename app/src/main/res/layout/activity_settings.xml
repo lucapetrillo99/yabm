@@ -259,7 +259,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -271,7 +270,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_info"
-            android:contentDescription="Info">
+            android:contentDescription="Info App">
         </ImageView>
 
         <LinearLayout
@@ -282,20 +281,10 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
                 android:text="Info App"
-                android:paddingLeft="45dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:paddingStart="45dp"
-                tools:ignore="RtlSymmetry">
-            </TextView>
-
-            <TextView
-                android:id="@+id/version"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="45dp"
                 android:paddingStart="45dp"
                 tools:ignore="RtlSymmetry">
             </TextView>

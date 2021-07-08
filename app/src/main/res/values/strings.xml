@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LinkContainer</string>
+    <string name="extended_app_name">Yet Another Bookmark Manager</string>
+    <string name="version">Versione %1$s</string>
 </resources>

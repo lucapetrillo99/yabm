@@ -1,17 +1,16 @@
 package com.example.linkcontainer;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -23,10 +22,9 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout importExport;
     private RelativeLayout backup;
     private RelativeLayout sendFeedback;
-    private TextView appVersion;
+    private RelativeLayout appInfo;
     private DatabaseHandler db;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +42,12 @@ public class SettingsActivity extends AppCompatActivity {
         importExport = findViewById(R.id.import_export_setting);
         backup = findViewById(R.id.backup_setting);
         sendFeedback = findViewById(R.id.feedback_setting);
-        appVersion = findViewById(R.id.version);
+        appInfo = findViewById(R.id.information_setting);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
-
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        setApplicationInfo();
+        appInfoClickListener();
         themeClickListener();
         categoriesClickListener();
         starCategoryClickListener();
@@ -137,21 +134,16 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void setApplicationInfo() {
-        try {
-            PackageInfo pInfo = getApplicationContext().getPackageManager().
-                    getPackageInfo(getApplicationContext().getPackageName(), 0);
-            appVersion.setText(pInfo.versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void feedbackClickListener() {
         sendFeedback.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
             startActivity(intent);
         });
     }
-
+    private void appInfoClickListener() {
+        appInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(SettingsActivity.this, InfoAppActivity.class);
+            startActivity(intent);
+        });
+    }
 }

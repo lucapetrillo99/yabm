@@ -59,8 +59,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
         public MyViewHolder(final View itemView, MainActivity mainActivity) {
             super(itemView);
-            link = itemView.findViewById(R.id.url);
             title = itemView.findViewById(R.id.title);
+            link = itemView.findViewById(R.id.link);
             description = itemView.findViewById(R.id.description);
             image = itemView.findViewById(R.id.image);
             checkbox = itemView.findViewById(R.id.checkbox);
@@ -83,9 +83,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         String description = bookmarks.get(position).getDescription();
-        String text = "<a href=" + bookmarks.get(position).getLink() + ">" + bookmarks.get(position).getLink()  +" </a>";
-        holder.link.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
         holder.title.setText(bookmarks.get(position).getTitle());
+        holder.link.setText(bookmarks.get(position).getLink());
 
         if (mainActivity.isContextualMenuEnable) {
             holder.checkbox.setVisibility(View.VISIBLE);
@@ -134,10 +133,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             holder.checkbox.setLayoutParams(checkboxLayout);
         }
 
-        holder.link.setOnClickListener(v -> {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(bookmarks.get(position).getLink()));
-            mainActivity.startActivity(i);
+        holder.title.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(bookmarks.get(position).getLink()));
+            Intent chooser = Intent.createChooser(intent, "Apri con");
+            mainActivity.startActivity(chooser);
         });
 
         holder.link.setOnLongClickListener(v -> {

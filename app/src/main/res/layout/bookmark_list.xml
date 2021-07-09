@@ -11,7 +11,6 @@
         cardview:strokeColor="?attr/strokeColor"
         cardview:strokeWidth="1dp"
         cardview:cardCornerRadius="5dp"
-        android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         app:cardUseCompatPadding="true">
 
@@ -26,11 +25,8 @@
                 android:layout_width="328dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_marginStart="0dp"
-                android:layout_marginLeft="0dp"
                 android:layout_marginEnd="4dp"
-                android:layout_marginRight="4dp"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="Url"
@@ -45,13 +41,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
                 android:layout_marginStart="12dp"
-                android:layout_marginLeft="12dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginRight="25dp"
                 android:layout_toStartOf="@+id/image"
-                android:layout_toLeftOf="@+id/image"
-                android:layout_toRightOf="@+id/bar"
                 android:layout_toEndOf="@+id/bar"
                 android:maxLines="1"
                 android:text="Title"
@@ -71,14 +63,10 @@
                 android:layout_height="57dp"
                 android:layout_below="@id/link"
                 android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_toStartOf="@+id/image"
-                android:layout_toLeftOf="@+id/image"
                 android:layout_toEndOf="@+id/bar"
-                android:layout_toRightOf="@+id/bar"
                 android:maxLines="10"
                 android:text="Description"
                 android:textSize="12sp">
@@ -90,10 +78,8 @@
                 android:layout_height="100dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginRight="27dp"
                 android:adjustViewBounds="true">
             </ImageView>
 
@@ -103,9 +89,7 @@
                 android:layout_height="30dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_marginTop="50dp"
-                android:layout_marginRight="10dp"
                 android:layout_marginEnd="10dp"
                 android:visibility="invisible">
             </CheckBox>
@@ -120,7 +104,8 @@
         android:gravity="center_vertical"
         android:layout_gravity="center"
         android:background="@null"
-        android:src="@drawable/ic_share">
+        android:src="@drawable/ic_share"
+        android:contentDescription="Share">
     </ImageButton>
 
 </LinearLayout>

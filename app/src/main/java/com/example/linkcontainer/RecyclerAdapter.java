@@ -121,7 +121,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             RelativeLayout.LayoutParams descriptionLayoutParams = (RelativeLayout.LayoutParams) holder.description.getLayoutParams();
             RelativeLayout.LayoutParams titleLayoutParams = (RelativeLayout.LayoutParams) holder.title.getLayoutParams();
             descriptionLayoutParams.height = 200;
-            descriptionLayoutParams.width = 1000;
+            descriptionLayoutParams.width = 750;
             titleLayoutParams.width = 1000;
             holder.description.setLayoutParams(descriptionLayoutParams);
         } else if (description == null && bookmarks.get(position).getImage() == null) {
@@ -140,7 +140,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
             mainActivity.startActivity(chooser);
         });
 
-        holder.link.setOnLongClickListener(v -> {
+        holder.title.setOnLongClickListener(v -> {
             showDialog(position);
             return false;
         });

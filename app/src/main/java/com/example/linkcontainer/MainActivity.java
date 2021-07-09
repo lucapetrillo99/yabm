@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
+            previousCategory = toolbarTitle.getText().toString();
             activityIntent = new Intent(MainActivity.this, InsertLink.class);
             startActivity(activityIntent);
             if (isContextualMenuEnable) {
@@ -360,6 +360,14 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         super.onResume();
         archiveUrl();
         setBookmarksLabel();
+        if (previousCategory != null) {
+            if (previousCategory.equals("Tutti i segnalibri")) {
+                bookmarks = db.getAllBookmarks();
+            } else {
+                bookmarks = db.getBookmarksByCategory(previousCategory);
+            }
+            setAdapter();
+        }
         categories.clear();
         categories = db.getAllCategories();
         invalidateOptionsMenu();

@@ -544,8 +544,6 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
-                intent = new Intent(InsertLink.this, MainActivity.class);
-                startActivity(intent);
                 finish();
             } else {
                 Toast.makeText(getApplicationContext(),

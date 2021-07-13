@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             bookmarks = new ArrayList<>(db.getBookmarksByCategory(result));
         }
         toolbarTitle.setText(result);
+        previousCategory = result;
         archiveUrl();
         unarchiveBookmark();
 
@@ -167,13 +167,26 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
+                        recyclerAdapter.getFilter().filter(query);
                         return false;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText) {
-                        recyclerAdapter.getFilter().filter(newText);
                         return false;
+                    }
+                });
+                searchView.setOnQueryTextFocusChangeListener((view, queryTextFocused) -> {
+                    if(!queryTextFocused) {
+                        if (previousCategory.equals(ALL_BOOKMARKS)) {
+                            bookmarks.clear();
+                            bookmarks = db.getAllBookmarks();
+                            setAdapter();
+                        } else {
+                            bookmarks.clear();
+                            bookmarks = db.getBookmarksByCategory(previousCategory);
+                            setAdapter();
+                        }
                     }
                 });
                 break;
@@ -217,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     fab.setVisibility(View.VISIBLE);
                 }
                 toolbarTitle.setText(item.getTitle());
+                previousCategory = (String) item.getTitle();
                 archiveUrl();
                 unarchiveBookmark();
                 bookmarks.clear();
@@ -224,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 setAdapter();
             } else if (item.getTitle().equals(ALL_BOOKMARKS)){
                 toolbarTitle.setText(item.getTitle());
+                previousCategory = (String) item.getTitle();
                 fab.setVisibility(View.VISIBLE);
                 archiveUrl();
                 unarchiveBookmark();
@@ -361,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         archiveUrl();
         setBookmarksLabel();
         if (previousCategory != null) {
-            if (previousCategory.equals("Tutti i segnalibri")) {
+            if (previousCategory.equals(ALL_BOOKMARKS)) {
                 bookmarks = db.getAllBookmarks();
             } else {
                 bookmarks = db.getBookmarksByCategory(previousCategory);

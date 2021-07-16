@@ -1,5 +1,7 @@
 package com.example.linkcontainer;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -7,9 +9,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Picasso;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Categories extends AppCompatActivity implements View.OnLongClickListener {
@@ -29,11 +41,11 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     private DatabaseHandler db;
     private Toolbar toolbar;
     private TextView toolbarTitle;
-    private ArrayList<String> categories;
-    private ArrayList<String> selectedCategories;
+    private ArrayList<Category> categories;
+    private ArrayList<Category> selectedCategories;
     private int counter = 0;
+    public static final int PERMISSION_REQUEST_STORAGE = 1000;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +57,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         recyclerView = findViewById(R.id.recycler_view);
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
@@ -141,7 +148,6 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         toolbarTitle.setText(String.valueOf(counter));
     }
 
-    @SuppressLint("SetTextI18n")
     private void removeContextualActionMode() {
         isContextualMenuEnable = false;
         areAllSelected = false;
@@ -205,5 +211,57 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public void getImageFromDevice() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                showWarningMessage();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                categoriesAdapter.addImageTitle.setVisibility(View.GONE);
+                categoriesAdapter.addImageButton.setVisibility(View.GONE);
+                categoriesAdapter.categoryImage.setVisibility(View.VISIBLE);
+                Picasso.get().load(data.getData())
+                        .fit()
+                        .centerCrop()
+                        .into(categoriesAdapter.categoryImage);
+
+            }
+        }
+    }
+
+    private void showWarningMessage() {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
+                Snackbar.LENGTH_LONG);
+
+        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setPadding(0, 0, 0, 0);
+
+        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
+
+        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
+        snackbarLayout.addView(customView, 0);
+        snackbar.show();
     }
 }

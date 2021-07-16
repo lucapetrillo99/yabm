@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private TextView toolbarTitle;
     private TextView noBookmarks;
     private FloatingActionButton fab;
-    private ArrayList<String> categories;
+    private ArrayList<Category> categories;
     private ArrayList<Bookmark> archivedUrl;
     private ArrayList<Bookmark> removedFromArchive;
     private ArrayList<Bookmark> selectedBookmarks;
@@ -220,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 break;
         }
 
-        for (String category: categories) {
-            if(item.getTitle() == category) {
+        for (Category category: categories) {
+            if (item.getTitle().equals(category.getCategoryTitle())) {
                 if(item.getTitle().equals("Archiviati")) {
                     isArchiveModeEnabled = true;
                     fab.setVisibility(View.INVISIBLE);
@@ -444,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         subMenu.clear();
         subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
         for (int i = 0; i < categories.size(); i ++) {
-            subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
+            subMenu.add(0, i + 1, Menu.NONE, categories.get(i).getCategoryTitle());
         }
     }
 

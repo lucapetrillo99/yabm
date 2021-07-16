@@ -49,7 +49,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private String category;
     private DatabaseHandler db;
     private Bookmark bookmark;
-    private ArrayList<String> categories;
+    private ArrayList<Category> categories;
     private Spinner dropdown;
     private boolean isPressed = false;
     private int pressedCounter = 0;
@@ -83,7 +83,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         ImageButton removeRemainder = findViewById(R.id.remove_reminder);
         bookmark = new Bookmark();
         categories = db.getCategories();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+        ArrayAdapter<Category> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, categories);
         dropdown.setAdapter(adapter);
 
@@ -175,7 +175,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     if (!input.getText().toString().isEmpty()) {
                         boolean result = db.addCategory(input.getText().toString());
                         if (result) {
-                            categories.add(input.getText().toString());
+                            Category category = new Category();
+                            category.setCategoryTitle(input.getText().toString());
+                            categories.add(category);
                             dialog.dismiss();
                             Toast.makeText(InsertLink.this,
                                     "Categoria inserita correttamente", Toast.LENGTH_LONG).show();

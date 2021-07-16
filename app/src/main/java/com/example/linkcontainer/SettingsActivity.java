@@ -97,13 +97,16 @@ public class SettingsActivity extends AppCompatActivity {
         startCategory.setOnClickListener(v -> {
             SettingsManager categoryManager = new SettingsManager(getApplicationContext(), CATEGORY);
             int checkedItem = 0;
-            String category = categoryManager.getCategory();
+            String startCategory = categoryManager.getCategory();
+            ArrayList<Category> categoryList = new ArrayList<>(db.getAllCategories());
             ArrayList<String> list = new ArrayList<>();
             list.add("Tutti i segnalibri");
-            list.addAll(db.getAllCategories());
+            for (Category category: categoryList) {
+                list.add(category.getCategoryTitle());
+            }
 
             for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).equals(category)) {
+                if (list.get(i).equals(startCategory)) {
                     checkedItem = i;
                 }
             }

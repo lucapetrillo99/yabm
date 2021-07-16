@@ -39,11 +39,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // TAGS Table - column names
     private static final String KEY_NAME = "name";
+    private static final String KEY_ICON = "icon";
 
 
     // Tag table create statement
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT" + ")";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
+            KEY_ICON + " TEXT" + ")";
 
     // Table Create Statements
     // Todo table create statement
@@ -75,6 +77,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_NAME, "Default");
         db.insert(TABLE_CATEGORY, null, values);
         values.put(KEY_NAME, "Archiviati");
+        db.insert(TABLE_CATEGORY, null, values);
+        values.put(KEY_NAME, "Miei");
         db.insert(TABLE_CATEGORY, null, values);
     }
 
@@ -168,34 +172,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result == 1;
     }
 
-    public ArrayList<String> getCategories() {
+    public ArrayList<Category> getCategories() {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<Category> categories = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
                 + KEY_NAME + " != ?", new String[]{"Archiviati"});
 
         if (cursor.moveToFirst()) {
             do {
-                categories.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                Category category = new Category();
+                category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
+                category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                category.setCategoryImage(cursor.getString(cursor.getColumnIndex(KEY_ICON)));
+
+                categories.add(category);
             } while (cursor.moveToNext());
         }
 
         return categories;
     }
 
-    public ArrayList<String> getAllCategories() {
+    public ArrayList<Category> getAllCategories() {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<Category> categories = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
 
         if (cursor.moveToFirst()) {
             do {
+                Category category = new Category();
+                category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
+                category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                category.setCategoryImage(cursor.getString(cursor.getColumnIndex(KEY_ICON)));
 
-                categories.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                categories.add(category);
             } while (cursor.moveToNext());
         }
 
@@ -294,35 +307,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{id}) > 0;
     }
 
-    public boolean deleteCategory(String category) {
+    public boolean deleteCategory(Category category) {
         boolean result = false;
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
-                " where " + KEY_NAME + " = ?", new String[]{category});
-
-        if (cursor.moveToFirst()){
-            String id = cursor.getString(cursor.getColumnIndex(CATEGORY_ID));
-            result = db.delete(TABLE_CATEGORY, KEY_NAME + " = ?",
-                    new String[]{category}) > 0;
-
-            if (result) {
-                db.delete(TABLE_BOOKMARK, KEY_CATEGORY + " = ?",
-                        new String[]{id});
-            }
-        }
-        return result;
+        return db.delete(TABLE_BOOKMARK, BOOKMARK_ID + " = ?",
+                new String[]{category.getCategoryId()}) > 0;
     }
 
-    public boolean updateCategory(String category, String id) {
+    public boolean updateCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(CATEGORY_ID, id);
-        values.put(KEY_NAME, category);
+        values.put(CATEGORY_ID, category.getCategoryId());
+        values.put(KEY_NAME, category.getCategoryTitle());
+        values.put(KEY_ICON, category.getCategoryImage());
 
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
-                new String[] { id });
+                new String[] { category.getCategoryId() });
 
         return result == 1;
     }

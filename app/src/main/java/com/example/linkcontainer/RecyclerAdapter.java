@@ -36,7 +36,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
-
     private static final int DESCRIPTION_MAX_LENGTH = 120;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;

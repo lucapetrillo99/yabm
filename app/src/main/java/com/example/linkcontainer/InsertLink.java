@@ -1,10 +1,18 @@
 package com.example.linkcontainer;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -19,19 +27,24 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +57,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private EditText inputLink, title;
     private TextView reminderTitle;
     private String category;
@@ -59,6 +73,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
     private boolean isModified = false;
+    private TextView addImageTitle;
+    private ImageButton addImageButton;
+    private ImageView categoryImage;
+    private Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +101,13 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         ImageButton removeRemainder = findViewById(R.id.remove_reminder);
         bookmark = new Bookmark();
         categories = db.getCategories();
-        ArrayAdapter<Category> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item, categories);
+        ArrayList<String> filteredCategories = new ArrayList<>();
+
+        for(Category category: categories) {
+            filteredCategories.add(category.getCategoryTitle());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, filteredCategories);
         dropdown.setAdapter(adapter);
 
         Intent intent = getIntent();
@@ -166,20 +189,32 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
+            addImageTitle = dialogView.findViewById(R.id.add_image_title);
+            addImageButton = dialogView.findViewById(R.id.add_image_button);
+            categoryImage = dialogView.findViewById(R.id.category_image);
             title.setText("Nuova categoria");
             input.setHint("Inserisci la categoria");
+
+            addImageButton.setOnClickListener(v1 -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+                } else {
+                    getImageFromDevice();
+                }
+            });
 
             dialog.setOnShowListener(dialogInterface -> {
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(view1 -> {
                     if (!input.getText().toString().isEmpty()) {
-                        boolean result = true;
-//                        Category category = new Category();
-//                        category.setCategoryTitle(input.getText().toString());
-//                        boolean result = db.addCategory(input.getText().toString());
+                        Category category = new Category();
+                        category.setCategoryTitle(input.getText().toString());
+                        category.setCategoryImage(image);
+                        boolean result = db.addCategory(category);
                         if (result) {
-
-//                            categories.add(category);
+                            categories.add(category);
+                            filteredCategories.add(category.getCategoryTitle());
                             dialog.dismiss();
                             Toast.makeText(InsertLink.this,
                                     "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
@@ -365,6 +400,43 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     .show();
             setRemainder = false;
         });
+    }
+
+    public void getImageFromDevice() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                showWarningMessage();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                addImageTitle.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                categoryImage.setVisibility(View.VISIBLE);
+                Uri chosenImageUri = data.getData();
+
+                try {
+                    image = MediaStore.Images.
+                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
+                    categoryImage.setImageBitmap(image);
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     public void setSpinnerItem(String category) {
@@ -576,5 +648,25 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         } else {
             exitConfirmDialog();
         }
+    }
+
+    private void showWarningMessage() {
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
+                Snackbar.LENGTH_LONG);
+
+        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setPadding(0, 0, 0, 0);
+
+        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
+
+        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
+        snackbarLayout.addView(customView, 0);
+        snackbar.show();
     }
 }

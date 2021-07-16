@@ -173,11 +173,13 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(view1 -> {
                     if (!input.getText().toString().isEmpty()) {
-                        boolean result = db.addCategory(input.getText().toString());
+                        boolean result = true;
+//                        Category category = new Category();
+//                        category.setCategoryTitle(input.getText().toString());
+//                        boolean result = db.addCategory(input.getText().toString());
                         if (result) {
-                            Category category = new Category();
-                            category.setCategoryTitle(input.getText().toString());
-                            categories.add(category);
+
+//                            categories.add(category);
                             dialog.dismiss();
                             Toast.makeText(InsertLink.this,
                                     "Categoria inserita correttamente", Toast.LENGTH_LONG).show();

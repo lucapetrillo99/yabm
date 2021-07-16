@@ -1,15 +1,17 @@
 package com.example.linkcontainer;
 
+import android.graphics.Bitmap;
+
 public class Category {
     String id;
     String title;
-    String image;
+    Bitmap image;
 
     public Category() {
 
     }
 
-    public Category(String id, String title, String image) {
+    public Category(String id, String title, Bitmap image) {
 
         this.id = id;
         this.title = title;
@@ -24,7 +26,7 @@ public class Category {
         return title;
     }
 
-    public String getCategoryImage() {
+    public Bitmap getCategoryImage() {
         return image;
     }
 
@@ -36,7 +38,7 @@ public class Category {
         this.title = title;
     }
 
-    public void setCategoryImage(String image) {
+    public void setCategoryImage(Bitmap image) {
         this.image = image;
     }
 }

@@ -5,8 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -45,7 +48,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Tag table create statement
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
             + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
-            KEY_ICON + " TEXT" + ")";
+            KEY_ICON + " BLOB" + ")";
 
     // Table Create Statements
     // Todo table create statement
@@ -114,17 +117,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addCategory(String category) {
+    public boolean addCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
-                + KEY_NAME + " = ?", new String[]{category});
+                + KEY_NAME + " = ?", new String[]{category.getCategoryTitle()});
 
         if (cursor.moveToFirst()) {
             return false;
         } else {
+
+            Bitmap image = category.getCategoryImage();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
             ContentValues values = new ContentValues();
-            values.put(KEY_NAME, category);
+            values.put(KEY_NAME, category.getCategoryTitle());
+            values.put(KEY_ICON, imageBytes);
             db.insert(TABLE_CATEGORY, null, values);
 
             return true;
@@ -185,8 +195,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                category.setCategoryImage(cursor.getString(cursor.getColumnIndex(KEY_ICON)));
-
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_ICON));
+                if (imageBytes != null) {
+                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    category.setCategoryImage(image);
+                }
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -206,8 +219,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                category.setCategoryImage(cursor.getString(cursor.getColumnIndex(KEY_ICON)));
-
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_ICON));
+                if (imageBytes != null) {
+                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    category.setCategoryImage(image);
+                }
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -308,7 +324,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public boolean deleteCategory(Category category) {
-        boolean result = false;
         SQLiteDatabase db = this.getWritableDatabase();
 
         return db.delete(TABLE_BOOKMARK, BOOKMARK_ID + " = ?",
@@ -318,10 +333,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean updateCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        Bitmap image = category.getCategoryImage();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
-        values.put(KEY_ICON, category.getCategoryImage());
+        values.put(KEY_ICON, imageBytes);
 
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[] { category.getCategoryId() });

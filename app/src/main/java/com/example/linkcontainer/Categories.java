@@ -236,11 +236,16 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                 categoriesAdapter.addImageTitle.setVisibility(View.GONE);
                 categoriesAdapter.addImageButton.setVisibility(View.GONE);
                 categoriesAdapter.categoryImage.setVisibility(View.VISIBLE);
-                Picasso.get().load(data.getData())
-                        .fit()
-                        .centerCrop()
-                        .into(categoriesAdapter.categoryImage);
+                Uri chosenImageUri = data.getData();
 
+                try {
+                    categoriesAdapter.image = MediaStore.Images.
+                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
+                    categoriesAdapter.categoryImage.setImageBitmap(categoriesAdapter.image);
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

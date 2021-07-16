@@ -193,7 +193,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         String queryResult = db.getCategoryId(IMPORTED);
         String categoryId;
         if (queryResult == null) {
-            db.addCategory(IMPORTED);
+//            db.addCategory(IMPORTED);
             categoryId = db.getCategoryId(IMPORTED);
         } else {
             categoryId = queryResult;

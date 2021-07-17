@@ -81,8 +81,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CATEGORY, null, values);
         values.put(KEY_NAME, "Archiviati");
         db.insert(TABLE_CATEGORY, null, values);
-        values.put(KEY_NAME, "Miei");
-        db.insert(TABLE_CATEGORY, null, values);
     }
 
     @Override
@@ -326,7 +324,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean deleteCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        return db.delete(TABLE_BOOKMARK, BOOKMARK_ID + " = ?",
+        return db.delete(TABLE_CATEGORY, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()}) > 0;
     }
 

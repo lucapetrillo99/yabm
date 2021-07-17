@@ -259,10 +259,12 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         protected Void doInBackground(Void... voids) {
 
             for (Category selectedCategory : list) {
-                categories.remove(selectedCategory);
-                result = db.deleteCategory(selectedCategory);
-                if (!result) {
-                    break;
+                if (!selectedCategory.getCategoryTitle().equals("Default")) {
+                    categories.remove(selectedCategory);
+                    result = db.deleteCategory(selectedCategory);
+                    if (!result) {
+                        break;
+                    }
                 }
             }
             return null;
@@ -287,15 +289,15 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     Category category = new Category();
+                    category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(categories.get(position).getCategoryTitle());
-                    categories.remove(position);
-                    notifyItemRemoved(position);
                     boolean result = db.deleteCategory(category);
-
-                    if (!result) {
+                    if (result) {
+                        categories.remove(position);
+                        notifyItemRemoved(position);
+                    } else {
                         Toast.makeText(v.getRootView().getContext(), "Impossibile eliminare la categoria", Toast.LENGTH_LONG).show();
-                        categories.add(position, category);
-                        notifyItemInserted(position);
+
                     }
                 });
         AlertDialog alertDialog = builder.create();

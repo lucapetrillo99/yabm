@@ -126,15 +126,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             return false;
         } else {
-
-            Bitmap image = category.getCategoryImage();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, category.getCategoryTitle());
-            values.put(KEY_ICON, imageBytes);
+            if (category.getCategoryImage() != null) {
+                Bitmap image = category.getCategoryImage();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                values.put(KEY_ICON, imageBytes);
+            }
             db.insert(TABLE_CATEGORY, null, values);
 
             return true;
@@ -333,16 +333,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean updateCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Bitmap image = category.getCategoryImage();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
-        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
-        values.put(KEY_ICON, imageBytes);
-
+        if (category.getCategoryImage() != null) {
+            Bitmap image = category.getCategoryImage();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            values.put(KEY_ICON, imageBytes);
+        } else {
+            values.put(KEY_ICON, (byte[]) null); 
+        }
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[] { category.getCategoryId() });
 

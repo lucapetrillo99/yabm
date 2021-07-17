@@ -236,6 +236,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                 categoriesAdapter.addImageTitle.setVisibility(View.GONE);
                 categoriesAdapter.addImageButton.setVisibility(View.GONE);
                 categoriesAdapter.categoryImage.setVisibility(View.VISIBLE);
+                categoriesAdapter.imageLayout.setVisibility(View.VISIBLE);
                 Uri chosenImageUri = data.getData();
 
                 try {

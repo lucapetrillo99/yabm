@@ -1,17 +1,11 @@
 package com.example.linkcontainer;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.text.InputType;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +17,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,13 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 
 import static android.view.View.INVISIBLE;
@@ -49,9 +38,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     private final ArrayList<Category> allCategories;
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     public ImageView categoryImage;
-    public ImageButton addImageButton;
+    public ImageButton addImageButton, modifyImage, removeImage;
     public TextView addImageTitle;
     public Bitmap image;
+    public LinearLayout imageLayout;
 
     public CategoriesAdapter(ArrayList<Category> categories, Categories categoriesActivity) {
         this.categories = categories;
@@ -112,9 +102,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         }
 
         holder.modify.setOnClickListener(v -> createDialog(position, true, v));
-
         holder.delete.setOnClickListener(v -> confirmDialog(position, v));
-
         holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, position));
 
         if (categoriesActivity.areAllSelected) {
@@ -154,7 +142,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         addImageTitle = dialogView.findViewById(R.id.add_image_title);
         addImageButton = dialogView.findViewById(R.id.add_image_button);
         categoryImage = dialogView.findViewById(R.id.category_image);
+        imageLayout = dialogView.findViewById(R.id.image_layout);
+        modifyImage = dialogView.findViewById(R.id.modify_image);
+        removeImage = dialogView.findViewById(R.id.remove_image);
 
+        image = null;
         if (isModify) {
             title.setText("Modifica categoria");
         } else {
@@ -164,13 +156,19 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         if (isModify) {
             input.setText(categories.get(position).getCategoryTitle());
-            Log.i("OUSHDOH", String.valueOf(categories.get(position).getCategoryImage().getClass()));
-
             if (categories.get(position).getCategoryImage() != null) {
                 addImageTitle.setVisibility(View.GONE);
                 addImageButton.setVisibility(View.GONE);
                 categoryImage.setVisibility(View.VISIBLE);
                 categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
+            }
+            if (categories.get(position).getCategoryImage() != null) {
+                Log.i("OUSHDOH", "Entro");
+                addImageTitle.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                categoryImage.setVisibility(View.VISIBLE);
+                categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
+                imageLayout.setVisibility(View.VISIBLE);
             }
         } else {
             input.setHint("Inserisci la categoria");
@@ -185,28 +183,46 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             }
         });
 
+        modifyImage.setOnClickListener(v1 -> categoriesActivity.getImageFromDevice());
+
+        removeImage.setOnClickListener(v1 -> {
+            image = null;
+            if (isModify) {
+                categories.get(position).setCategoryImage(null);
+            }
+            addImageTitle.setVisibility(View.VISIBLE);
+            addImageButton.setVisibility(View.VISIBLE);
+            categoryImage.setVisibility(View.GONE);
+            imageLayout.setVisibility(View.GONE);
+
+        });
+
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 if (isModify) {
                     Category category = new Category();
+                    category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
-                    category.setCategoryImage(image);
-                    if (!categories.get(position).getCategoryTitle().equals(category.getCategoryTitle())) {
-                        boolean result = db.updateCategory(category);
-                        if (result) {
-                            Toast.makeText(v.getRootView().getContext(),
-                                    "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
-                            categories.set(position, category);
-                            notifyItemChanged(position);
-                        } else {
-                            Toast.makeText(v.getRootView().getContext(),
-                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
-                        }
+                    Log.i("OUSHDOH", String.valueOf(image));
+                    if (image == null) {
+                        category.setCategoryImage(categories.get(position).getCategoryImage());
                     } else {
-                        dialog.dismiss();
+                        category.setCategoryImage(image);
                     }
+                    boolean result = db.updateCategory(category);
+                    Log.i("OUSHDOH", String.valueOf(result));
+                    if (result) {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                        categories.set(position, category);
+                        notifyItemChanged(position);
+                    } else {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                    }
+                    dialog.dismiss();
                 } else {
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();

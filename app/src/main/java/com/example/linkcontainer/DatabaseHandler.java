@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
+    private Context mContext;
     private static DatabaseHandler instance;
 
     // Database Version
@@ -62,7 +63,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static synchronized DatabaseHandler getInstance(Context context) {
         if (instance == null)
             instance = new DatabaseHandler(context.getApplicationContext());
-
         return instance;
     }
 
@@ -75,12 +75,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // creating required tables
         db.execSQL(CREATE_TABLE_CATEGORY);
         db.execSQL(CREATE_TABLE_BOOKMARK);
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, "Default");
-        db.insert(TABLE_CATEGORY, null, values);
-        values.put(KEY_NAME, "Archiviati");
-        db.insert(TABLE_CATEGORY, null, values);
     }
 
     @Override

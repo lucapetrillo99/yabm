@@ -14,8 +14,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/toolbar_title"
             android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginStart="20dp"
             android:textStyle="bold">
         </TextView>
+
     </RelativeLayout>
 
 </androidx.appcompat.widget.Toolbar>

@@ -3,13 +3,19 @@ package com.example.linkcontainer;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +24,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -41,8 +51,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+    private RecyclerView categoriesRecyclerview;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private DrawerLayout drawerLayout;
     private TextView noBookmarks;
     private FloatingActionButton fab;
     private ArrayList<Category> categories;
@@ -68,11 +80,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        ImageView categoriesMenu = findViewById(R.id.categories_menu);
+        categoriesRecyclerview = findViewById(R.id.categories_recyclerview);
         setSupportActionBar(toolbar);
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
+            Drawable defaultDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_default, null);
+            Category defaultCategory = new Category();
+            defaultCategory.setCategoryTitle("Default");
+            defaultCategory.setCategoryImage(drawableToBitmap(defaultDrawable));
+            Drawable archiveDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_archive, null);
+            Category archiveCategory = new Category();
+            archiveCategory.setCategoryTitle("Archiviati");
+            archiveCategory.setCategoryImage(drawableToBitmap(archiveDrawable));
+            ArrayList<Category> appCategories = new ArrayList<>();
+            appCategories.add(defaultCategory);
+            appCategories.add(archiveCategory);
+            for (Category category : appCategories) {
+                db.addCategory(category);
+            }
             File folder = new File(getFilesDir() + File.separator +
                     getString(R.string.app_name));
             boolean success = true;
@@ -111,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 handleSendText(intent);
             }
         }
+
+        categoriesMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
@@ -220,33 +251,33 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 break;
         }
 
-        for (Category category: categories) {
-            if (item.getTitle().equals(category.getCategoryTitle())) {
-                if(item.getTitle().equals("Archiviati")) {
-                    isArchiveModeEnabled = true;
-                    fab.setVisibility(View.INVISIBLE);
-                } else {
-                    isArchiveModeEnabled = false;
-                    fab.setVisibility(View.VISIBLE);
-                }
-                toolbarTitle.setText(item.getTitle());
-                previousCategory = (String) item.getTitle();
-                archiveUrl();
-                unarchiveBookmark();
-                bookmarks.clear();
-                bookmarks = db.getBookmarksByCategory((String)item.getTitle());
-                setAdapter();
-            } else if (item.getTitle().equals(ALL_BOOKMARKS)){
-                toolbarTitle.setText(item.getTitle());
-                previousCategory = (String) item.getTitle();
-                fab.setVisibility(View.VISIBLE);
-                archiveUrl();
-                unarchiveBookmark();
-                bookmarks.clear();
-                bookmarks = db.getAllBookmarks();
-                setAdapter();
-            }
-        }
+//        for (Category category: categories) {
+//            if (item.getTitle().equals(category.getCategoryTitle())) {
+//                if(item.getTitle().equals("Archiviati")) {
+//                    isArchiveModeEnabled = true;
+//                    fab.setVisibility(View.INVISIBLE);
+//                } else {
+//                    isArchiveModeEnabled = false;
+//                    fab.setVisibility(View.VISIBLE);
+//                }
+//                toolbarTitle.setText(item.getTitle());
+//                previousCategory = (String) item.getTitle();
+//                archiveUrl();
+//                unarchiveBookmark();
+//                bookmarks.clear();
+//                bookmarks = db.getBookmarksByCategory((String)item.getTitle());
+//                setAdapter();
+//            } else if (item.getTitle().equals(ALL_BOOKMARKS)){
+//                toolbarTitle.setText(item.getTitle());
+//                previousCategory = (String) item.getTitle();
+//                fab.setVisibility(View.VISIBLE);
+//                archiveUrl();
+//                unarchiveBookmark();
+//                bookmarks.clear();
+//                bookmarks = db.getAllBookmarks();
+//                setAdapter();
+//            }
+//        }
         return true;
     }
 
@@ -440,12 +471,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     private void addFilterCategories() {
-        SubMenu subMenu = toolbar.getMenu().findItem(R.id.filter).getSubMenu();
-        subMenu.clear();
-        subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
-        for (int i = 0; i < categories.size(); i ++) {
-            subMenu.add(0, i + 1, Menu.NONE, categories.get(i).getCategoryTitle());
-        }
+//        final Menu menu = navigationView.getMenu();
+//        final SubMenu subMenu = menu.addSubMenu("SubMenu Title");
+//        subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
+//        for (int i = 0; i < categories.size(); i ++) {
+//            subMenu.add(0, i + 1, Menu.NONE, categories.get(i).getCategoryTitle());
+//        }
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        categoriesRecyclerview.setLayoutManager(layoutManager);
+        categoriesRecyclerview.setHasFixedSize(true);
+        CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this);
+        categoriesRecyclerview.setAdapter(categoriesMenuAdapter);
     }
 
     @Override
@@ -549,5 +585,19 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             default:
                 settingsManager.setTheme(SYSTEM_DEFAULT);
         }
+    }
+
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

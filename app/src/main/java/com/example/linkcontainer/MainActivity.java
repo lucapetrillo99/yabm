@@ -4,15 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -32,7 +29,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -81,9 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
         drawerLayout = findViewById(R.id.drawer_layout);
-        ImageView categoriesMenu = findViewById(R.id.categories_menu);
         categoriesRecyclerview = findViewById(R.id.categories_recyclerview);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -141,8 +140,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         }
 
-        categoriesMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
             previousCategory = toolbarTitle.getText().toString();
@@ -192,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 if (isContextualMenuEnable) {
                     removeContextualActionMode();
                 }
+                break;
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search:
                 SearchView searchView = (SearchView) item.getActionView();
@@ -250,34 +250,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 recyclerAdapter.notifyDataSetChanged();
                 break;
         }
-
-//        for (Category category: categories) {
-//            if (item.getTitle().equals(category.getCategoryTitle())) {
-//                if(item.getTitle().equals("Archiviati")) {
-//                    isArchiveModeEnabled = true;
-//                    fab.setVisibility(View.INVISIBLE);
-//                } else {
-//                    isArchiveModeEnabled = false;
-//                    fab.setVisibility(View.VISIBLE);
-//                }
-//                toolbarTitle.setText(item.getTitle());
-//                previousCategory = (String) item.getTitle();
-//                archiveUrl();
-//                unarchiveBookmark();
-//                bookmarks.clear();
-//                bookmarks = db.getBookmarksByCategory((String)item.getTitle());
-//                setAdapter();
-//            } else if (item.getTitle().equals(ALL_BOOKMARKS)){
-//                toolbarTitle.setText(item.getTitle());
-//                previousCategory = (String) item.getTitle();
-//                fab.setVisibility(View.VISIBLE);
-//                archiveUrl();
-//                unarchiveBookmark();
-//                bookmarks.clear();
-//                bookmarks = db.getAllBookmarks();
-//                setAdapter();
-//            }
-//        }
         return true;
     }
 
@@ -599,5 +571,33 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public void filterByCategory(String categoryName) {
+         if (categoryName.equals(ALL_BOOKMARKS)){
+            toolbarTitle.setText(categoryName);
+            previousCategory = categoryName;
+            fab.setVisibility(View.VISIBLE);
+            archiveUrl();
+            unarchiveBookmark();
+            bookmarks.clear();
+            bookmarks = db.getAllBookmarks();
+         } else {
+             if (categoryName.equals("Archiviati")) {
+                 isArchiveModeEnabled = true;
+                 fab.setVisibility(View.INVISIBLE);
+             } else {
+                 isArchiveModeEnabled = false;
+                 fab.setVisibility(View.VISIBLE);
+             }
+             toolbarTitle.setText(categoryName);
+             previousCategory = categoryName;
+             archiveUrl();
+             unarchiveBookmark();
+             bookmarks.clear();
+             bookmarks = db.getBookmarksByCategory(categoryName);
+         }
+        setAdapter();
+        drawerLayout.closeDrawers();
     }
 }

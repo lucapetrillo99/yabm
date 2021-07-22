@@ -82,8 +82,8 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem filter = menu.findItem(R.id.filter);
-        filter.setVisible(false);
+        MenuItem settings = menu.findItem(R.id.settings);
+        settings.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -221,6 +221,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 showWarningMessage();

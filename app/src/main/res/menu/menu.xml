@@ -10,14 +10,6 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView">
     </item>
 
-    <item android:id="@+id/filter"
-        android:icon="@drawable/ic_filter"
-        app:showAsAction="always"
-        android:title="Filtra">
-        <menu>
-        </menu>
-    </item>
-
     <item
         android:title="Impostazioni"
         android:id="@+id/settings"

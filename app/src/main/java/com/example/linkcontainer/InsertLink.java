@@ -410,6 +410,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 showWarningMessage();
@@ -479,9 +480,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem search = menu.findItem(R.id.search);
-        MenuItem filter = menu.findItem(R.id.filter);
         search.setVisible(false);
-        filter.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 

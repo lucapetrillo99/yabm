@@ -61,10 +61,8 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem search = menu.findItem(R.id.search);
-        MenuItem filter = menu.findItem(R.id.filter);
         MenuItem settings = menu.findItem(R.id.settings);
         search.setVisible(false);
-        filter.setVisible(false);
         settings.setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }

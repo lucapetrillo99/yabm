@@ -1,8 +1,5 @@
 package com.example.linkcontainer;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +8,10 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FeedbackActivity extends AppCompatActivity {
@@ -19,14 +20,13 @@ public class FeedbackActivity extends AppCompatActivity {
     private static final String MAIL = "lucapetrillo0@gmail.com";
     private String finalInformation;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Invia feedback");
+        toolbarTitle.setText(R.string.feedback_title);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
         subject = findViewById(R.id.title_mail);

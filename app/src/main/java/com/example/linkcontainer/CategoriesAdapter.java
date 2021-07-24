@@ -148,9 +148,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         image = null;
         if (isModify) {
-            title.setText("Modifica categoria");
+            title.setText(R.string.modify_category_title);
         } else {
-            title.setText("Nuova categoria");
+            title.setText(R.string.new_category_title);
         }
 
         input.setInputType(InputType.TYPE_CLASS_TEXT);

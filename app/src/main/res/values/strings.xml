@@ -2,4 +2,21 @@
     <string name="app_name">LinkContainer</string>
     <string name="extended_app_name">Yet Another Bookmark Manager</string>
     <string name="version">Versione %1$s</string>
+    <string name="backup_title">Backup</string>
+    <string name="bookmarks_manager_title">Importa/Esporta</string>
+    <string name="categories_title">Categorie</string>
+    <string name="modify_category_title">Modifica categoria</string>
+    <string name="new_category_title">Nuova categoria</string>
+    <string name="all_bookmarks_title">Tutti i segnalibri</string>
+    <string name="archived_bookmarks">Archiviati</string>
+    <string name="default_bookmarks">Default</string>
+    <string name="feedback_title">Invia feedback</string>
+    <string name="new_bookmark_title">Nuovo Segnalibro</string>
+    <string name="cancel">Annulla</string>
+    <string name="confirm">Conferma</string>
+    <string name="retry">Indietro</string>
+    <string name="reminder_inserted">Promemoria inserito:</string>
+    <string name="next">Avanti</string>
+    <string name="new_reminder">Inserisci un promemoria:</string>
+    <string name="settings_title">Impostazioni</string>
 </resources>

@@ -59,7 +59,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bookmarks_manager);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Importa/Esporta");
+        toolbarTitle.setText(R.string.bookmarks_manager_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());

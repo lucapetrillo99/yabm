@@ -1,19 +1,10 @@
 package com.example.linkcontainer;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,11 +16,17 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.squareup.picasso.Picasso;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -38,7 +35,6 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     public boolean isContextualMenuEnable = false;
     private RecyclerView recyclerView;
     private CategoriesAdapter categoriesAdapter;
-    private DatabaseHandler db;
     private Toolbar toolbar;
     private TextView toolbarTitle;
     private ArrayList<Category> categories;
@@ -53,7 +49,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Categorie");
+        toolbarTitle.setText(R.string.categories_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
@@ -65,7 +61,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         recyclerView = findViewById(R.id.recycler_view);
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
 
-        db = DatabaseHandler.getInstance(getApplicationContext());
+        DatabaseHandler db = DatabaseHandler.getInstance(getApplicationContext());
         categories = db.getCategories();
         selectedCategories = new ArrayList<>();
         setAdapter();
@@ -153,7 +149,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     private void removeContextualActionMode() {
         isContextualMenuEnable = false;
         areAllSelected = false;
-        toolbarTitle.setText("Categorie");
+        toolbarTitle.setText(R.string.categories_title);
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
         toolbar.inflateMenu(R.menu.menu);

@@ -7,12 +7,9 @@ public class Category {
     String title;
     Bitmap image;
 
-    public Category() {
-
-    }
+    public Category() { }
 
     public Category(String id, String title, Bitmap image) {
-
         this.id = id;
         this.title = title;
         this.image = image;

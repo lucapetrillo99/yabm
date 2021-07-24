@@ -31,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Impostazioni");
+        toolbarTitle.setText(R.string.settings_title);
         setSupportActionBar(toolbar);
 
         db = DatabaseHandler.getInstance(getApplicationContext());
@@ -102,7 +102,7 @@ public class SettingsActivity extends AppCompatActivity {
             String startCategory = categoryManager.getCategory();
             ArrayList<Category> categoryList = new ArrayList<>(db.getAllCategories());
             ArrayList<String> list = new ArrayList<>();
-            list.add("Tutti i segnalibri");
+            list.add(getString(R.string.all_bookmarks_title));
             for (Category category: categoryList) {
                 list.add(category.getCategoryTitle());
             }

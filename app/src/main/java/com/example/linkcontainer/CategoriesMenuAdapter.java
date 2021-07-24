@@ -32,7 +32,7 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         Drawable drawable = ResourcesCompat.getDrawable(mainActivity.getResources(),
                 R.drawable.ic_all_bookmarks, null);
         Category category = new Category();
-        category.setCategoryTitle("Tutti i segnalibri");
+        category.setCategoryTitle(mainActivity.getString(R.string.all_bookmarks_title));
         category.setCategoryImage(drawableToBitmap(drawable));
         categories.add(0, category);
     }
@@ -71,11 +71,11 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
             holder.relativeLayout.setBackgroundColor(Color.parseColor("#303030"));
         }
 
-        if (categories.get(position).getCategoryTitle().equals("Default")) {
+        if (categories.get(position).getCategoryTitle().equals(mainActivity.getString(R.string.default_bookmarks))) {
             holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.ic_default, null));
 
-        } else if (categories.get(position).getCategoryTitle().equals("Archiviati")) {
+        } else if (categories.get(position).getCategoryTitle().equals(mainActivity.getString(R.string.archived_bookmarks))) {
             holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.ic_archive, null));
         }

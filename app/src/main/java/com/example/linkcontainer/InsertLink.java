@@ -84,7 +84,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         setContentView(R.layout.activity_insert_link);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Nuovo Segnalibro");
+        toolbarTitle.setText(R.string.new_bookmark_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());
@@ -193,7 +193,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             addImageTitle = dialogView.findViewById(R.id.add_image_title);
             addImageButton = dialogView.findViewById(R.id.add_image_button);
             categoryImage = dialogView.findViewById(R.id.category_image);
-            title.setText("Nuova categoria");
+            title.setText(R.string.new_category_title);
             input.setHint("Inserisci la categoria");
 
             addImageButton.setOnClickListener(v1 -> {
@@ -249,11 +249,11 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             final AlertDialog alertDialog = alert.create();
             alertDialog.setCanceledOnTouchOutside(false);
             cancelButton.setOnClickListener(v -> {
-                cancelButton.setText("Annulla");
+                cancelButton.setText(R.string.cancel);
                 if (isPressed) {
                     datePicker.setVisibility(View.VISIBLE);
                     timePicker.setVisibility(View.INVISIBLE);
-                    confirmButton.setText("Avanti");
+                    confirmButton.setText(R.string.cancel);
                     isPressed = false;
                     pressedCounter = 0;
                 } else {
@@ -262,8 +262,8 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             });
 
             confirmButton.setOnClickListener(v -> {
-                confirmButton.setText("Conferma");
-                cancelButton.setText("Indietro");
+                confirmButton.setText(R.string.confirm);
+                cancelButton.setText(R.string.retry);
                 datePicker.setVisibility(View.INVISIBLE);
                 timePicker.setVisibility(View.VISIBLE);
                 isPressed = true;
@@ -296,7 +296,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                             modifyRemainder.setVisibility(View.VISIBLE);
                             removeRemainder.setVisibility(View.VISIBLE);
 
-                            reminderTitle.setText("Promemoria inserito:");
+                            reminderTitle.setText(R.string.reminder_inserted);
                             date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
                             Toast.makeText(getApplicationContext(),
                                     "Promemoria impostato correttamente", Toast.LENGTH_LONG)
@@ -333,11 +333,11 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             final AlertDialog alertDialog = alert.create();
             alertDialog.setCanceledOnTouchOutside(false);
             cancelButton.setOnClickListener(v -> {
-                cancelButton.setText("Annulla");
+                cancelButton.setText(R.string.cancel);
                 if (isPressed) {
                     datePicker.setVisibility(View.VISIBLE);
                     timePicker.setVisibility(View.INVISIBLE);
-                    confirmButton.setText("Avanti");
+                    confirmButton.setText(R.string.next);
                     isPressed = false;
                     pressedCounter = 0;
                 } else {
@@ -346,8 +346,8 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             });
 
             confirmButton.setOnClickListener(v -> {
-                confirmButton.setText("Conferma");
-                cancelButton.setText("Indietro");
+                confirmButton.setText(R.string.confirm);
+                cancelButton.setText(R.string.cancel);
                 datePicker.setVisibility(View.INVISIBLE);
                 timePicker.setVisibility(View.VISIBLE);
                 isPressed = true;
@@ -395,7 +395,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             date.setVisibility(View.INVISIBLE);
             modifyRemainder.setVisibility(View.INVISIBLE);
             removeRemainder.setVisibility(View.INVISIBLE);
-            reminderTitle.setText("Inserisci un promemoria:");
+            reminderTitle.setText(R.string.new_reminder);
             Toast.makeText(getApplicationContext(),
                     "Promemoria eliminato", Toast.LENGTH_LONG)
                     .show();

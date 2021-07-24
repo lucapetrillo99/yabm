@@ -53,7 +53,7 @@ public class BackupActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Backup");
+        toolbarTitle.setText(R.string.backup_title);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         backupHandler = BackupHandler.getInstance(getApplicationContext());
@@ -79,7 +79,7 @@ public class BackupActivity extends AppCompatActivity {
     }
 
     private void autoBackupListener() {
-        autoBackupSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener) (buttonView, isChecked) -> {
+        autoBackupSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 createAutoBackupFile();
                 autoBackupManager.setAutoBackup(true);

@@ -3,16 +3,12 @@ package com.example.linkcontainer;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -87,14 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
-            Drawable defaultDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_default, null);
-            Category defaultCategory = new Category();
-            defaultCategory.setCategoryTitle("Default");
-            defaultCategory.setCategoryImage(drawableToBitmap(defaultDrawable));
-            Drawable archiveDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_archive, null);
-            Category archiveCategory = new Category();
-            archiveCategory.setCategoryTitle("Archiviati");
-            archiveCategory.setCategoryImage(drawableToBitmap(archiveDrawable));
+            Category defaultCategory = new Category(null, "Default", null);
+            Category archiveCategory = new Category(null, "Archiviati", null);
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);
@@ -443,16 +432,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     private void addFilterCategories() {
-//        final Menu menu = navigationView.getMenu();
-//        final SubMenu subMenu = menu.addSubMenu("SubMenu Title");
-//        subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
-//        for (int i = 0; i < categories.size(); i ++) {
-//            subMenu.add(0, i + 1, Menu.NONE, categories.get(i).getCategoryTitle());
-//        }
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         categoriesRecyclerview.setLayoutManager(layoutManager);
         categoriesRecyclerview.setHasFixedSize(true);
-        CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this);
+        CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this, toolbarTitle.getText().toString());
         categoriesRecyclerview.setAdapter(categoriesMenuAdapter);
     }
 
@@ -557,20 +540,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             default:
                 settingsManager.setTheme(SYSTEM_DEFAULT);
         }
-    }
-
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
     }
 
     public void filterByCategory(String categoryName) {

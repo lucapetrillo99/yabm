@@ -72,7 +72,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:padding="10dp"
+                android:layout_marginStart="5dp"
+                android:padding="15dp"
                 android:text="Categorie"
                 android:textStyle="bold"
                 android:textAllCaps="true"/>

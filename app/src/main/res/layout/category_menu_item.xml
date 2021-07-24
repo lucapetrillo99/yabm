@@ -8,17 +8,23 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
+            android:id="@+id/menu_item"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:layout_margin="0dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:background="?android:attr/selectableItemBackground">
 
             <ImageView
                 android:id="@+id/category_setting_image"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginEnd="5dp"
@@ -32,7 +38,6 @@
                 android:layout_toEndOf="@+id/category_setting_image"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
                 android:maxLines="1"
                 android:textSize="17sp"
                 android:textStyle="bold">

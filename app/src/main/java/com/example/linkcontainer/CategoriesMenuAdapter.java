@@ -82,6 +82,9 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
 
         holder.itemView.setOnClickListener(v -> {
             mainActivity.filterByCategory(categories.get(position).getCategoryTitle());
+            if (categories.get(position).getCategoryTitle().equals(startCategory)) {
+                holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+            }
             selectedPosition = position;
             touches ++;
             notifyDataSetChanged();

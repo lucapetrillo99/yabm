@@ -35,7 +35,7 @@ public class FeedbackActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> {
             if (subject.getText().toString().isEmpty() && text.getText().toString().isEmpty()) {
                 finish();
-
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {
                 confirmDialog();
             }
@@ -70,7 +70,10 @@ public class FeedbackActivity extends AppCompatActivity {
         builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno persi")
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> finish());
+                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    finish();
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -90,7 +93,7 @@ public class FeedbackActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (subject.getText().toString().isEmpty() && text.getText().toString().isEmpty()) {
             finish();
-
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         } else {
             confirmDialog();
         }

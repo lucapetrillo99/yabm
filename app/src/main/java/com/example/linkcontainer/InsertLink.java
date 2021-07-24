@@ -141,6 +141,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         toolbar.setNavigationOnClickListener(v -> {
             if (inputLink.getText().toString().isEmpty()) {
                 finish();
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {
                 exitConfirmDialog();
             }
@@ -486,9 +487,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            Intent intent = new Intent(InsertLink.this, SettingsActivity.class);
-            startActivity(intent);
-            finish();
+        Intent intent = new Intent(InsertLink.this, SettingsActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        finish();
         return true;
     }
 
@@ -600,6 +602,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                         .show();
                 intent = new Intent(InsertLink.this, MainActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 finish();
             } else {
                 Toast.makeText(getApplicationContext(),
@@ -619,6 +622,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
+                intent = new Intent(InsertLink.this, MainActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 finish();
             } else {
                 Toast.makeText(getApplicationContext(),
@@ -634,7 +640,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno perssi")
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> finish());
+                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    finish();
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

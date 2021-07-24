@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             previousCategory = toolbarTitle.getText().toString();
             activityIntent = new Intent(MainActivity.this, InsertLink.class);
             startActivity(activityIntent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             if (isContextualMenuEnable) {
                 removeContextualActionMode();
             }
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case R.id.settings:
                 activityIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(activityIntent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 if (isContextualMenuEnable) {
                     removeContextualActionMode();
                 }

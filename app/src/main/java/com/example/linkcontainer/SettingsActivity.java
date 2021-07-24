@@ -45,7 +45,10 @@ public class SettingsActivity extends AppCompatActivity {
         appInfo = findViewById(R.id.information_setting);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        });
 
         appInfoClickListener();
         themeClickListener();
@@ -88,6 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
         categoriesSetting.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, Categories.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
     }
 
@@ -125,6 +129,7 @@ public class SettingsActivity extends AppCompatActivity {
         importExport.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, BookmarksManagerActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
     }
 
@@ -132,6 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
         backup.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, BackupActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
     }
 
@@ -139,12 +145,20 @@ public class SettingsActivity extends AppCompatActivity {
         sendFeedback.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, FeedbackActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
     }
     private void appInfoClickListener() {
         appInfo.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, InfoAppActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

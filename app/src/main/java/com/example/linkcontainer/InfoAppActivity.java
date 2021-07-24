@@ -18,10 +18,15 @@ public class InfoAppActivity extends AppCompatActivity {
         try {
             PackageInfo packageInfo = getApplicationContext().getPackageManager().
                     getPackageInfo(getApplicationContext().getPackageName(), 0);
-
             appVersion.setText(getString(R.string.version, packageInfo.versionName));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

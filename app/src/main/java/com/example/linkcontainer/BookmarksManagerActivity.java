@@ -69,7 +69,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
         importListener();
         exportListener();
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -121,6 +124,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 showWarningMessage();
@@ -304,5 +308,11 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
                     .show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

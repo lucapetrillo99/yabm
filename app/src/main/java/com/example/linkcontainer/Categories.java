@@ -57,7 +57,10 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        });
 
         recyclerView = findViewById(R.id.recycler_view);
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
@@ -67,9 +70,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         selectedCategories = new ArrayList<>();
         setAdapter();
 
-        insertCategory.setOnClickListener(view -> {
-            categoriesAdapter.createDialog(0, false, view);
-        });
+        insertCategory.setOnClickListener(view -> categoriesAdapter.createDialog(0, false, view));
     }
 
     private void setAdapter() {
@@ -96,6 +97,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
             case R.id.settings:
                 Intent activityIntent = new Intent(Categories.this, SettingsActivity.class);
                 startActivity(activityIntent);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 break;
             case R.id.search:
                 SearchView searchView = (SearchView) item.getActionView();
@@ -207,7 +209,6 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                     Toast.makeText(getApplicationContext(), finalBookmarkMessage + finalDeletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();
-
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -270,5 +271,11 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
         snackbarLayout.addView(customView, 0);
         snackbar.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

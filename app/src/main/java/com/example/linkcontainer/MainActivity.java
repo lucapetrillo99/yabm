@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -18,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,11 +42,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+    private RecyclerView categoriesRecyclerview;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private DrawerLayout drawerLayout;
     private TextView noBookmarks;
     private FloatingActionButton fab;
-    private ArrayList<String> categories;
+    private ArrayList<Category> categories;
     private ArrayList<Bookmark> archivedUrl;
     private ArrayList<Bookmark> removedFromArchive;
     private ArrayList<Bookmark> selectedBookmarks;
@@ -68,11 +71,25 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        categoriesRecyclerview = findViewById(R.id.categories_recyclerview);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
+            Category defaultCategory = new Category(null, "Default", null);
+            Category archiveCategory = new Category(null, "Archiviati", null);
+            ArrayList<Category> appCategories = new ArrayList<>();
+            appCategories.add(defaultCategory);
+            appCategories.add(archiveCategory);
+            for (Category category : appCategories) {
+                db.addCategory(category);
+            }
             File folder = new File(getFilesDir() + File.separator +
                     getString(R.string.app_name));
             boolean success = true;
@@ -162,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     removeContextualActionMode();
                 }
                 break;
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
             case R.id.search:
                 SearchView searchView = (SearchView) item.getActionView();
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -218,34 +238,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 updateCounter();
                 recyclerAdapter.notifyDataSetChanged();
                 break;
-        }
-
-        for (String category: categories) {
-            if(item.getTitle() == category) {
-                if(item.getTitle().equals("Archiviati")) {
-                    isArchiveModeEnabled = true;
-                    fab.setVisibility(View.INVISIBLE);
-                } else {
-                    isArchiveModeEnabled = false;
-                    fab.setVisibility(View.VISIBLE);
-                }
-                toolbarTitle.setText(item.getTitle());
-                previousCategory = (String) item.getTitle();
-                archiveUrl();
-                unarchiveBookmark();
-                bookmarks.clear();
-                bookmarks = db.getBookmarksByCategory((String)item.getTitle());
-                setAdapter();
-            } else if (item.getTitle().equals(ALL_BOOKMARKS)){
-                toolbarTitle.setText(item.getTitle());
-                previousCategory = (String) item.getTitle();
-                fab.setVisibility(View.VISIBLE);
-                archiveUrl();
-                unarchiveBookmark();
-                bookmarks.clear();
-                bookmarks = db.getAllBookmarks();
-                setAdapter();
-            }
         }
         return true;
     }
@@ -440,12 +432,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     private void addFilterCategories() {
-        SubMenu subMenu = toolbar.getMenu().findItem(R.id.filter).getSubMenu();
-        subMenu.clear();
-        subMenu.add(0, 0, Menu.NONE, ALL_BOOKMARKS);
-        for (int i = 0; i < categories.size(); i ++) {
-            subMenu.add(0, i + 1, Menu.NONE, categories.get(i));
-        }
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        categoriesRecyclerview.setLayoutManager(layoutManager);
+        categoriesRecyclerview.setHasFixedSize(true);
+        CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this, toolbarTitle.getText().toString());
+        categoriesRecyclerview.setAdapter(categoriesMenuAdapter);
     }
 
     @Override
@@ -549,5 +540,33 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             default:
                 settingsManager.setTheme(SYSTEM_DEFAULT);
         }
+    }
+
+    public void filterByCategory(String categoryName) {
+         if (categoryName.equals(ALL_BOOKMARKS)){
+            toolbarTitle.setText(categoryName);
+            previousCategory = categoryName;
+            fab.setVisibility(View.VISIBLE);
+            archiveUrl();
+            unarchiveBookmark();
+            bookmarks.clear();
+            bookmarks = db.getAllBookmarks();
+         } else {
+             if (categoryName.equals("Archiviati")) {
+                 isArchiveModeEnabled = true;
+                 fab.setVisibility(View.INVISIBLE);
+             } else {
+                 isArchiveModeEnabled = false;
+                 fab.setVisibility(View.VISIBLE);
+             }
+             toolbarTitle.setText(categoryName);
+             previousCategory = categoryName;
+             archiveUrl();
+             unarchiveBookmark();
+             bookmarks.clear();
+             bookmarks = db.getBookmarksByCategory(categoryName);
+         }
+        setAdapter();
+        drawerLayout.closeDrawers();
     }
 }

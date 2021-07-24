@@ -1,8 +1,10 @@
 package com.example.linkcontainer;
 
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,8 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +32,18 @@ import static android.view.View.INVISIBLE;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
-    private final ArrayList<String> categories;
+    private final ArrayList<Category> categories;
     private DatabaseHandler db;
     private final Categories categoriesActivity;
-    private final ArrayList<String> allCategories;
+    private final ArrayList<Category> allCategories;
+    public static final int PERMISSION_REQUEST_STORAGE = 1000;
+    public ImageView categoryImage;
+    public ImageButton addImageButton, modifyImage, removeImage;
+    public TextView addImageTitle;
+    public Bitmap image;
+    public LinearLayout imageLayout;
 
-    public CategoriesAdapter(ArrayList<String> categories, Categories categoriesActivity) {
+    public CategoriesAdapter(ArrayList<Category> categories, Categories categoriesActivity) {
         this.categories = categories;
         this.categoriesActivity = categoriesActivity;
         this.allCategories = new ArrayList<>(categories);
@@ -69,10 +79,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         db = DatabaseHandler.getInstance(categoriesActivity);
 
-        holder.title.setText(categories.get(position));
+        holder.title.setText(categories.get(position).getCategoryTitle());
 
         if (categoriesActivity.isContextualMenuEnable) {
-            if (categories.get(position).equals("Default")) {
+            if (categories.get(position).getCategoryTitle().equals("Default")) {
                 holder.checkbox.setVisibility(View.INVISIBLE);
             }else {
                 holder.checkbox.setVisibility(View.VISIBLE);
@@ -82,7 +92,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         } else {
             holder.checkbox.setVisibility(View.INVISIBLE);
-            if (categories.get(position).equals("Default")) {
+            if (categories.get(position).getCategoryTitle().equals("Default")) {
                 holder.modify.setVisibility(INVISIBLE);
                 holder.delete.setVisibility(INVISIBLE);
             } else {
@@ -92,9 +102,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         }
 
         holder.modify.setOnClickListener(v -> createDialog(position, true, v));
-
         holder.delete.setOnClickListener(v -> confirmDialog(position, v));
-
         holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, position));
 
         if (categoriesActivity.areAllSelected) {
@@ -108,7 +116,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         }
     }
 
-    public void updateCategories(ArrayList<String> selectedCategories) {
+    public void updateCategories(ArrayList<Category> selectedCategories) {
         UpdateCategories updateCategories = new UpdateCategories(selectedCategories);
         updateCategories.execute();
         notifyDataSetChanged();
@@ -119,7 +127,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         return categories.size();
     }
 
-    @SuppressLint("SetTextI18n")
     public void createDialog(int position, boolean isModify, View v) {
         LayoutInflater layoutInflater = LayoutInflater.from(v.getRootView().getContext());
         View dialogView = layoutInflater.inflate(R.layout.dialog, null);
@@ -130,9 +137,16 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .setCancelable(false)
                 .create();
 
-        final EditText input = dialogView.findViewById(R.id.user_input);
+        EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
+        addImageTitle = dialogView.findViewById(R.id.add_image_title);
+        addImageButton = dialogView.findViewById(R.id.add_image_button);
+        categoryImage = dialogView.findViewById(R.id.category_image);
+        imageLayout = dialogView.findViewById(R.id.image_layout);
+        modifyImage = dialogView.findViewById(R.id.modify_image);
+        removeImage = dialogView.findViewById(R.id.remove_image);
 
+        image = null;
         if (isModify) {
             title.setText("Modifica categoria");
         } else {
@@ -141,40 +155,83 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         if (isModify) {
-            input.setText(categories.get(position));
+            input.setText(categories.get(position).getCategoryTitle());
+            if (categories.get(position).getCategoryImage() != null) {
+                addImageTitle.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                categoryImage.setVisibility(View.VISIBLE);
+                categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
+            }
+            if (categories.get(position).getCategoryImage() != null) {
+                Log.i("OUSHDOH", "Entro");
+                addImageTitle.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                categoryImage.setVisibility(View.VISIBLE);
+                categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
+                imageLayout.setVisibility(View.VISIBLE);
+            }
         } else {
             input.setHint("Inserisci la categoria");
         }
 
-        dialog.setOnShowListener((DialogInterface.OnShowListener) dialogInterface -> {
+        addImageButton.setOnClickListener(v1 -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && categoriesActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                categoriesActivity.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+            } else {
+                categoriesActivity.getImageFromDevice();
+            }
+        });
 
-            Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+        modifyImage.setOnClickListener(v1 -> categoriesActivity.getImageFromDevice());
+
+        removeImage.setOnClickListener(v1 -> {
+            image = null;
+            if (isModify) {
+                categories.get(position).setCategoryImage(null);
+            }
+            addImageTitle.setVisibility(View.VISIBLE);
+            addImageButton.setVisibility(View.VISIBLE);
+            categoryImage.setVisibility(View.GONE);
+            imageLayout.setVisibility(View.GONE);
+
+        });
+
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
                 if (isModify) {
-                    String category = input.getText().toString();
-                    if (!categories.get(position).equals(category)) {
-                        String id = db.getCategoryId(categories.get(position));
-                        boolean result = db.updateCategory(category, id);
-                        if (result) {
-                            Toast.makeText(v.getRootView().getContext(),
-                                    "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
-                            categories.set(position, category);
-                            notifyItemChanged(position);
-                        } else {
-                            Toast.makeText(v.getRootView().getContext(),
-                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
-                        }
+                    Category category = new Category();
+                    category.setCategoryId(categories.get(position).getCategoryId());
+                    category.setCategoryTitle(input.getText().toString());
+                    Log.i("OUSHDOH", String.valueOf(image));
+                    if (image == null) {
+                        category.setCategoryImage(categories.get(position).getCategoryImage());
+                    } else {
+                        category.setCategoryImage(image);
+                    }
+                    boolean result = db.updateCategory(category);
+                    Log.i("OUSHDOH", String.valueOf(result));
+                    if (result) {
+                        Toast.makeText(v.getRootView().getContext(),
+                                "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                        categories.set(position, category);
+                        notifyItemChanged(position);
                     } else {
                         Toast.makeText(v.getRootView().getContext(),
                                 "Categoria già esistente!", Toast.LENGTH_LONG).show();
                     }
+                    dialog.dismiss();
                 } else {
                     if (!input.getText().toString().isEmpty()) {
-                        boolean result = db.addCategory(input.getText().toString());
+                        Category category = new Category();
+                        category.setCategoryTitle(input.getText().toString());
+                        category.setCategoryImage(image);
+                        boolean result = db.addCategory(category);
                         if (result) {
                             dialog.dismiss();
-                            categories.add(input.getText().toString());
+                            categories.add(category);
                             notifyItemInserted(getItemCount());
                         } else {
                             Toast.makeText(v.getRootView().getContext(),
@@ -191,9 +248,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     }
 
     private class UpdateCategories extends AsyncTask<Void, Void, Void> {
-        private final ArrayList<String> list;
+        private final ArrayList<Category> list;
 
-        public UpdateCategories(ArrayList<String> categories) {
+        public UpdateCategories(ArrayList<Category> categories) {
             this.list = categories;
         }
 
@@ -201,11 +258,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         @Override
         protected Void doInBackground(Void... voids) {
 
-            for (String selectedCategory : list) {
-                categories.remove(selectedCategory);
-                result = db.deleteCategory(selectedCategory);
-                if (!result) {
-                    break;
+            for (Category selectedCategory : list) {
+                if (!selectedCategory.getCategoryTitle().equals("Default")) {
+                    categories.remove(selectedCategory);
+                    result = db.deleteCategory(selectedCategory);
+                    if (!result) {
+                        break;
+                    }
                 }
             }
             return null;
@@ -229,15 +288,16 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    String category = categories.get(position);
-                    categories.remove(position);
-                    notifyItemRemoved(position);
+                    Category category = new Category();
+                    category.setCategoryId(categories.get(position).getCategoryId());
+                    category.setCategoryTitle(categories.get(position).getCategoryTitle());
                     boolean result = db.deleteCategory(category);
-
-                    if (!result) {
+                    if (result) {
+                        categories.remove(position);
+                        notifyItemRemoved(position);
+                    } else {
                         Toast.makeText(v.getRootView().getContext(), "Impossibile eliminare la categoria", Toast.LENGTH_LONG).show();
-                        categories.add(position, category);
-                        notifyItemInserted(position);
+
                     }
                 });
         AlertDialog alertDialog = builder.create();
@@ -252,15 +312,14 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     Filter filter = new Filter(){
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
-            ArrayList<String> filteredCategories = new ArrayList<>();
-            Log.i("AHIDAH", allCategories.toString());
+            ArrayList<Category> filteredCategories = new ArrayList<>();
 
             if (constraint.toString().isEmpty()) {
                 filteredCategories.addAll(allCategories);
             } else {
-                for (String bookmark: allCategories) {
-                    if (bookmark.toLowerCase().contains(constraint.toString().toLowerCase())) {
-                        filteredCategories.add(bookmark);
+                for (Category category: allCategories) {
+                    if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        filteredCategories.add(category);
                     }
                 }
             }
@@ -274,7 +333,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             categories.clear();
-            categories.addAll((Collection<? extends String>) results.values);
+            categories.addAll((Collection<? extends Category>) results.values);
             notifyDataSetChanged();
         }
     };

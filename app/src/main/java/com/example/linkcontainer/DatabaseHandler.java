@@ -5,12 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
+    private Context mContext;
     private static DatabaseHandler instance;
 
     // Database Version
@@ -39,11 +43,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // TAGS Table - column names
     private static final String KEY_NAME = "name";
+    private static final String KEY_ICON = "icon";
 
 
     // Tag table create statement
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT" + ")";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
+            KEY_ICON + " BLOB" + ")";
 
     // Table Create Statements
     // Todo table create statement
@@ -57,7 +63,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static synchronized DatabaseHandler getInstance(Context context) {
         if (instance == null)
             instance = new DatabaseHandler(context.getApplicationContext());
-
         return instance;
     }
 
@@ -70,12 +75,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // creating required tables
         db.execSQL(CREATE_TABLE_CATEGORY);
         db.execSQL(CREATE_TABLE_BOOKMARK);
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, "Default");
-        db.insert(TABLE_CATEGORY, null, values);
-        values.put(KEY_NAME, "Archiviati");
-        db.insert(TABLE_CATEGORY, null, values);
     }
 
     @Override
@@ -110,17 +109,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addCategory(String category) {
+    public boolean addCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
-                + KEY_NAME + " = ?", new String[]{category});
+                + KEY_NAME + " = ?", new String[]{category.getCategoryTitle()});
 
         if (cursor.moveToFirst()) {
             return false;
         } else {
             ContentValues values = new ContentValues();
-            values.put(KEY_NAME, category);
+            values.put(KEY_NAME, category.getCategoryTitle());
+            if (category.getCategoryImage() != null) {
+                Bitmap image = category.getCategoryImage();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+                values.put(KEY_ICON, imageBytes);
+            }
             db.insert(TABLE_CATEGORY, null, values);
 
             return true;
@@ -168,34 +174,49 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result == 1;
     }
 
-    public ArrayList<String> getCategories() {
+    public ArrayList<Category> getCategories() {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<Category> categories = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
                 + KEY_NAME + " != ?", new String[]{"Archiviati"});
 
         if (cursor.moveToFirst()) {
             do {
-                categories.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                Category category = new Category();
+                category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
+                category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_ICON));
+                if (imageBytes != null) {
+                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    category.setCategoryImage(image);
+                }
+                categories.add(category);
             } while (cursor.moveToNext());
         }
 
         return categories;
     }
 
-    public ArrayList<String> getAllCategories() {
+    public ArrayList<Category> getAllCategories() {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        ArrayList<String> categories = new ArrayList<>();
+        ArrayList<Category> categories = new ArrayList<>();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
 
         if (cursor.moveToFirst()) {
             do {
-
-                categories.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                Category category = new Category();
+                category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
+                category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_ICON));
+                if (imageBytes != null) {
+                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    category.setCategoryImage(image);
+                }
+                categories.add(category);
             } while (cursor.moveToNext());
         }
 
@@ -294,35 +315,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{id}) > 0;
     }
 
-    public boolean deleteCategory(String category) {
-        boolean result = false;
+    public boolean deleteCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
-                " where " + KEY_NAME + " = ?", new String[]{category});
-
-        if (cursor.moveToFirst()){
-            String id = cursor.getString(cursor.getColumnIndex(CATEGORY_ID));
-            result = db.delete(TABLE_CATEGORY, KEY_NAME + " = ?",
-                    new String[]{category}) > 0;
-
-            if (result) {
-                db.delete(TABLE_BOOKMARK, KEY_CATEGORY + " = ?",
-                        new String[]{id});
-            }
-        }
-        return result;
+        return db.delete(TABLE_CATEGORY, CATEGORY_ID + " = ?",
+                new String[]{category.getCategoryId()}) > 0;
     }
 
-    public boolean updateCategory(String category, String id) {
+    public boolean updateCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(CATEGORY_ID, id);
-        values.put(KEY_NAME, category);
-
+        values.put(CATEGORY_ID, category.getCategoryId());
+        values.put(KEY_NAME, category.getCategoryTitle());
+        if (category.getCategoryImage() != null) {
+            Bitmap image = category.getCategoryImage();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            values.put(KEY_ICON, imageBytes);
+        } else {
+            values.put(KEY_ICON, (byte[]) null); 
+        }
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
-                new String[] { id });
+                new String[] { category.getCategoryId() });
 
         return result == 1;
     }

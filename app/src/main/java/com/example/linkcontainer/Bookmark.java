@@ -1,7 +1,6 @@
 package com.example.linkcontainer;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Bookmark implements Serializable {
 

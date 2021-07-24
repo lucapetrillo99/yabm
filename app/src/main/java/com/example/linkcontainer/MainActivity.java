@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private static final int ARCHIVE_OPTION = 2;
     private static final int UNARCHIVE_OPTION = 3;
     private static final String CATEGORY = "category";
-    private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
     private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
@@ -82,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
-            Category defaultCategory = new Category(null, "Default", null);
-            Category archiveCategory = new Category(null, "Archiviati", null);
+            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks), null);
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), null);
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);
@@ -103,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             settingsManager.setFirstAccess(false);
         }
 
-        if (result.equals(ALL_BOOKMARKS)) {
+        if (result.equals(getString(R.string.all_bookmarks_title))) {
             bookmarks = new ArrayList<>(db.getAllBookmarks());
         } else {
             bookmarks = new ArrayList<>(db.getBookmarksByCategory(result));
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 });
                 searchView.setOnQueryTextFocusChangeListener((view, queryTextFocused) -> {
                     if(!queryTextFocused) {
-                        if (previousCategory.equals(ALL_BOOKMARKS)) {
+                        if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
                             bookmarks = db.getAllBookmarks();
                             setAdapter();
@@ -258,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
-                        if(toolbarTitle.getText().toString().equals("Archiviati")) {
+                        if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                             Bookmark unarchivedBookmark = bookmarks.get(position);
                             removedFromArchive.add(bookmarks.get(position));
                             recyclerAdapter.removeBookmark(position);
@@ -294,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if(toolbarTitle.getText().toString().equals("Archiviati")) {
+                if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                     new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                             .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
                             .addSwipeRightActionIcon(R.drawable.ic_actions)
@@ -368,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         archiveUrl();
         setBookmarksLabel();
         if (previousCategory != null) {
-            if (previousCategory.equals(ALL_BOOKMARKS)) {
+            if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                 bookmarks = db.getAllBookmarks();
             } else {
                 bookmarks = db.getBookmarksByCategory(previousCategory);
@@ -388,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbar.inflateMenu(R.menu.contextual_menu);
         MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
         MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
-        if (previousCategory.equals("Archiviati")) {
+        if (previousCategory.equals(getString(R.string.archived_bookmarks))) {
             archive.setVisible(false);
             unarchive.setVisible(true);
         } else {
@@ -543,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void filterByCategory(String categoryName) {
-         if (categoryName.equals(ALL_BOOKMARKS)){
+         if (categoryName.equals(getString(R.string.all_bookmarks_title))){
             toolbarTitle.setText(categoryName);
             previousCategory = categoryName;
             fab.setVisibility(View.VISIBLE);
@@ -552,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             bookmarks.clear();
             bookmarks = db.getAllBookmarks();
          } else {
-             if (categoryName.equals("Archiviati")) {
+             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
                  isArchiveModeEnabled = true;
                  fab.setVisibility(View.INVISIBLE);
              } else {

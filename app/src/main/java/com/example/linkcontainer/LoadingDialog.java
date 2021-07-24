@@ -15,7 +15,6 @@ public class LoadingDialog {
 
     LoadingDialog (Activity activity) {
         this.activity = activity;
-
     }
 
     @SuppressLint("InflateParams")

@@ -74,6 +74,7 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         if (categories.get(position).getCategoryTitle().equals("Default")) {
             holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.ic_default, null));
+
         } else if (categories.get(position).getCategoryTitle().equals("Archiviati")) {
             holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.ic_archive, null));
@@ -89,10 +90,6 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         if (touches == 0) {
             if (categories.get(position).getCategoryTitle().equals(startCategory)) {
                 holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
-            }
-        } else {
-            if (categories.get(position).getCategoryTitle().equals(startCategory)) {
-                holder.relativeLayout.setBackgroundColor(Color.parseColor("#303030"));
             }
         }
     }

@@ -79,6 +79,7 @@
             android:background="@drawable/custom_background_edit_text"
             android:backgroundTint="?attr/colorSecondary"
             android:scrollHorizontally="true"
+            android:inputType="textCapSentences"
             tools:targetApi="lollipop">
         </EditText>
 

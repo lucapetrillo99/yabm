@@ -134,7 +134,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton("Annulla", null)
-                .setCancelable(false)
                 .create();
 
         EditText input = dialogView.findViewById(R.id.user_input);
@@ -153,7 +152,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             title.setText(R.string.new_category_title);
         }
 
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
         if (isModify) {
             input.setText(categories.get(position).getCategoryTitle());
             if (categories.get(position).getCategoryImage() != null) {
@@ -163,7 +161,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
             }
             if (categories.get(position).getCategoryImage() != null) {
-                Log.i("OUSHDOH", "Entro");
                 addImageTitle.setVisibility(View.GONE);
                 addImageButton.setVisibility(View.GONE);
                 categoryImage.setVisibility(View.VISIBLE);

@@ -123,9 +123,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     date.setVisibility(View.VISIBLE);
                     modifyRemainder.setVisibility(View.VISIBLE);
                     removeRemainder.setVisibility(View.VISIBLE);
-
-                    setSpinnerItem(category);
-                    reminderTitle.setText("Promemoria inserito:");
+                    reminderTitle.setText(getString(R.string.reminder_inserted));
                     date.setText(DateFormat.format("dd/MM/yyyy HH:mm", bookmark.getReminder()));
                 } else {
                     addRemainder.setVisibility(View.VISIBLE);
@@ -135,15 +133,27 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 }
                 inputLink.setText(bookmark.getLink());
                 title.setText(bookmark.getTitle());
+                setSpinnerItem(category);
             }
         }
 
         toolbar.setNavigationOnClickListener(v -> {
-            if (inputLink.getText().toString().isEmpty()) {
-                finish();
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            if (isModified) {
+                if (!bookmark.getLink().equals(inputLink.getText().toString()) ||
+                        !bookmark.getTitle().equals(title.getText().toString()) ||
+                        !bookmark.getCategory().equals(db.getCategoryId(category))) {
+                    confirmDialog(inputLink.getText().toString(), db.getCategoryId(category));
+                } else {
+                    finish();
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                }
             } else {
-                exitConfirmDialog();
+                if (inputLink.getText().toString().isEmpty()) {
+                    finish();
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                } else {
+                    exitConfirmDialog();
+                }
             }
         });
 
@@ -637,7 +647,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private void exitConfirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno perssi")
+        builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno persi")
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {

@@ -52,7 +52,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private DatabaseHandler db;
     int i = 0;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

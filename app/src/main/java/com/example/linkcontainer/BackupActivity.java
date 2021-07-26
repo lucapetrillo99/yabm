@@ -1,10 +1,5 @@
 package com.example.linkcontainer;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -22,13 +17,19 @@ import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Calendar;
@@ -36,10 +37,10 @@ import java.util.Calendar;
 public class BackupActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final int RESULT_OK = 1;
-    private static final int REQUEST_CODE = 1;
     private static final String AUTO_BACKUP = "auto_backup";
     private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FILE_EXTENSION = "db";
+    private static final String DATE_PATTERN = "yyyyMMddHHmmss";
     private SwitchMaterial autoBackupSwitch;
     private RelativeLayout createBackupOption;
     private RelativeLayout restoreBackupOption;
@@ -90,6 +91,22 @@ public class BackupActivity extends AppCompatActivity {
         });
     }
 
+    ActivityResultLauncher<Intent> createBackupLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                Uri uri = result.getData().getData();
+                int backupResult = backupHandler.createBackup(uri);
+                if (backupResult == RESULT_OK) {
+                    Toast.makeText(getApplicationContext(), "Backup creato correttamente",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    });
+
     private void createBackupListener() {
         createBackupOption.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -98,16 +115,37 @@ public class BackupActivity extends AppCompatActivity {
             } else {
                 final String TITLE = "bookmarks-";
 
-                CharSequence currentTime = DateFormat.format("yyyyMMddHHmmss", Calendar.getInstance().getTime());
+                CharSequence currentTime = DateFormat.format(DATE_PATTERN, Calendar.getInstance().getTime());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("text/*");
                 intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".db");
 
-                startActivityForResult(intent, REQUEST_CODE);
+                createBackupLauncher.launch(intent);
             }
         });
     }
+
+    ActivityResultLauncher<Intent> restoreBackupLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                Uri uri = result.getData().getData();
+                if (checkFileExtension(uri)) {
+                    int backupResult = backupHandler.restoreBackup(uri);
+                    if (backupResult == RESULT_OK) {
+                        Toast.makeText(getApplicationContext(), "Backup ripristinato correttamente",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Impossibile ripristinare il backup",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "File selezionato non valido",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    });
 
     private void restoreBackupListener() {
         restoreBackupOption.setOnClickListener(v -> {
@@ -157,59 +195,23 @@ public class BackupActivity extends AppCompatActivity {
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");
 
-                    startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+                    restoreBackupLauncher.launch(intent);
                     alertDialog.dismiss();
                 });
             }
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                if (checkFileExtension(uri)) {
-                    int result = backupHandler.restoreBackup(uri);
-                    if (result == RESULT_OK) {
-                        Toast.makeText(getApplicationContext(), "Backup ripristinato correttamente",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Impossibile ripristinare il backup",
-                                Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "File selezionato non valido",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        } else if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                int result = backupHandler.createBackup(uri);
-                if (result == RESULT_OK) {
-                    Toast.makeText(getApplicationContext(), "Backup creato correttamente",
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     private boolean checkFileExtension(Uri uri) {
         Cursor returnCursor =
                 getContentResolver().query(uri, null, null, null, null);
-
-        returnCursor.close();
 
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         returnCursor.moveToFirst();
 
         String fileName = returnCursor.getString(nameIndex);
         String fileExtension = fileName.split("\\.")[1];
+        returnCursor.close();
         return fileExtension.equals(FILE_EXTENSION);
     }
 
@@ -227,7 +229,7 @@ public class BackupActivity extends AppCompatActivity {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
                 Snackbar.LENGTH_LONG);
 
-        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
+        View customView = View.inflate(this, R.layout.snackbar_custom, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setPadding(0, 0, 0, 0);
 

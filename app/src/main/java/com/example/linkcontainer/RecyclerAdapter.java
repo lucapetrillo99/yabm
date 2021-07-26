@@ -10,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +25,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
@@ -182,7 +181,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     }
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
-       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation);
+       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation, this);
        updateBookmarks.execute();
        notifyDataSetChanged();
     }
@@ -196,24 +195,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
     }
 
-    private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
+    private static class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
         private final int operation;
         private final ArrayList<Bookmark> list;
+        private final WeakReference<RecyclerAdapter> activityReference;
 
-        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation) {
+        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation, RecyclerAdapter context) {
             this.list = bookmarks;
             this.operation = operation;
+            activityReference = new WeakReference<>(context);
         }
 
         boolean result = true;
         @Override
         protected Void doInBackground(Void... voids) {
-
+            RecyclerAdapter recyclerAdapter = activityReference.get();
             switch (operation) {
                 case 1:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.deleteBookmark(selectedBookmark.id);
+                        recyclerAdapter.bookmarks.remove(selectedBookmark);
+                        result = recyclerAdapter.db.deleteBookmark(selectedBookmark.id);
                         if (!result) {
                             break;
                         }
@@ -221,8 +222,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 2:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
+                        recyclerAdapter.bookmarks.remove(selectedBookmark);
+                        result = recyclerAdapter.db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
                         if (!result) {
                             break;
                         }
@@ -230,8 +231,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 3:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.removeFromArchive(selectedBookmark.getId());
+                        recyclerAdapter.bookmarks.remove(selectedBookmark);
+                        result = recyclerAdapter.db.removeFromArchive(selectedBookmark.getId());
                         if (!result) {
                             break;
                         }
@@ -244,8 +245,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            RecyclerAdapter recyclerAdapter = activityReference.get();
             if (!result) {
-                Toast.makeText(mainActivity, "Impossibile eliminare i segnalibri!",
+                Toast.makeText(recyclerAdapter.mainActivity, "Impossibile eliminare i segnalibri!",
                         Toast.LENGTH_LONG).show();
             }
         }

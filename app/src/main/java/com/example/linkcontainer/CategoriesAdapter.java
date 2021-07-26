@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,11 +31,12 @@ import static android.view.View.INVISIBLE;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
+    public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private final ArrayList<Category> categories;
     private DatabaseHandler db;
     private final Categories categoriesActivity;
     private final ArrayList<Category> allCategories;
-    public static final int PERMISSION_REQUEST_STORAGE = 1000;
+    private AlertDialog dialog;
     public ImageView categoryImage;
     public ImageButton addImageButton, modifyImage, removeImage;
     public TextView addImageTitle;
@@ -82,7 +82,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         holder.title.setText(categories.get(position).getCategoryTitle());
 
         if (categoriesActivity.isContextualMenuEnable) {
-            if (categories.get(position).getCategoryTitle().equals("Default")) {
+            if (categories.get(position).getCategoryTitle().equals(categoriesActivity.getString(R.string.default_bookmarks))) {
                 holder.checkbox.setVisibility(View.INVISIBLE);
             }else {
                 holder.checkbox.setVisibility(View.VISIBLE);
@@ -92,7 +92,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         } else {
             holder.checkbox.setVisibility(View.INVISIBLE);
-            if (categories.get(position).getCategoryTitle().equals("Default")) {
+            if (categories.get(position).getCategoryTitle().equals(categoriesActivity.getString(R.string.default_bookmarks))) {
                 holder.modify.setVisibility(INVISIBLE);
                 holder.delete.setVisibility(INVISIBLE);
             } else {
@@ -101,7 +101,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             }
         }
 
-        holder.modify.setOnClickListener(v -> createDialog(position, true, v));
+        holder.modify.setOnClickListener(v -> newCategoryDialog(position, true, v));
         holder.delete.setOnClickListener(v -> confirmDialog(position, v));
         holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, position));
 
@@ -117,7 +117,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     }
 
     public void updateCategories(ArrayList<Category> selectedCategories) {
-        UpdateCategories updateCategories = new UpdateCategories(selectedCategories);
+        UpdateCategories updateCategories = new UpdateCategories(selectedCategories, this);
         updateCategories.execute();
         notifyDataSetChanged();
     }
@@ -127,13 +127,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         return categories.size();
     }
 
-    public void createDialog(int position, boolean isModify, View v) {
+    public void newCategoryDialog(int position, boolean isModify, View v) {
         LayoutInflater layoutInflater = LayoutInflater.from(v.getRootView().getContext());
         View dialogView = layoutInflater.inflate(R.layout.dialog, null);
-        final AlertDialog dialog = new AlertDialog.Builder(categoriesActivity)
+        dialog = new AlertDialog.Builder(categoriesActivity)
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton("Annulla", null)
+                .setNegativeButton(categoriesActivity.getString(R.string.cancel), null)
                 .create();
 
         EditText input = dialogView.findViewById(R.id.user_input);
@@ -168,7 +168,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 imageLayout.setVisibility(View.VISIBLE);
             }
         } else {
-            input.setHint("Inserisci la categoria");
+            input.setHint(R.string.insert_category_title);
         }
 
         addImageButton.setOnClickListener(v1 -> {
@@ -201,14 +201,12 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     Category category = new Category();
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
-                    Log.i("OUSHDOH", String.valueOf(image));
                     if (image == null) {
                         category.setCategoryImage(categories.get(position).getCategoryImage());
                     } else {
                         category.setCategoryImage(image);
                     }
                     boolean result = db.updateCategory(category);
-                    Log.i("OUSHDOH", String.valueOf(result));
                     if (result) {
                         Toast.makeText(v.getRootView().getContext(),
                                 "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
@@ -244,21 +242,27 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         dialog.show();
     }
 
-    private class UpdateCategories extends AsyncTask<Void, Void, Void> {
-        private final ArrayList<Category> list;
+    public void closeCategoryDialog() {
+        dialog.dismiss();
+    }
 
-        public UpdateCategories(ArrayList<Category> categories) {
+    private static class UpdateCategories extends AsyncTask<Void, Void, Void> {
+        private final ArrayList<Category> list;
+        private final WeakReference<CategoriesAdapter> activityReference;
+
+        public UpdateCategories(ArrayList<Category> categories, CategoriesAdapter context) {
             this.list = categories;
+            activityReference = new WeakReference<>(context);
         }
 
         boolean result = true;
         @Override
         protected Void doInBackground(Void... voids) {
-
+            CategoriesAdapter categoryAdapter = activityReference.get();
             for (Category selectedCategory : list) {
-                if (!selectedCategory.getCategoryTitle().equals("Default")) {
-                    categories.remove(selectedCategory);
-                    result = db.deleteCategory(selectedCategory);
+                if (!selectedCategory.getCategoryTitle().equals(categoryAdapter.categoriesActivity.getString(R.string.default_bookmarks))) {
+                    categoryAdapter.categories.remove(selectedCategory);
+                    result = categoryAdapter.db.deleteCategory(selectedCategory);
                     if (!result) {
                         break;
                     }
@@ -270,8 +274,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            CategoriesAdapter categoryAdapter = activityReference.get();
             if (!result) {
-                Toast.makeText(categoriesActivity, "Impossibile eliminare i segnalibri!",
+                Toast.makeText(categoryAdapter.categoriesActivity, "Impossibile eliminare i segnalibri!",
                         Toast.LENGTH_LONG).show();
             }
         }
@@ -327,6 +332,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             return filterResults;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             categories.clear();

@@ -33,8 +33,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -58,21 +59,21 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
-    private EditText inputLink, title;
+    private static final int DATE_ERROR = -1;
+    private static final int TIME_ERROR = -2;
+    private EditText link, title;
     private TextView reminderTitle;
     private String category;
     private DatabaseHandler db;
     private Bookmark bookmark;
     private ArrayList<Category> categories;
-    private Spinner dropdown;
+    private Spinner spinnerCategories;
     private boolean isPressed = false;
     private int pressedCounter = 0;
     private int year, month, day, hour, minute;
     private long alarmStartTime = -1;
     private boolean setRemainder = false;
-    private static final int DATE_ERROR = -1;
-    private static final int TIME_ERROR = -2;
-    private boolean isModified = false;
+    private boolean isEditMode = false;
     private TextView addImageTitle;
     private ImageButton addImageButton;
     private ImageView categoryImage;
@@ -89,9 +90,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());
 
-        dropdown = findViewById(R.id.spinner1);
-        dropdown.setOnItemSelectedListener(this);
-        inputLink = findViewById(R.id.insert_link);
+        spinnerCategories = findViewById(R.id.spinner1);
+        spinnerCategories.setOnItemSelectedListener(this);
+        link = findViewById(R.id.insert_link);
         title = findViewById(R.id.insert_title);
         reminderTitle = findViewById(R.id.reminder_title);
         ImageButton newCategory = findViewById(R.id.new_category);
@@ -108,14 +109,14 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, filteredCategories);
-        dropdown.setAdapter(adapter);
+        spinnerCategories.setAdapter(adapter);
 
         Intent intent = getIntent();
         if(intent.getExtras() != null){
             if (intent.getStringExtra("url") != null) {
-                inputLink.setText(intent.getStringExtra("url"));
+                link.setText(intent.getStringExtra("url"));
             } else if (intent.getSerializableExtra("bookmark") != null) {
-                isModified = true;
+                isEditMode = true;
                 bookmark = (Bookmark) intent.getSerializableExtra("bookmark");
                 String category = intent.getStringExtra("category");
                 if (bookmark.getReminder() != -1) {
@@ -131,24 +132,24 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                     modifyRemainder.setVisibility(View.INVISIBLE);
                     removeRemainder.setVisibility(View.INVISIBLE);
                 }
-                inputLink.setText(bookmark.getLink());
+                link.setText(bookmark.getLink());
                 title.setText(bookmark.getTitle());
                 setSpinnerItem(category);
             }
         }
 
         toolbar.setNavigationOnClickListener(v -> {
-            if (isModified) {
-                if (!bookmark.getLink().equals(inputLink.getText().toString()) ||
+            if (isEditMode) {
+                if (!bookmark.getLink().equals(link.getText().toString()) ||
                         !bookmark.getTitle().equals(title.getText().toString()) ||
                         !bookmark.getCategory().equals(db.getCategoryId(category))) {
-                    confirmDialog(inputLink.getText().toString(), db.getCategoryId(category));
+                    confirmDialog(link.getText().toString(), db.getCategoryId(category));
                 } else {
                     finish();
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 }
             } else {
-                if (inputLink.getText().toString().isEmpty()) {
+                if (link.getText().toString().isEmpty()) {
                     finish();
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 } else {
@@ -159,7 +160,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
         FloatingActionButton fab = findViewById(R.id.insert_link_button);
         fab.setOnClickListener(view -> {
-            String link = inputLink.getText().toString();
+            String link = this.link.getText().toString();
             if (link.isEmpty()) {
                 Toast.makeText(getApplicationContext(),
                         "Inserisci un link!", Toast.LENGTH_LONG)
@@ -169,7 +170,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             }
         });
 
-        inputLink.addTextChangedListener(new TextWatcher() {
+        link.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -177,11 +178,11 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if (Patterns.WEB_URL.matcher(inputLink.getText().toString()).matches()) {
+                if (Patterns.WEB_URL.matcher(link.getText().toString()).matches()) {
                     fab.setEnabled(true);
                 } else {
                     fab.setEnabled(false);
-                    inputLink.setError("Link non valido");
+                    link.setError("Link non valido");
                 }
             }
 
@@ -413,10 +414,30 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         });
     }
 
+    ActivityResultLauncher<Intent> importImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                addImageTitle.setVisibility(View.GONE);
+                addImageButton.setVisibility(View.GONE);
+                categoryImage.setVisibility(View.VISIBLE);
+                Uri chosenImageUri = result.getData().getData();
+
+                try {
+                    image = MediaStore.Images.
+                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
+                    categoryImage.setImageBitmap(image);
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    });
+
     public void getImageFromDevice() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+        importImageLauncher.launch(intent);
     }
 
     @Override
@@ -429,32 +450,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                addImageTitle.setVisibility(View.GONE);
-                addImageButton.setVisibility(View.GONE);
-                categoryImage.setVisibility(View.VISIBLE);
-                Uri chosenImageUri = data.getData();
-
-                try {
-                    image = MediaStore.Images.
-                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
-                    categoryImage.setImageBitmap(image);
-                } catch (IOException e) {
-                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
     public void setSpinnerItem(String category) {
-        for (int i = 0; i <  dropdown.getCount(); i ++) {
-            if(dropdown.getItemAtPosition(i).equals(category)) {
-                dropdown.setSelection(i);
+        for (int i = 0; i <  spinnerCategories.getCount(); i ++) {
+            if(spinnerCategories.getItemAtPosition(i).equals(category)) {
+                spinnerCategories.setSelection(i);
                 return;
             }
         }
@@ -463,7 +462,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private void confirmDialog(String link, String categoryId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        if (isModified) {
+        if (isEditMode) {
             builder.setMessage("Sei sicuro di voler modificare il segnalibro?")
                     .setCancelable(false)
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
@@ -597,7 +596,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     private void insertBookmark() {
         boolean queryResult;
         Intent intent;
-        if (isModified) {
+        if (isEditMode) {
             queryResult = db.updateBookmark(bookmark);
             if (queryResult) {
                 if (setRemainder) {
@@ -661,7 +660,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public void onBackPressed() {
-        if (inputLink.getText().toString().isEmpty()) {
+        if (link.getText().toString().isEmpty()) {
             finish();
         } else {
             exitConfirmDialog();
@@ -672,7 +671,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
                 Snackbar.LENGTH_LONG);
 
-        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
+        View customView = View.inflate(this, R.layout.snackbar_custom, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setPadding(0, 0, 0, 0);
 

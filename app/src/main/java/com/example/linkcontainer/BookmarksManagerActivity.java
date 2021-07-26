@@ -1,11 +1,5 @@
 package com.example.linkcontainer;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,6 +14,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -41,8 +41,6 @@ import java.util.Set;
 
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
-    private static final int REQUEST_CODE = 1;
-    private static final String IMPORTED = "Importati";
     private static final long ALARM_START_TIME = -1;
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
@@ -50,7 +48,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private final Set<String> descriptions = new LinkedHashSet<>();
     private int bookmarksCounter = 0;
     private DatabaseHandler db;
-    int i = 0;
+    int descriptionCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +70,19 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             finish();
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
+
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    ActivityResultLauncher<Intent> importBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                Uri uri = result.getData().getData();
+                getBookmarksFromUri(uri);
+                importOptionsDialog();
+            }
+        }
+    });
+
     private void importListener() {
         importOption.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -85,12 +93,11 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("text/html");
 
-                startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
+                importBookmarksLauncher.launch(intent);
             }
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void exportListener() {
         exportOption.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -100,25 +107,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 createBookmarksFile();
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
-            Uri uri;
-            if (data != null) {
-                uri = data.getData();
-                getBookmarksFromUri(uri);
-                importOptionsDialog();
-            }
-        } else if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                writeBookmarksFile(uri);
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-
     }
 
     @Override
@@ -135,7 +123,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), ""
                 , Snackbar.LENGTH_LONG);
 
-        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
+        View customView = View.inflate(this, R.layout.snackbar_custom, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setPadding(0, 0, 0, 0);
 
@@ -193,17 +181,16 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private void importBookmarks() {
         LoadingDialog loadingDialog = new LoadingDialog(BookmarksManagerActivity.this);
         loadingDialog.startLoading();
-        String queryResult = db.getCategoryId(IMPORTED);
+        String queryResult = db.getCategoryId(getString(R.string.imported));
         String categoryId;
         if (queryResult == null) {
             Category category = new Category();
-            category.setCategoryTitle(IMPORTED);
+            category.setCategoryTitle(getString(R.string.imported));
             db.addCategory(category);
-            categoryId = db.getCategoryId(IMPORTED);
+            categoryId = db.getCategoryId(getString(R.string.imported));
         } else {
             categoryId = queryResult;
         }
-
         if (importedBookmarks.size() > 0) {
             Thread thread = new Thread() {
                 public void run() {
@@ -226,8 +213,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                                     bookmark.setTitle(link.split("//")[1].split("/")[0]);
                                 }
                                 if (bookmark.getDescription() == null) {
-                                    if (i < descriptions.toArray().length) {
-                                        bookmark.setDescription(descriptions.toArray()[i].toString());
+                                    if (descriptionCounter < descriptions.toArray().length) {
+                                        bookmark.setDescription(descriptions.toArray()[descriptionCounter].toString());
                                     }
                                 }
                                 bookmark.setLink(link);
@@ -236,12 +223,12 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
                                 boolean insertionResult = db.addBookmark(bookmark);
                                 if (insertionResult)
-                                    bookmarksCounter++;
+                                    bookmarksCounter ++;
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        i ++;
+                        descriptionCounter++;
                     }
                     runOnUiThread(() -> {
                         loadingDialog.dismissLoading();
@@ -258,6 +245,15 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
+    ActivityResultLauncher<Intent> writeBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                Uri uri = result.getData().getData();
+                writeBookmarksFile(uri);
+            }
+        }
+    });
+
     private void createBookmarksFile() {
         final String TITLE = "bookmarks-";
 
@@ -267,7 +263,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         intent.setType("text/html");
         intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".html");
 
-        startActivityForResult(intent, REQUEST_CODE);
+        writeBookmarksLauncher.launch(intent);
     }
 
     private void writeBookmarksFile(Uri uri) {

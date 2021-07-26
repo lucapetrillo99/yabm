@@ -2,7 +2,6 @@ package com.example.linkcontainer;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatDelegate;
 

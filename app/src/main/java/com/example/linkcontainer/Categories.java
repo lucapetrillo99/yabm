@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -248,29 +246,10 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 categoriesAdapter.closeCategoryDialog();
-                showWarningMessage();
+                StoragePermissionDialog storagePermissionDialog = new StoragePermissionDialog(this);
+                storagePermissionDialog.showWarningMessage();
             }
         }
-    }
-
-    private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
-                Snackbar.LENGTH_LONG);
-
-        View customView = View.inflate(this, R.layout.snackbar_custom, null);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0);
-
-        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
-
-        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
-        snackbarLayout.addView(customView, 0);
-        snackbar.show();
     }
 
     @Override

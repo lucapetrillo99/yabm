@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;
@@ -220,29 +218,10 @@ public class BackupActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showWarningMessage();
+                StoragePermissionDialog storagePermissionDialog = new StoragePermissionDialog(this);
+                storagePermissionDialog.showWarningMessage();
             }
         }
-    }
-
-    private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
-                Snackbar.LENGTH_LONG);
-
-        View customView = View.inflate(this, R.layout.snackbar_custom, null);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0);
-
-        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
-
-        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
-        snackbarLayout.addView(customView, 0);
-        snackbar.show();
     }
 
     private void createAutoBackupFile() {

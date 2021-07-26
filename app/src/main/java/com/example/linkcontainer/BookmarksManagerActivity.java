@@ -8,9 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.format.DateFormat;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,8 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -114,29 +110,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showWarningMessage();
+                StoragePermissionDialog storagePermissionDialog = new StoragePermissionDialog(this);
+                storagePermissionDialog.showWarningMessage();
             }
         }
-    }
-
-    private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), ""
-                , Snackbar.LENGTH_LONG);
-
-        View customView = View.inflate(this, R.layout.snackbar_custom, null);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0);
-
-        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
-
-        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
-        snackbarLayout.addView(customView, 0);
-        snackbar.show();
     }
 
     private void getBookmarksFromUri(Uri uri) {

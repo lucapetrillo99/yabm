@@ -46,7 +46,7 @@
         <TextView
             android:id="@+id/no_bookmarks"
             android:layout_marginTop="80dp"
-            android:text="Al momento non hai segnalibri"
+            android:text="@string/no_bookmarks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
@@ -75,7 +75,7 @@
                 android:layout_marginTop="70dp"
                 android:layout_marginStart="5dp"
                 android:padding="15dp"
-                android:text="Categorie"
+                android:text="@string/categories_title"
                 android:textStyle="bold"
                 android:textAllCaps="true"/>
 

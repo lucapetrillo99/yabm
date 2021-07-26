@@ -54,7 +54,7 @@
                 android:layout_toEndOf="@+id/warning_image"
                 android:layout_toStartOf="@+id/warning_close_button"
                 android:layout_marginTop="10dp"
-                android:text="Per effettuare l'operazione consenti di accedere alla memoria di archiviazione"
+                android:text="@string/warning_description"
                 android:textColor="@color/white"
                 android:textSize="15sp">
             </TextView>
@@ -66,10 +66,12 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/warning_description"
                 android:layout_marginTop="15dp"
-                android:text="Vai a Impostazioni"
+                android:text="@string/go_to_settings"
                 android:textColor="@color/white"
-                android:layout_alignParentEnd="true">
+                android:layout_alignParentEnd="true"
+                android:focusable="true">
             </TextView>
+
         </RelativeLayout>
 
     </com.google.android.material.card.MaterialCardView>

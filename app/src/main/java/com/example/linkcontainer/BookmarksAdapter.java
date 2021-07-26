@@ -34,14 +34,14 @@ import com.squareup.picasso.Picasso;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
+public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyViewHolder> implements Filterable {
     private static final int DESCRIPTION_MAX_LENGTH = 120;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
     private DatabaseHandler db;
     private final ArrayList<Bookmark> allBookmarks;
 
-    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
+    public BookmarksAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
         this.mainActivity = mainActivity;
         this.allBookmarks = new ArrayList<>(bookmarks);
@@ -157,7 +157,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         if (!mainActivity.isArchiveModeEnabled) {
             holder.itemView.setOnClickListener(v -> {
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(mainActivity, InsertLink.class);
+                Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
                 intent.putExtra("bookmark", bookmarks.get(position));
                 intent.putExtra("category", category);
                 mainActivity.startActivity(intent);
@@ -198,9 +198,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     private static class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
         private final int operation;
         private final ArrayList<Bookmark> list;
-        private final WeakReference<RecyclerAdapter> activityReference;
+        private final WeakReference<BookmarksAdapter> activityReference;
 
-        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation, RecyclerAdapter context) {
+        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation, BookmarksAdapter context) {
             this.list = bookmarks;
             this.operation = operation;
             activityReference = new WeakReference<>(context);
@@ -209,12 +209,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         boolean result = true;
         @Override
         protected Void doInBackground(Void... voids) {
-            RecyclerAdapter recyclerAdapter = activityReference.get();
+            BookmarksAdapter bookmarksAdapter = activityReference.get();
             switch (operation) {
                 case 1:
                     for (Bookmark selectedBookmark : list) {
-                        recyclerAdapter.bookmarks.remove(selectedBookmark);
-                        result = recyclerAdapter.db.deleteBookmark(selectedBookmark.id);
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.id);
                         if (!result) {
                             break;
                         }
@@ -222,8 +222,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 2:
                     for (Bookmark selectedBookmark : list) {
-                        recyclerAdapter.bookmarks.remove(selectedBookmark);
-                        result = recyclerAdapter.db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
                         if (!result) {
                             break;
                         }
@@ -231,8 +231,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 3:
                     for (Bookmark selectedBookmark : list) {
-                        recyclerAdapter.bookmarks.remove(selectedBookmark);
-                        result = recyclerAdapter.db.removeFromArchive(selectedBookmark.getId());
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.removeFromArchive(selectedBookmark.getId());
                         if (!result) {
                             break;
                         }
@@ -245,9 +245,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            RecyclerAdapter recyclerAdapter = activityReference.get();
+            BookmarksAdapter bookmarksAdapter = activityReference.get();
             if (!result) {
-                Toast.makeText(recyclerAdapter.mainActivity, "Impossibile eliminare i segnalibri!",
+                Toast.makeText(bookmarksAdapter.mainActivity, "Impossibile eliminare i segnalibri!",
                         Toast.LENGTH_LONG).show();
             }
         }

@@ -89,7 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void categoriesClickListener() {
         categoriesSetting.setOnClickListener(v -> {
-            Intent intent = new Intent(SettingsActivity.this, Categories.class);
+            Intent intent = new Intent(SettingsActivity.this, CategoriesActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });

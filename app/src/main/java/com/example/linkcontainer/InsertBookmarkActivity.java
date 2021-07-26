@@ -57,7 +57,7 @@ import java.util.Objects;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class InsertLink extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class InsertBookmarkActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
@@ -191,9 +191,9 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
         });
 
         newCategory.setOnClickListener(view -> {
-            LayoutInflater layoutInflater = LayoutInflater.from(InsertLink.this);
+            LayoutInflater layoutInflater = LayoutInflater.from(InsertBookmarkActivity.this);
             View dialogView = layoutInflater.inflate(R.layout.dialog, null);
-            final AlertDialog dialog = new AlertDialog.Builder(InsertLink.this)
+            final AlertDialog dialog = new AlertDialog.Builder(InsertBookmarkActivity.this)
                     .setView(dialogView)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton("Annulla", null)
@@ -228,14 +228,14 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                             categories.add(category);
                             filteredCategories.add(category.getCategoryTitle());
                             dialog.dismiss();
-                            Toast.makeText(InsertLink.this,
+                            Toast.makeText(InsertBookmarkActivity.this,
                                     "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(InsertLink.this,
+                            Toast.makeText(InsertBookmarkActivity.this,
                                     "Categoria già esistente!", Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(InsertLink.this,
+                        Toast.makeText(InsertBookmarkActivity.this,
                                 "Inserisci il nome di una categoria!", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -246,7 +246,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
         addRemainder.setOnClickListener(view -> {
             Calendar calendar = Calendar.getInstance();
-            final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
+            final AlertDialog.Builder alert = new AlertDialog.Builder(InsertBookmarkActivity.this);
             View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
             DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
             TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
@@ -328,7 +328,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
         modifyRemainder.setOnClickListener(view -> {
             Calendar calendar = Calendar.getInstance();
-            final AlertDialog.Builder alert = new AlertDialog.Builder(InsertLink.this);
+            final AlertDialog.Builder alert = new AlertDialog.Builder(InsertBookmarkActivity.this);
             View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
             DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
             TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
@@ -496,7 +496,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(InsertLink.this, SettingsActivity.class);
+        Intent intent = new Intent(InsertBookmarkActivity.this, SettingsActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         finish();
@@ -504,10 +504,10 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     }
 
     private void getBookmarkInformation(String link, String categoryId) {
-        LoadingDialog loadingDialog = new LoadingDialog(InsertLink.this);
+        LoadingDialog loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
         loadingDialog.startLoading();
         bookmark.setLink(link);
-        Utils.getJsoupContent(link).subscribeOn(Schedulers.newThread())
+        Utils.getUrlContent(link).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
                     if (result != null) {
@@ -550,13 +550,13 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
     }
 
     private void setReminder(String message, String link) {
-        Intent intent = new Intent(InsertLink.this, AlarmReceiver.class);
+        Intent intent = new Intent(InsertBookmarkActivity.this, AlarmReceiver.class);
         final int notificationId = 0;
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("message", message);
         intent.putExtra("link", link);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                InsertLink.this, 0, intent,
+                InsertBookmarkActivity.this, 0, intent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -609,7 +609,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro modificato!", Toast.LENGTH_LONG)
                         .show();
-                intent = new Intent(InsertLink.this, MainActivity.class);
+                intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 finish();
@@ -631,7 +631,7 @@ public class InsertLink extends AppCompatActivity implements AdapterView.OnItemS
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
-                intent = new Intent(InsertLink.this, MainActivity.class);
+                intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 finish();

@@ -29,7 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Categories extends AppCompatActivity implements View.OnLongClickListener {
+public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     public boolean areAllSelected = false;
     public boolean isContextualMenuEnable = false;
@@ -90,7 +90,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
         switch (id) {
             case R.id.settings:
-                Intent activityIntent = new Intent(Categories.this, SettingsActivity.class);
+                Intent activityIntent = new Intent(CategoriesActivity.this, SettingsActivity.class);
                 startActivity(activityIntent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 break;

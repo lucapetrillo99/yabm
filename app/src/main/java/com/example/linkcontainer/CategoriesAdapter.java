@@ -34,7 +34,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private final ArrayList<Category> categories;
     private DatabaseHandler db;
-    private final Categories categoriesActivity;
+    private final CategoriesActivity categoriesActivity;
     private final ArrayList<Category> allCategories;
     private AlertDialog dialog;
     public ImageView categoryImage;
@@ -43,7 +43,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public Bitmap image;
     public LinearLayout imageLayout;
 
-    public CategoriesAdapter(ArrayList<Category> categories, Categories categoriesActivity) {
+    public CategoriesAdapter(ArrayList<Category> categories, CategoriesActivity categoriesActivity) {
         this.categories = categories;
         this.categoriesActivity = categoriesActivity;
         this.allCategories = new ArrayList<>(categories);
@@ -55,7 +55,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         CheckBox checkbox;
         View view;
 
-        public categoriesViewHolder(@NonNull View itemView, Categories categoriesActivity) {
+        public categoriesViewHolder(@NonNull View itemView, CategoriesActivity categoriesActivity) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             modify = itemView.findViewById(R.id.modify);

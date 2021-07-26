@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
-    private RecyclerAdapter recyclerAdapter;
+    private BookmarksAdapter bookmarksAdapter;
     private RecyclerView categoriesRecyclerview;
     private Toolbar toolbar;
     private TextView toolbarTitle;
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
             previousCategory = toolbarTitle.getText().toString();
-            activityIntent = new Intent(MainActivity.this, InsertLink.class);
+            activityIntent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
             startActivity(activityIntent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             if (isContextualMenuEnable) {
@@ -145,16 +145,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private void setAdapter() {
         setBookmarksLabel();
         initSwipe();
-        recyclerAdapter = new RecyclerAdapter(bookmarks, MainActivity.this);
+        bookmarksAdapter = new BookmarksAdapter(bookmarks, MainActivity.this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setAdapter(bookmarksAdapter);
     }
 
     void handleSendText (Intent intent){
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
-            Intent linkIntent = new Intent(MainActivity.this, InsertLink.class);
+            Intent linkIntent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
             linkIntent.putExtra("url", sharedText);
             startActivity(linkIntent);
         }
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
-                        recyclerAdapter.getFilter().filter(query);
+                        bookmarksAdapter.getFilter().filter(query);
                         return false;
                     }
 
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     counter = 0;
                 }
                 updateCounter();
-                recyclerAdapter.notifyDataSetChanged();
+                bookmarksAdapter.notifyDataSetChanged();
                 break;
         }
         return true;
@@ -262,28 +262,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                         if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                             Bookmark unarchivedBookmark = bookmarks.get(position);
                             removedFromArchive.add(bookmarks.get(position));
-                            recyclerAdapter.removeBookmark(position);
+                            bookmarksAdapter.removeBookmark(position);
                             bookmarks.remove(position);
-                            recyclerAdapter.notifyItemRemoved(position);
+                            bookmarksAdapter.notifyItemRemoved(position);
 
                             Snackbar.make(recyclerView, unarchivedBookmark.getLink() + " rimosso dall'archivio.", Snackbar.LENGTH_LONG)
                                     .setAction("Annulla", v -> {
                                         removedFromArchive.remove(removedFromArchive.lastIndexOf(unarchivedBookmark));
                                         bookmarks.add(position, unarchivedBookmark);
-                                        recyclerAdapter.notifyItemInserted(position);
+                                        bookmarksAdapter.notifyItemInserted(position);
                                     }).show();
                         } else {
                             Bookmark archivedBookmark = bookmarks.get(position);
                             archivedUrl.add(bookmarks.get(position));
                             bookmarks.remove(position);
-                            recyclerAdapter.removeBookmark(position);
-                            recyclerAdapter.notifyItemRemoved(position);
+                            bookmarksAdapter.removeBookmark(position);
+                            bookmarksAdapter.notifyItemRemoved(position);
 
                             Snackbar.make(recyclerView, archivedBookmark.getLink() + " archiviato.", Snackbar.LENGTH_LONG)
                                     .setAction("Annulla", v -> {
                                         archivedUrl.remove(archivedUrl.lastIndexOf(archivedBookmark));
                                         bookmarks.add(position, archivedBookmark);
-                                        recyclerAdapter.notifyItemInserted(position);
+                                        bookmarksAdapter.notifyItemInserted(position);
                                     }).show();
                         }
                         break;
@@ -330,13 +330,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> {
                     dialogInterface.cancel();
-                    recyclerAdapter.notifyDataSetChanged();
+                    bookmarksAdapter.notifyDataSetChanged();
                 })
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     if (db.deleteBookmark(id)) {
                         bookmarks.remove(position);
-                        recyclerAdapter.removeBookmark(position);
-                        recyclerAdapter.notifyItemRemoved(position);
+                        bookmarksAdapter.removeBookmark(position);
+                        bookmarksAdapter.notifyItemRemoved(position);
                         Toast.makeText(getApplicationContext(), "Segnalibro eliminato", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getApplicationContext(), "Impossibile eliminare il segnalibro", Toast.LENGTH_LONG).show();
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
 
         toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
-        recyclerAdapter.notifyDataSetChanged();
+        bookmarksAdapter.notifyDataSetChanged();
         return true;
     }
 
@@ -428,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         addFilterCategories();
         counter = 0;
         selectedBookmarks.clear();
-        recyclerAdapter.notifyDataSetChanged();
+        bookmarksAdapter.notifyDataSetChanged();
 
     }
 
@@ -502,13 +502,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
                     switch (operation) {
                         case DELETE_OPTION:
-                            recyclerAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
+                            bookmarksAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
                             break;
                         case ARCHIVE_OPTION:
-                            recyclerAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                            bookmarksAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
                             break;
                         case UNARCHIVE_OPTION:
-                            recyclerAdapter.updateBookmarks(selectedBookmarks, UNARCHIVE_OPTION);
+                            bookmarksAdapter.updateBookmarks(selectedBookmarks, UNARCHIVE_OPTION);
                             break;
                     }
                     Toast.makeText(getApplicationContext(), finalBookmarkMessage + finalDeletedQuestion,

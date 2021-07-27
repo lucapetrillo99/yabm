@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -14,7 +15,7 @@ import androidx.fragment.app.DialogFragment;
 import com.ilpet.yabm.R;
 import com.squareup.picasso.Picasso;
 
-public class ImagePreview extends DialogFragment{
+public class ImagePreview extends DialogFragment {
     private static String image;
     private static String title;
 
@@ -27,7 +28,7 @@ public class ImagePreview extends DialogFragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_FRAME, DialogFragment.STYLE_NO_FRAME);
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.DialogAnimation);
     }
 
     @Nullable

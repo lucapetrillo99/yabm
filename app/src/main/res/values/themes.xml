@@ -14,8 +14,17 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="DialogAnimation">
+    <style name="ActivityAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in_sheet_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_sheet_bottom</item>
+    </style>
+
+    <style name="DialogAnimation" parent="@android:style/Theme.Panel">
+        <item name="android:windowAnimationStyle">@style/MyAnimation.Window</item>
+    </style>
+
+    <style name="MyAnimation.Window" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 </resources>

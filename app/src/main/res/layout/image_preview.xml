@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:gravity="center"
+    android:minHeight="1000dp"
+    android:minWidth="1000dp"
     android:background="@color/black">
 
     <include
@@ -14,7 +16,7 @@
 <com.github.chrisbanes.photoview.PhotoView
     android:id="@+id/preview_image"
     android:layout_width="match_parent"
-    android:layout_marginTop="7dp"
+    android:layout_marginTop="20dp"
     android:layout_height="match_parent"/>
 
 </LinearLayout>

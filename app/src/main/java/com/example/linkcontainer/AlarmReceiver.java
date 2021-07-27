@@ -12,7 +12,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 public class AlarmReceiver extends BroadcastReceiver {
-
     private static final String CHANNEL_ID = "SAMPLE_CHANNEL";
 
     @Override
@@ -39,7 +38,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.prova)
-                    .setContentTitle("Promemoria")
+                    .setContentTitle(context.getString(R.string.reminder))
                     .setContentText(message)
                     .setContentIntent(contentIntent)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

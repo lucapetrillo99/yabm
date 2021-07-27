@@ -15,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="20dp"
@@ -26,8 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_theme"
-            android:contentDescription="Theme">
+            android:src="@drawable/ic_theme">
         </ImageView>
 
         <LinearLayout
@@ -39,8 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Tema"
-                android:paddingLeft="45dp"
+                android:text="@string/theme"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"
@@ -56,7 +53,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -67,8 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_modify_categories"
-            android:contentDescription="Modify categories">
+            android:src="@drawable/ic_modify_categories">
         </ImageView>
 
         <LinearLayout
@@ -80,8 +75,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Gestisci categorie"
-                android:paddingLeft="45dp"
+                android:text="@string/manage_categories"
+                android:paddingStart="45dp"
                 android:textSize="18sp"
                 android:textStyle="bold">
             </TextView>
@@ -95,7 +90,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -106,8 +100,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_start_category"
-            android:contentDescription="Start categories">
+            android:src="@drawable/ic_start_category">
         </ImageView>
 
         <LinearLayout
@@ -119,8 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Categoria visualizzata all'avvio"
-                android:paddingLeft="45dp"
+                android:text="@string/started_category_displayed"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"
@@ -136,7 +128,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -147,8 +138,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_import_export"
-            android:contentDescription="Import export">
+            android:src="@drawable/ic_import_export">
         </ImageView>
 
         <LinearLayout
@@ -160,8 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Importa/Esporta"
-                android:paddingLeft="45dp"
+                android:text="@string/import_export"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"
@@ -177,7 +166,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -188,8 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_backup"
-            android:contentDescription="Backup">
+            android:src="@drawable/ic_backup">
         </ImageView>
 
         <LinearLayout
@@ -201,8 +188,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Backup"
-                android:paddingLeft="45dp"
+                android:text="@string/backup"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"
@@ -218,7 +204,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
-        android:layout_marginLeft="10dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="10dp"
@@ -229,8 +214,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_feedback"
-            android:contentDescription="Feedback">
+            android:src="@drawable/ic_feedback">
         </ImageView>
 
         <LinearLayout
@@ -242,8 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Invia un feedback"
-                android:paddingLeft="45dp"
+                android:text="@string/send_feedback"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"
@@ -269,8 +252,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_info"
-            android:contentDescription="Info App">
+            android:src="@drawable/ic_info">
         </ImageView>
 
         <LinearLayout
@@ -282,7 +264,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Info App"
+                android:text="@string/info_app"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingStart="45dp"

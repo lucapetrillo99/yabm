@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="Scegli l'azione"
+        android:text="@string/action_title"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginTop="5dp"
@@ -25,21 +25,20 @@
             android:id="@+id/open_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Apri"
+            android:text="@string/open"
             android:textSize="15sp"
             android:layout_marginTop="15dp"
-            android:layout_marginLeft="15dp"
             android:layout_marginStart="15dp" />
 
         <TextView
             android:id="@+id/copy_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Copia"
+            android:text="@string/copy"
             android:textSize="15sp"
-            android:layout_marginLeft="15dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"/>
+
     </LinearLayout>
 
 </LinearLayout>

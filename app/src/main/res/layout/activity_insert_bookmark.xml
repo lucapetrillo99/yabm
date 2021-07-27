@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".InsertLink">
+    tools:context=".InsertBookmarkActivity">
 
     <include
         layout="@layout/toolbar">
@@ -21,10 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="80dp"
-            android:text="Link:"
+            android:text="@string/link"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginEnd="8dp" />
@@ -39,7 +37,7 @@
             android:layout_marginEnd="15dp"
             android:layout_marginRight="15dp"
             android:layout_weight="1"
-            android:hint="Inserisci il link"
+            android:hint="@string/insert_link"
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
@@ -53,10 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="35dp"
-            android:text="Titolo:"
+            android:text="@string/bookmark_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginEnd="8dp" />
@@ -71,7 +67,7 @@
             android:layout_marginEnd="15dp"
             android:layout_marginRight="15dp"
             android:layout_weight="1"
-            android:hint="Inserisci un titolo"
+            android:hint="@string/insert_title"
             android:maxLength="30"
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
@@ -79,6 +75,7 @@
             android:background="@drawable/custom_background_edit_text"
             android:backgroundTint="?attr/colorSecondary"
             android:scrollHorizontally="true"
+            android:inputType="textCapSentences"
             tools:targetApi="lollipop">
         </EditText>
 
@@ -86,10 +83,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
             android:layout_marginTop="35dp"
-            android:layout_marginRight="8dp"
-            android:text="Seleziona una categoria:"
+            android:text="@string/bookmark_category"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginEnd="8dp" />
@@ -118,7 +113,6 @@
                 android:layout_height="wrap_content"
                 android:layout_column="2"
                 android:layout_marginTop="20dp"
-                android:layout_marginRight="15dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center"
                 android:src="@drawable/ic_add"
@@ -133,9 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginLeft="15dp"
             android:layout_marginTop="35dp"
-            android:layout_marginRight="8dp"
             android:text="Inserisci un promemoria:"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -150,20 +142,15 @@
                 android:layout_width="81dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_marginStart="168dp"
-                android:layout_marginLeft="168dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="161dp"
-                android:layout_marginRight="161dp"
                 android:layout_marginBottom="20dp"
                 android:padding="15dp"
                 android:background="@null"
                 android:src="@drawable/ic_calendar">
             </ImageButton>
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -176,8 +163,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="8dp"
                     android:textSize="18sp"
                     android:layout_marginEnd="8dp"
                     android:visibility="invisible">
@@ -194,7 +179,6 @@
                         android:layout_width="wrap_content"
                         android:layout_column="0"
                         android:src="@drawable/ic_small_calendar"
-                        android:layout_marginLeft="100dp"
                         android:visibility="invisible"
                         android:background="@null"
                         android:layout_marginStart="100dp">
@@ -238,8 +222,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
             android:src="@drawable/ic_check"
-            tools:ignore="MissingConstraints"
-            android:contentDescription="New Link" />
+            tools:ignore="MissingConstraints"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

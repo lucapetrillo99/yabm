@@ -10,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,23 +25,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> implements Filterable {
+public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyViewHolder> implements Filterable {
     private static final int DESCRIPTION_MAX_LENGTH = 120;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
     private DatabaseHandler db;
     private final ArrayList<Bookmark> allBookmarks;
 
-    public RecyclerAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
+    public BookmarksAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
         this.mainActivity = mainActivity;
         this.allBookmarks = new ArrayList<>(bookmarks);
@@ -158,7 +157,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         if (!mainActivity.isArchiveModeEnabled) {
             holder.itemView.setOnClickListener(v -> {
                 String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(mainActivity, InsertLink.class);
+                Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
                 intent.putExtra("bookmark", bookmarks.get(position));
                 intent.putExtra("category", category);
                 mainActivity.startActivity(intent);
@@ -182,7 +181,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     }
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
-       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation);
+       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation, this);
        updateBookmarks.execute();
        notifyDataSetChanged();
     }
@@ -196,24 +195,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
     }
 
-    private class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
+    private static class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
         private final int operation;
         private final ArrayList<Bookmark> list;
+        private final WeakReference<BookmarksAdapter> activityReference;
 
-        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation) {
+        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation, BookmarksAdapter context) {
             this.list = bookmarks;
             this.operation = operation;
+            activityReference = new WeakReference<>(context);
         }
 
         boolean result = true;
         @Override
         protected Void doInBackground(Void... voids) {
-
+            BookmarksAdapter bookmarksAdapter = activityReference.get();
             switch (operation) {
                 case 1:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.deleteBookmark(selectedBookmark.id);
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.id);
                         if (!result) {
                             break;
                         }
@@ -221,8 +222,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 2:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
                         if (!result) {
                             break;
                         }
@@ -230,8 +231,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     break;
                 case 3:
                     for (Bookmark selectedBookmark : list) {
-                        bookmarks.remove(selectedBookmark);
-                        result = db.removeFromArchive(selectedBookmark.getId());
+                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
+                        result = bookmarksAdapter.db.removeFromArchive(selectedBookmark.getId());
                         if (!result) {
                             break;
                         }
@@ -244,8 +245,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            BookmarksAdapter bookmarksAdapter = activityReference.get();
             if (!result) {
-                Toast.makeText(mainActivity, "Impossibile eliminare i segnalibri!",
+                Toast.makeText(bookmarksAdapter.mainActivity, "Impossibile eliminare i segnalibri!",
                         Toast.LENGTH_LONG).show();
             }
         }
@@ -306,7 +308,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
     public void showDialog(int position) {
         final Dialog dialog = new Dialog(mainActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.bottom_sheet);
+        dialog.setContentView(R.layout.link_actions_dialog);
 
         TextView openLink = dialog.findViewById(R.id.open_link);
         TextView copyLink = dialog.findViewById(R.id.copy_link);

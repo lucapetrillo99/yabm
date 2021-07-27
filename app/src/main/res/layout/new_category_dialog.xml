@@ -37,9 +37,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="30dp"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        tools:ignore="LabelFor">
+        android:inputType="textCapSentences">
 
     </EditText>
 
@@ -54,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Aggiungi un'immagine"
+            android:text="@string/add_image"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -66,7 +64,6 @@
             android:layout_below="@+id/add_image_title"
             android:layout_centerInParent="true"
             android:layout_marginTop="20dp"
-            android:contentDescription="Add Image"
             android:src="@drawable/ic_add_category_image"
             android:visibility="visible"
             android:background="@null"/>

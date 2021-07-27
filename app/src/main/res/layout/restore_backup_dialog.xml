@@ -20,8 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_auto_restore"
-            android:contentDescription="Auto Restore">
+            android:src="@drawable/ic_auto_restore">
         </ImageView>
 
         <LinearLayout
@@ -33,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Ripristina automaticamente"
+                android:text="@string/automatic_restore"
                 android:textSize="18sp"
                 android:paddingStart="45dp"
                 tools:ignore="RtlSymmetry">
@@ -58,8 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_manual_restore"
-            android:contentDescription="Manual Restore">
+            android:src="@drawable/ic_manual_restore">
         </ImageView>
 
         <LinearLayout
@@ -71,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:text="Ripristina manualmente"
+                android:text="@string/manual_restore"
                 android:textSize="18sp"
                 android:paddingStart="45dp"
                 tools:ignore="RtlSymmetry">

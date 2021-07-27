@@ -22,8 +22,8 @@
         <activity android:name=".BookmarksManagerActivity" />
         <activity android:name=".FeedbackActivity" />
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".Categories" />
-        <activity android:name=".InsertLink" />
+        <activity android:name=".CategoriesActivity" />
+        <activity android:name=".InsertBookmarkActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

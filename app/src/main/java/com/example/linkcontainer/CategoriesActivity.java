@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,8 +15,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -25,12 +25,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Categories extends AppCompatActivity implements View.OnLongClickListener {
+public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
+    public static final int PERMISSION_REQUEST_STORAGE = 1000;
     public boolean areAllSelected = false;
     public boolean isContextualMenuEnable = false;
     private RecyclerView recyclerView;
@@ -39,8 +39,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     private TextView toolbarTitle;
     private ArrayList<Category> categories;
     private ArrayList<Category> selectedCategories;
-    private int counter = 0;
-    public static final int PERMISSION_REQUEST_STORAGE = 1000;
+    private int selectedCategory = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +65,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         selectedCategories = new ArrayList<>();
         setAdapter();
 
-        insertCategory.setOnClickListener(view -> categoriesAdapter.createDialog(0, false, view));
+        insertCategory.setOnClickListener(view -> categoriesAdapter.newCategoryDialog(0, false, view));
     }
 
     private void setAdapter() {
@@ -91,7 +90,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
         switch (id) {
             case R.id.settings:
-                Intent activityIntent = new Intent(Categories.this, SettingsActivity.class);
+                Intent activityIntent = new Intent(CategoriesActivity.this, SettingsActivity.class);
                 startActivity(activityIntent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 break;
@@ -111,19 +110,19 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                 });
                 break;
             case R.id.delete:
-                if (counter > 0) {
-                    contextualModeDialog();
+                if (selectedCategory > 0) {
+                    confirmDeleteDialog();
                 }
                 break;
             case R.id.select_all:
                 if (!areAllSelected) {
                     areAllSelected = true;
                     selectedCategories.addAll(categories);
-                    counter = categories.size() - 1;
+                    selectedCategory = categories.size() - 1;
                 } else {
                     areAllSelected = false;
                     selectedCategories.removeAll(categories);
-                    counter = 0;
+                    selectedCategory = 0;
                 }
                 updateCounter();
                 categoriesAdapter.notifyDataSetChanged();
@@ -134,16 +133,16 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
     public void makeSelection(View v, int position) {
         if (((CheckBox)v).isChecked()) {
             selectedCategories.add(categories.get(position));
-            counter ++;
+            selectedCategory++;
         } else {
             selectedCategories.remove(categories.get(position));
-            counter --;
+            selectedCategory--;
         }
         updateCounter();
     }
 
     public void updateCounter() {
-        toolbarTitle.setText(String.valueOf(counter));
+        toolbarTitle.setText(String.valueOf(selectedCategory));
     }
 
     private void removeContextualActionMode() {
@@ -151,9 +150,13 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         areAllSelected = false;
         toolbarTitle.setText(R.string.categories_title);
         toolbar.getMenu().clear();
-        toolbar.setNavigationIcon(null);
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        });
         toolbar.inflateMenu(R.menu.menu);
-        counter = 0;
+        selectedCategory = 0;
         selectedCategories.clear();
         categoriesAdapter.notifyDataSetChanged();
 
@@ -177,7 +180,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         return false;
     }
 
-    private void contextualModeDialog() {
+    private void confirmDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String message;
         String categoryQuestion;
@@ -185,7 +188,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         String categoryMessage;
 
         message = "Sei sicuro di voler eliminare ";
-        if (counter > 1) {
+        if (selectedCategory > 1) {
             categoryQuestion = " categorie?";
             deletedQuestion = " eliminate!";
             categoryMessage = "Categorie";
@@ -197,7 +200,7 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
 
         String finalBookmarkMessage = categoryMessage;
         String finalDeletedQuestion = deletedQuestion;
-        builder.setMessage(message + counter + categoryQuestion)
+        builder.setMessage(message + selectedCategory + categoryQuestion)
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
@@ -210,36 +213,18 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
         alertDialog.show();
     }
 
-    public void getImageFromDevice() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PERMISSION_REQUEST_STORAGE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showWarningMessage();
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PERMISSION_REQUEST_STORAGE && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
+    ActivityResultLauncher<Intent> imageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
                 categoriesAdapter.addImageTitle.setVisibility(View.GONE);
                 categoriesAdapter.addImageButton.setVisibility(View.GONE);
                 categoriesAdapter.categoryImage.setVisibility(View.VISIBLE);
                 categoriesAdapter.imageLayout.setVisibility(View.VISIBLE);
-                Uri chosenImageUri = data.getData();
+                Uri chosenImageUri = result.getData().getData();
 
                 try {
                     categoriesAdapter.image = MediaStore.Images.
-                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
+                            Media.getBitmap(getContentResolver(), chosenImageUri);
                     categoriesAdapter.categoryImage.setImageBitmap(categoriesAdapter.image);
                 } catch (IOException e) {
                     Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
@@ -247,26 +232,24 @@ public class Categories extends AppCompatActivity implements View.OnLongClickLis
                 }
             }
         }
+    });
+
+    public void getImageFromDevice() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imageLauncher.launch(intent);
     }
 
-    private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
-                Snackbar.LENGTH_LONG);
-
-        View customView = getLayoutInflater().inflate(R.layout.snackbar_custom, null);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0);
-
-        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
-
-        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
-        snackbarLayout.addView(customView, 0);
-        snackbar.show();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                categoriesAdapter.closeCategoryDialog();
+                StoragePermissionDialog storagePermissionDialog = new StoragePermissionDialog(this);
+                storagePermissionDialog.showWarningMessage();
+            }
+        }
     }
 
     @Override

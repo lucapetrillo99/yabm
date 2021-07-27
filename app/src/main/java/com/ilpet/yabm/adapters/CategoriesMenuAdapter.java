@@ -69,7 +69,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         holder.title.setText(categories.get(position).getCategoryTitle());
 
         if(selectedPosition==position) {
-            holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+            holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                    R.drawable.category_background, null));
         }
         else {
             holder.relativeLayout.setBackgroundColor(Color.parseColor("#303030"));
@@ -87,7 +88,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         holder.itemView.setOnClickListener(v -> {
             mainActivity.filterByCategory(categories.get(position).getCategoryTitle());
             if (categories.get(position).getCategoryTitle().equals(startCategory)) {
-                holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+                holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                        R.drawable.category_background, null));
             }
             selectedPosition = position;
             touches ++;
@@ -96,7 +98,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
 
         if (touches == 0) {
             if (categories.get(position).getCategoryTitle().equals(startCategory)) {
-                holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+                holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                        R.drawable.category_background, null));
             }
         }
     }

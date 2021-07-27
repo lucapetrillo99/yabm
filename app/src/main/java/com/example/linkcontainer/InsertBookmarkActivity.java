@@ -82,7 +82,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_insert_link);
+        setContentView(R.layout.activity_insert_bookmark);
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText(R.string.new_bookmark_title);
@@ -192,7 +192,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
         newCategory.setOnClickListener(view -> {
             LayoutInflater layoutInflater = LayoutInflater.from(InsertBookmarkActivity.this);
-            View dialogView = layoutInflater.inflate(R.layout.dialog, null);
+            View dialogView = layoutInflater.inflate(R.layout.new_category_dialog, null);
             final AlertDialog dialog = new AlertDialog.Builder(InsertBookmarkActivity.this)
                     .setView(dialogView)
                     .setPositiveButton(android.R.string.ok, null)
@@ -671,7 +671,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
                 Snackbar.LENGTH_LONG);
 
-        View customView = View.inflate(this, R.layout.snackbar_custom, null);
+        View customView = View.inflate(this, R.layout.storage_warning_dialog, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setPadding(0, 0, 0, 0);
 

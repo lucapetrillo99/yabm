@@ -308,7 +308,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
     public void showDialog(int position) {
         final Dialog dialog = new Dialog(mainActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.bottom_sheet);
+        dialog.setContentView(R.layout.link_actions_dialog);
 
         TextView openLink = dialog.findViewById(R.id.open_link);
         TextView copyLink = dialog.findViewById(R.id.copy_link);

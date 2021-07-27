@@ -129,7 +129,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
     public void newCategoryDialog(int position, boolean isModify, View v) {
         LayoutInflater layoutInflater = LayoutInflater.from(v.getRootView().getContext());
-        View dialogView = layoutInflater.inflate(R.layout.dialog, null);
+        View dialogView = layoutInflater.inflate(R.layout.new_category_dialog, null);
         dialog = new AlertDialog.Builder(categoriesActivity)
                 .setView(dialogView)
                 .setPositiveButton(android.R.string.ok, null)

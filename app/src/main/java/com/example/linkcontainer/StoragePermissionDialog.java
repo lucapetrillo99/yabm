@@ -19,7 +19,7 @@ public class StoragePermissionDialog {
         Snackbar snackbar = Snackbar.make(activity.findViewById(android.R.id.content), "",
                 Snackbar.LENGTH_LONG);
 
-        View customView = View.inflate(activity, R.layout.snackbar_custom, null);
+        View customView = View.inflate(activity, R.layout.storage_warning_dialog, null);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setPadding(0, 0, 0, 0);
 

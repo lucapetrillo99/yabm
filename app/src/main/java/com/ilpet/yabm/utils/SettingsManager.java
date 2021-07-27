@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,10 +12,10 @@ public class SettingsManager {
     private static final String AUTO_BACKUP = "auto_backup";
     private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FIRST_ACCESS = "first_access";
+    private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
-    private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
 
     public SettingsManager(Context context, String setting) {
         this.settingsManager = context.getSharedPreferences(setting, Context.MODE_PRIVATE);

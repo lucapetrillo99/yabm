@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,6 +24,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ilpet.yabm.adapters.CategoriesAdapter;
+import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.StoragePermissionDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.classes;
 
 import android.graphics.Bitmap;
 

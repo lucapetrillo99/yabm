@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -10,6 +10,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.SettingsManager;
 
 import java.util.ArrayList;
 

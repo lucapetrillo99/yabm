@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -18,6 +18,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.LoadingDialog;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

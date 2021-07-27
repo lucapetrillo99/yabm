@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.adapters;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,6 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.MainActivity;
+import com.ilpet.yabm.classes.Category;
 
 import java.util.ArrayList;
 

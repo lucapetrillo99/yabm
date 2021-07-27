@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+
+import com.ilpet.yabm.R;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "SAMPLE_CHANNEL";

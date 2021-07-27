@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -23,6 +23,13 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.adapters.BookmarksAdapter;
+import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
+import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.SettingsManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

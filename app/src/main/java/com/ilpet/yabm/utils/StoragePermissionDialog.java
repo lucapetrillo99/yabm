@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,12 +6,13 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.view.View;
 
+import com.ilpet.yabm.R;
 import com.google.android.material.snackbar.Snackbar;
 
 public class StoragePermissionDialog {
     private final Activity activity;
 
-    StoragePermissionDialog(Activity activity) {
+    public StoragePermissionDialog(Activity activity) {
         this.activity = activity;
     }
 

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.adapters;
 
 import android.app.Dialog;
 import android.content.ClipData;
@@ -29,6 +29,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.ImagePreview;
+import com.ilpet.yabm.activities.InsertBookmarkActivity;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.MainActivity;
+import com.ilpet.yabm.classes.Bookmark;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -214,7 +220,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
                 case 1:
                     for (Bookmark selectedBookmark : list) {
                         bookmarksAdapter.bookmarks.remove(selectedBookmark);
-                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.id);
+                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.getId());
                         if (!result) {
                             break;
                         }

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -26,6 +26,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.ilpet.yabm.utils.AlarmReceiver;
+import com.ilpet.yabm.utils.BackupHandler;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.SettingsManager;
+import com.ilpet.yabm.utils.StoragePermissionDialog;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;

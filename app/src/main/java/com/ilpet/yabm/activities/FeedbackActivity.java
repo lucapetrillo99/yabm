@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.ilpet.yabm.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FeedbackActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

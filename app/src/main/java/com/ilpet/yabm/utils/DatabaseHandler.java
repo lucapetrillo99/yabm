@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.classes.Category;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

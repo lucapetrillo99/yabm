@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.utils;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,13 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+
+import com.ilpet.yabm.R;
 import com.squareup.picasso.Picasso;
 
 public class ImagePreview extends DialogFragment{
     private static String image;
     private static String title;
 
-    static ImagePreview newInstance(String imageToLoad, String imageTitle) {
+    public static ImagePreview newInstance(String imageToLoad, String imageTitle) {
         image = imageToLoad;
         title = imageTitle;
         return new ImagePreview();

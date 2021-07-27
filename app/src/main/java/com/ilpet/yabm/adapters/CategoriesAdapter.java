@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.ilpet.yabm.adapters;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -22,6 +22,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.CategoriesActivity;
+import com.ilpet.yabm.classes.Category;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

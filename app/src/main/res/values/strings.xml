@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LinkContainer</string>
+    <string name="app_name">YABM</string>
     <string name="extended_app_name">Yet Another Bookmark Manager</string>
     <string name="version">Versione %1$s</string>
     <string name="backup_title">Backup</string>

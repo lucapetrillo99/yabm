@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.linkcontainer">
+    package="com.ilpet.yabm">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -17,14 +17,14 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.LinkContainer">
-        <activity android:name=".activities.InfoAppActivity"></activity>
-        <activity android:name=".activities.BackupActivity" />
-        <activity android:name=".activities.BookmarksManagerActivity" />
-        <activity android:name=".activities.FeedbackActivity" />
-        <activity android:name=".activities.SettingsActivity" />
-        <activity android:name=".activities.CategoriesActivity" />
-        <activity android:name=".activities.InsertBookmarkActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="com.ilpet.yabm.activities.InfoAppActivity"></activity>
+        <activity android:name="com.ilpet.yabm.activities.BackupActivity" />
+        <activity android:name="com.ilpet.yabm.activities.BookmarksManagerActivity" />
+        <activity android:name="com.ilpet.yabm.activities.FeedbackActivity" />
+        <activity android:name="com.ilpet.yabm.activities.SettingsActivity" />
+        <activity android:name="com.ilpet.yabm.activities.CategoriesActivity" />
+        <activity android:name="com.ilpet.yabm.activities.InsertBookmarkActivity" />
+        <activity android:name="com.ilpet.yabm.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".utils.AlarmReceiver" />
+        <receiver android:name="com.ilpet.yabm.utils.AlarmReceiver" />
     </application>
 
 </manifest>

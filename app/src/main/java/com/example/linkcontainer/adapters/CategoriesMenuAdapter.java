@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.adapters;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,6 +15,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.activities.MainActivity;
+import com.example.linkcontainer.classes.Category;
 
 import java.util.ArrayList;
 

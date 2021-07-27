@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.classes.Bookmark;
+import com.example.linkcontainer.classes.Category;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.linkcontainer.R;
+
 public class LoadingDialog {
 
     Activity activity;
     AlertDialog dialog;
 
-    LoadingDialog (Activity activity) {
+    public LoadingDialog (Activity activity) {
         this.activity = activity;
     }
 

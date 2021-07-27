@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -23,6 +23,13 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.linkcontainer.classes.Bookmark;
+import com.example.linkcontainer.adapters.BookmarksAdapter;
+import com.example.linkcontainer.adapters.CategoriesMenuAdapter;
+import com.example.linkcontainer.classes.Category;
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.utils.SettingsManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.adapters;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -22,6 +22,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.activities.CategoriesActivity;
+import com.example.linkcontainer.classes.Category;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

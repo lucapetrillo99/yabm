@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.adapters;
 
 import android.app.Dialog;
 import android.content.ClipData;
@@ -29,6 +29,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.utils.ImagePreview;
+import com.example.linkcontainer.activities.InsertBookmarkActivity;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.activities.MainActivity;
+import com.example.linkcontainer.classes.Bookmark;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -214,7 +220,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
                 case 1:
                     for (Bookmark selectedBookmark : list) {
                         bookmarksAdapter.bookmarks.remove(selectedBookmark);
-                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.id);
+                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.getId());
                         if (!result) {
                             break;
                         }

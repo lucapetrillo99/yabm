@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.example.linkcontainer.R;
 
 public class InfoAppActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -39,6 +39,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.linkcontainer.utils.AlarmReceiver;
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.utils.LoadingDialog;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.utils.Utils;
+import com.example.linkcontainer.classes.Bookmark;
+import com.example.linkcontainer.classes.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.classes;
 
 import java.io.Serializable;
 

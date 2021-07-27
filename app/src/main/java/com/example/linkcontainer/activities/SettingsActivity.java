@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -10,6 +10,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.example.linkcontainer.classes.Category;
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.utils.SettingsManager;
 
 import java.util.ArrayList;
 

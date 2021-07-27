@@ -1,4 +1,4 @@
-package com.example.linkcontainer;
+package com.example.linkcontainer.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -18,6 +18,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.example.linkcontainer.classes.Bookmark;
+import com.example.linkcontainer.classes.Category;
+import com.example.linkcontainer.utils.DatabaseHandler;
+import com.example.linkcontainer.utils.LoadingDialog;
+import com.example.linkcontainer.R;
+import com.example.linkcontainer.utils.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

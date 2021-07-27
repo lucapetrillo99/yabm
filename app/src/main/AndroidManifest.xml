@@ -17,14 +17,14 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.LinkContainer">
-        <activity android:name=".InfoAppActivity"></activity>
-        <activity android:name=".BackupActivity" />
-        <activity android:name=".BookmarksManagerActivity" />
-        <activity android:name=".FeedbackActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".CategoriesActivity" />
-        <activity android:name=".InsertBookmarkActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.InfoAppActivity"></activity>
+        <activity android:name=".activities.BackupActivity" />
+        <activity android:name=".activities.BookmarksManagerActivity" />
+        <activity android:name=".activities.FeedbackActivity" />
+        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.CategoriesActivity" />
+        <activity android:name=".activities.InsertBookmarkActivity" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".utils.AlarmReceiver" />
     </application>
 
 </manifest>

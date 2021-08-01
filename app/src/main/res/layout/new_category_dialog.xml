@@ -25,7 +25,6 @@
     <EditText
         android:id="@+id/user_input"
         android:background="@drawable/custom_background_edit_text"
-        android:backgroundTint="?attr/colorSecondary"
         android:layout_gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="40dp"

@@ -8,8 +8,8 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true">
+        app:cardPreventCornerOverlap="false"
+        app:cardElevation="0dp">
 
         <RelativeLayout
             android:id="@+id/menu_item"
@@ -18,8 +18,7 @@
             android:padding="10dp"
             android:layout_margin="0dp"
             android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:layout_marginTop="2dp">
 
             <ImageView
                 android:id="@+id/category_setting_image"

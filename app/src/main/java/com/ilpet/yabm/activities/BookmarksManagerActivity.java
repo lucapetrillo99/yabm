@@ -19,11 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
-import com.ilpet.yabm.R;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
@@ -49,6 +49,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private RelativeLayout exportOption;
     private final Set<String> importedBookmarks = new LinkedHashSet<>();
     private final Set<String> descriptions = new LinkedHashSet<>();
+    private final ArrayList<Bookmark> bookmarks = new ArrayList<>();
     private int bookmarksCounter = 0;
     private DatabaseHandler db;
     int descriptionCounter = 0;
@@ -107,7 +108,13 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
             } else {
-                createBookmarksFile();
+                ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+                if (bookmarks.size() == 0) {
+                    Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
+                            .show();
+                } else {
+                    createBookmarksFile();
+                }
             }
         });
     }
@@ -248,6 +255,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".html");
 
         writeBookmarksLauncher.launch(intent);
+
     }
 
     private void writeBookmarksFile(Uri uri) {
@@ -260,7 +268,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         final String INITIAL_FILE_CONTENT = "<DT><A HREF=";
         final String FINAL_FILE_CONTENT = "</A>";
         try {
-            ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
             OutputStream outputStream = getContentResolver().openOutputStream(uri);
             outputStream.write(FILE_HEADER.getBytes());
             outputStream.write("\n".getBytes());

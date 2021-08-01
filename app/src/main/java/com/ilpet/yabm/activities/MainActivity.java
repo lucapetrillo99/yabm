@@ -304,19 +304,19 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                     new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                            .addSwipeRightActionIcon(R.drawable.ic_actions)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                            .addSwipeLeftActionIcon(R.drawable.ic_unarchive)
+                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
+                            .addSwipeRightActionIcon(R.drawable.ic_delete)
+                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
+                            .addSwipeLeftActionIcon(R.drawable.ic_unarchive_30)
                             .create()
                             .decorate();
 
                 } else {
                     new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                            .addSwipeRightActionIcon(R.drawable.ic_actions)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.design_default_color_primary_dark))
-                            .addSwipeLeftActionIcon(R.drawable.ic_archive)
+                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
+                            .addSwipeRightActionIcon(R.drawable.ic_delete)
+                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
+                            .addSwipeLeftActionIcon(R.drawable.ic_archive_30)
                             .create()
                             .decorate();
 

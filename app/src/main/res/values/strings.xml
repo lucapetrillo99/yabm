@@ -29,7 +29,7 @@
     <string name="restore_backup">Ripristina backup</string>
     <string name="import_export_description">Porta i tuoi segnalilbri sempre con te!</string>
     <string name="import_description">Importa da file .HMTL</string>
-    <string name="export_description">Esporta da file .HTML</string>
+    <string name="export_description">Esporta su file .HTML</string>
     <string name="contact_us">Contattaci:</string>
     <string name="message_title">Scrivi un titolo</string>
     <string name="message_text">Testo</string>

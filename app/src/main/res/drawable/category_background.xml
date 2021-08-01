@@ -3,7 +3,7 @@
     android:shape="rectangle"
     android:useLevel="false">
 
-    <solid android:color="@color/design_default_color_primary_dark" />
+    <solid android:color="@color/orange_dead" />
 
     <size
         android:height="10dp"

@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:orientation="vertical"
-    android:gravity="center"
-    android:background="@color/design_default_color_primary">
+    android:gravity="center">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,7 +11,14 @@
         android:text="@string/app_name"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:background="?attr/colorPrimary"
         android:padding="20dp">
     </TextView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/backgroundColor"
+        android:layout_marginBottom="5dp"/>
 
 </LinearLayout>

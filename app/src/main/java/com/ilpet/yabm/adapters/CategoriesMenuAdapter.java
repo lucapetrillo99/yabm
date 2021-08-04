@@ -76,7 +76,7 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
                 .inflate(R.layout.category_menu_item, parent, false);
         TypedValue backgroundValue = new TypedValue();
         TypedValue iconBackgroundValue = new TypedValue();
-        theme.resolveAttribute(R.attr.background, backgroundValue, true);
+        theme.resolveAttribute(R.color.light_black, backgroundValue, true);
         color = backgroundValue.data;
         theme.resolveAttribute(R.attr.backgroundColor, iconBackgroundValue, true);
         iconColor = iconBackgroundValue.data;
@@ -93,8 +93,9 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     public void onBindViewHolder(@NonNull categoriesMenuViewHolder holder, int position) {
         holder.categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
         holder.title.setText(categories.get(position).getCategoryTitle());
+        holder.relativeLayout.setBackgroundColor(color);
 
-        if(selectedPosition==position) {
+        if (selectedPosition == position) {
             holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.category_background, null));
         }

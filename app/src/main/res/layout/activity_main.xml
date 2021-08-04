@@ -61,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:backgroundTint="?attr/background"
+        android:background="?attr/cardBackgroundColor"
         app:headerLayout="@layout/menu_header">
 
         <LinearLayout
@@ -89,7 +89,6 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/categories_recyclerview"
                 android:layout_width="match_parent"
-                android:backgroundTint="?attr/background"
                 android:layout_height="match_parent">
             </androidx.recyclerview.widget.RecyclerView>
 

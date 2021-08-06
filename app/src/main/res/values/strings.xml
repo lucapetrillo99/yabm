@@ -56,4 +56,5 @@
     <string name="manual_restore">Ripristina manualmente</string>
     <string name="warning_description">Per effettuare l\'operazione consenti di accedere alla memoria di archiviazione</string>
     <string name="go_to_settings">Vai a Impostazioni</string>
+    <string name="search">Cerca</string>
 </resources>

@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 public class ImagePreview extends DialogFragment {
     private static String image;
     private static String title;
+    private boolean tap = false;
 
     public static ImagePreview newInstance(String imageToLoad, String imageTitle) {
         image = imageToLoad;
@@ -47,6 +48,16 @@ public class ImagePreview extends DialogFragment {
                 .into(imageView);
 
         toolbar.setNavigationOnClickListener(v -> dismiss());
+
+        imageView.setOnClickListener(view1 -> {
+            if (!tap) {
+                toolbar.setVisibility(View.VISIBLE);
+                tap = true;
+            } else {
+                toolbar.setVisibility(View.INVISIBLE);
+                tap = false;
+            }
+        });
         return view;
     }
 }

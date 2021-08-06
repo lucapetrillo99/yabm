@@ -11,7 +11,7 @@
         <item name="colorSecondaryVariant">@color/orange_dead</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="background">@color/white</item>
-        <item name="backgroundColor">@color/light_black</item>
+        <item name="backgroundColor">@color/gray</item>
         <item name="strokeColor">@color/light_black</item>
         <item name="cardBackgroundColor">@color/dirty_white</item>
 

@@ -667,10 +667,22 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
     @Override
     public void onBackPressed() {
-        if (link.getText().toString().isEmpty()) {
-            finish();
+        if (isEditMode) {
+            if (!bookmark.getLink().equals(link.getText().toString()) ||
+                    !bookmark.getTitle().equals(title.getText().toString()) ||
+                    !bookmark.getCategory().equals(db.getCategoryId(category))) {
+                confirmDialog(link.getText().toString(), db.getCategoryId(category));
+            } else {
+                finish();
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            }
         } else {
-            exitConfirmDialog();
+            if (link.getText().toString().isEmpty()) {
+                finish();
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+            } else {
+                exitConfirmDialog();
+            }
         }
     }
 

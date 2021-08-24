@@ -45,7 +45,6 @@
             android:paddingRight="10dp"
             android:maxLength="50"
             android:background="@drawable/custom_background_edit_text"
-            android:backgroundTint="?attr/colorSecondary"
             android:maxLines="@android:integer/status_bar_notification_info_maxnum">
 
         </EditText>
@@ -64,7 +63,6 @@
             android:gravity="top"
             android:layout_marginTop="30dp"
             android:background="@drawable/custom_background_edit_text"
-            android:backgroundTint="?attr/colorSecondary"
             android:maxLength="250"/>
 
     </LinearLayout>

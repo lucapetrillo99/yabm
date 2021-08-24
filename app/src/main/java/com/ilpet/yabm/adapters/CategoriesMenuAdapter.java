@@ -1,10 +1,12 @@
 package com.ilpet.yabm.adapters;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,13 +32,23 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     private final String startCategory;
     private int selectedPosition = -1;
     private int touches = 0;
+    private @ColorInt int color;
+    private @ColorInt int iconColor;
+    private Drawable defaultIcon;
+    private Drawable archiveIcon;
+    private final Resources.Theme theme;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public CategoriesMenuAdapter(ArrayList<Category> categories, MainActivity mainActivity, String startCategory) {
         this.categories = categories;
         this.mainActivity = mainActivity;
         this.startCategory = startCategory;
+        TypedValue typedValue = new TypedValue();
+        theme = mainActivity.getTheme();
+        theme.resolveAttribute(R.attr.backgroundColor, typedValue, true);
         Drawable drawable = ResourcesCompat.getDrawable(mainActivity.getResources(),
                 R.drawable.ic_all_bookmarks, null);
+        drawable.setTint(typedValue.data);
         Category category = new Category();
         category.setCategoryTitle(mainActivity.getString(R.string.all_bookmarks_title));
         category.setCategoryImage(drawableToBitmap(drawable));
@@ -60,34 +74,49 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     public categoriesMenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.category_menu_item, parent, false);
+        TypedValue backgroundValue = new TypedValue();
+        TypedValue iconBackgroundValue = new TypedValue();
+        theme.resolveAttribute(R.color.light_black, backgroundValue, true);
+        color = backgroundValue.data;
+        theme.resolveAttribute(R.attr.backgroundColor, iconBackgroundValue, true);
+        iconColor = iconBackgroundValue.data;
+        defaultIcon = ResourcesCompat.getDrawable(mainActivity.getResources(),
+                R.drawable.ic_default, null);
+
+        archiveIcon = ResourcesCompat.getDrawable(mainActivity.getResources(),
+                R.drawable.ic_archive, null);
         return new categoriesMenuViewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(@NonNull categoriesMenuViewHolder holder, int position) {
         holder.categoryImage.setImageBitmap(categories.get(position).getCategoryImage());
         holder.title.setText(categories.get(position).getCategoryTitle());
+        holder.relativeLayout.setBackgroundColor(color);
 
-        if(selectedPosition==position) {
-            holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+        if (selectedPosition == position) {
+            holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                    R.drawable.category_background, null));
         }
         else {
-            holder.relativeLayout.setBackgroundColor(Color.parseColor("#303030"));
+            holder.relativeLayout.setBackgroundColor(color);
         }
 
         if (categories.get(position).getCategoryTitle().equals(mainActivity.getString(R.string.default_bookmarks))) {
-            holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
-                    R.drawable.ic_default, null));
+            defaultIcon.setTint(iconColor);
+            holder.categoryImage.setImageDrawable(defaultIcon);
 
         } else if (categories.get(position).getCategoryTitle().equals(mainActivity.getString(R.string.archived_bookmarks))) {
-            holder.categoryImage.setImageDrawable(ResourcesCompat.getDrawable(mainActivity.getResources(),
-                    R.drawable.ic_archive, null));
+            archiveIcon.setTint(iconColor);
+            holder.categoryImage.setImageDrawable(archiveIcon);
         }
 
         holder.itemView.setOnClickListener(v -> {
             mainActivity.filterByCategory(categories.get(position).getCategoryTitle());
             if (categories.get(position).getCategoryTitle().equals(startCategory)) {
-                holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+                holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                        R.drawable.category_background, null));
             }
             selectedPosition = position;
             touches ++;
@@ -96,7 +125,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
 
         if (touches == 0) {
             if (categories.get(position).getCategoryTitle().equals(startCategory)) {
-                holder.relativeLayout.setBackgroundColor(Color.parseColor("#66FF66"));
+                holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
+                        R.drawable.category_background, null));
             }
         }
     }

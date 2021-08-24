@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="@color/black">
+    android:minHeight="1500dp"
+    android:minWidth="1000dp"
+    android:background="@color/light_black">
 
     <include
         layout="@layout/toolbar">
@@ -14,7 +16,7 @@
 <com.github.chrisbanes.photoview.PhotoView
     android:id="@+id/preview_image"
     android:layout_width="match_parent"
-    android:layout_marginTop="7dp"
+    android:layout_marginTop="20dp"
     android:layout_height="match_parent"/>
 
 </LinearLayout>

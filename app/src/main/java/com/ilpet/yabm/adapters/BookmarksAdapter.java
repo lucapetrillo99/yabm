@@ -54,12 +54,12 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-      TextView link, title, description;
-      ImageView image;
-      ImageButton shareButton;
-      View view;
-      CheckBox checkbox;
-      RelativeLayout relativeLayout;
+        TextView link, title, description;
+        ImageView image;
+        ImageButton shareButton;
+        View view;
+        CheckBox checkbox;
+        RelativeLayout relativeLayout;
 
         public MyViewHolder(final View itemView, MainActivity mainActivity) {
             super(itemView);
@@ -172,7 +172,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
                 }
             });
         }
-        
+
         holder.checkbox.setOnClickListener(v -> mainActivity.makeSelection(v, position));
 
         if (mainActivity.areAllSelected) {
@@ -187,9 +187,9 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
     }
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
-       UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation, this);
-       updateBookmarks.execute();
-       notifyDataSetChanged();
+        UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation, this);
+        updateBookmarks.execute();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -213,6 +213,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         }
 
         boolean result = true;
+
         @Override
         protected Void doInBackground(Void... voids) {
             BookmarksAdapter bookmarksAdapter = activityReference.get();
@@ -264,7 +265,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         return filter;
     }
 
-    Filter filter = new Filter(){
+    Filter filter = new Filter() {
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
             ArrayList<Bookmark> filteredBookmarks = new ArrayList<>();
@@ -272,7 +273,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
             if (constraint.toString().isEmpty()) {
                 filteredBookmarks.addAll(allBookmarks);
             } else {
-                for (Bookmark bookmark: allBookmarks) {
+                for (Bookmark bookmark : allBookmarks) {
                     if (bookmark.getTitle() == null) {
                         if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
                                 || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
@@ -337,7 +338,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().getAttributes().windowAnimations = R.style.ActivityAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 

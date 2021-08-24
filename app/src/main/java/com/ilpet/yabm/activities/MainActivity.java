@@ -330,10 +330,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
 
-    private void confirmDialog(String id, int position) {
+    public void confirmDialog(String id, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Sei sicuro di voler eliminare il link?")
+        builder.setMessage("Sei sicuro di voler eliminare il segnalibro?")
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> {
                     dialogInterface.cancel();

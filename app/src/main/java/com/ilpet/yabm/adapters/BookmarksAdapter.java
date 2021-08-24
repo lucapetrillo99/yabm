@@ -1,5 +1,6 @@
 package com.ilpet.yabm.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -21,6 +22,7 @@ import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,12 +31,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.ImagePreview;
-import com.ilpet.yabm.activities.InsertBookmarkActivity;
 import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.InsertBookmarkActivity;
 import com.ilpet.yabm.activities.MainActivity;
 import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.ImagePreview;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
@@ -55,7 +57,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView link, title, description;
-        ImageView image;
+        ImageView image, options;
         ImageButton shareButton;
         View view;
         CheckBox checkbox;
@@ -67,6 +69,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
             link = itemView.findViewById(R.id.link);
             description = itemView.findViewById(R.id.description);
             image = itemView.findViewById(R.id.image);
+            options = itemView.findViewById(R.id.bookmark_options);
             checkbox = itemView.findViewById(R.id.checkbox);
             shareButton = itemView.findViewById(R.id.share);
             relativeLayout = itemView.findViewById(R.id.relative_layout);
@@ -83,6 +86,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         return new MyViewHolder(itemView, mainActivity);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
@@ -119,6 +123,30 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
                 imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
             });
         }
+
+        holder.options.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(mainActivity, holder.options);
+            popup.getMenuInflater().inflate(R.menu.bookmark_menu_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.modify_bookmark:
+                        String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                        Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
+                        intent.putExtra("bookmark", bookmarks.get(position));
+                        intent.putExtra("category", category);
+                        mainActivity.startActivity(intent);
+                        mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        break;
+                    case R.id.delete_bookmark:
+                        mainActivity.confirmDialog(bookmarks.get(position).getId(), position);
+                        break;
+                }
+                return true;
+            });
+            popup.show();
+            });
 
         if (description != null && bookmarks.get(position).getImage() == null) {
             holder.image.setVisibility(View.GONE);
@@ -159,19 +187,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
                 mainActivity.removeContextualActionMode();
             }
         });
-
-        if (!mainActivity.isArchiveModeEnabled) {
-            holder.itemView.setOnClickListener(v -> {
-                String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
-                intent.putExtra("bookmark", bookmarks.get(position));
-                intent.putExtra("category", category);
-                mainActivity.startActivity(intent);
-                if (mainActivity.isContextualMenuEnable) {
-                    mainActivity.removeContextualActionMode();
-                }
-            });
-        }
 
         holder.checkbox.setOnClickListener(v -> mainActivity.makeSelection(v, position));
 

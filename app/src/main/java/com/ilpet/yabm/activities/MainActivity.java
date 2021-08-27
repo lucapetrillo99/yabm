@@ -129,12 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         String action = intent.getAction();
         String type = intent.getType();
 
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
-            if ("text/plain".equals(type)) {
-                handleSendText(intent);
-            }
-        }
-
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
             previousCategory = toolbarTitle.getText().toString();
@@ -156,15 +150,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(bookmarksAdapter);
-    }
-
-    void handleSendText (Intent intent){
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (sharedText != null) {
-            Intent linkIntent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
-            linkIntent.putExtra("url", sharedText);
-            startActivity(linkIntent);
-        }
     }
 
     @Override

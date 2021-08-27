@@ -39,15 +39,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.AlarmReceiver;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
-import com.ilpet.yabm.R;
 import com.ilpet.yabm.utils.Utils;
-import com.ilpet.yabm.classes.Bookmark;
-import com.ilpet.yabm.classes.Category;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -60,6 +60,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -68,6 +70,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
+    private static final String REGEX = "^(([^:/?#]+):)?(//([^/?#]*))?";
     private EditText link, title;
     private TextView reminderTitle;
     private String category;
@@ -111,6 +114,16 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         categories = db.getCategories();
         ArrayList<String> filteredCategories = new ArrayList<>();
 
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                handleSendText(intent);
+            }
+        }
+
         for(Category category: categories) {
             filteredCategories.add(category.getCategoryTitle());
         }
@@ -118,14 +131,12 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 android.R.layout.simple_spinner_dropdown_item, filteredCategories);
         spinnerCategories.setAdapter(adapter);
 
-        Intent intent = getIntent();
         if(intent.getExtras() != null){
-            if (intent.getStringExtra("url") != null) {
-                link.setText(intent.getStringExtra("url"));
-            } else if (intent.getSerializableExtra("bookmark") != null) {
+            if (intent.getSerializableExtra("bookmark") != null) {
                 isEditMode = true;
                 bookmark = (Bookmark) intent.getSerializableExtra("bookmark");
                 String category = intent.getStringExtra("category");
+                toolbarTitle.setText(R.string.modify_bookmark);
                 if (bookmark.getReminder() != -1) {
                     addRemainder.setVisibility(View.INVISIBLE);
                     date.setVisibility(View.VISIBLE);
@@ -421,6 +432,13 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         });
     }
 
+    void handleSendText (Intent intent){
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            link.setText(sharedText);
+        }
+    }
+
     ActivityResultLauncher<Intent> importImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             if (result.getData() != null) {
@@ -513,41 +531,60 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private void getBookmarkInformation(String link, String categoryId) {
         LoadingDialog loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
         loadingDialog.startLoading();
-        bookmark.setLink(link);
+
+        if (isEditMode) {
+            bookmark.setImage(null);
+        }
         Utils.getUrlContent(link).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
-                    if (result != null) {
-                        Elements metaTags = result.getElementsByTag("meta");
+                            if (result != null) {
+                                Elements metaTags = result.getElementsByTag("meta");
 
-                        for (Element element : metaTags) {
-                            if (element.attr("property").equals("og:image")) {
-                                bookmark.setImage(element.attr("content"));
-                            } else if (element.attr("property").equals("og:site_name")) {
-                                if (title.getText().toString().isEmpty()) {
-                                    bookmark.setTitle(element.attr("content"));
+                                for (Element element : metaTags) {
+                                    if (element.attr("property").equals("og:image")) {
+                                        Pattern pattern = Pattern.compile(REGEX);
+                                        Matcher matcher = pattern.matcher(element.attr("content"));
+                                        if (matcher.find()) {
+                                            if (!Objects.equals(matcher.group(0), "")) {
+                                                bookmark.setImage(element.attr("content"));
+                                            }else {
+                                                bookmark.setImage(matcher.group(0) + element.attr("content"));
+                                            }
+                                        }
+                                    } else if (element.attr("property").equals("og:site_name")) {
+                                        if (isEditMode) {
+                                            if (!link.equals(bookmark.getLink())) {
+                                                bookmark.setTitle(element.attr("content"));
+                                            }
+                                        } else {
+                                            if (title.getText().toString().isEmpty()) {
+                                                bookmark.setTitle(element.attr("content"));
+                                            }
+                                        }
+                                    } else if (element.attr("name").equals("description")) {
+                                        bookmark.setDescription(element.attr("content"));
+                                    }
                                 }
-                            } else if (element.attr("name").equals("description")) {
-                                bookmark.setDescription(element.attr("content"));
-                            }
-                        }
-                        bookmark.setCategory(categoryId);
-                        bookmark.setReminder(alarmStartTime);
+                                bookmark.setCategory(categoryId);
+                                bookmark.setReminder(alarmStartTime);
+                                bookmark.setLink(link);
+                                if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                    bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                } else if(!isEditMode) {
+                                    if (!title.getText().toString().isEmpty()) {
+                                        bookmark.setTitle(title.getText().toString());
+                                    }
+                                }
+                                insertBookmark();
+                                loadingDialog.dismissLoading();
 
-                        if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
-                            bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                        } else if (!title.getText().toString().isEmpty()) {
-                            bookmark.setTitle(title.getText().toString());
-                        }
-                        insertBookmark();
-                        loadingDialog.dismissLoading();
-
-                    } else {
-                        loadingDialog.dismissLoading();
-                        Toast.makeText(getApplicationContext(),
-                                "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
-                                .show();
-                    }},
+                            } else {
+                                loadingDialog.dismissLoading();
+                                Toast.makeText(getApplicationContext(),
+                                        "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
+                                        .show();
+                            }},
                         error -> {
                             Toast.makeText(getApplicationContext(),
                                     "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)

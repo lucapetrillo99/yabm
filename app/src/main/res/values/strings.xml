@@ -59,4 +59,5 @@
     <string name="search">Cerca</string>
     <string name="modify">Modifica</string>
     <string name="delete">Elimina</string>
+    <string name="modify_bookmark">Modifica segnalibro</string>
 </resources>

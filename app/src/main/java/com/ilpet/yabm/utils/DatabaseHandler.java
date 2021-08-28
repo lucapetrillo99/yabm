@@ -5,21 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     private final Context context;
     private static DatabaseHandler instance;
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "linkcontainer";
+    private static final String DATABASE_NAME = "yabm";
 
     private static final String TABLE_BOOKMARK = "bookmark";
     private static final String TABLE_CATEGORY = "category";
@@ -36,11 +33,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PREVIOUS_CATEGORY = "prev_category";
 
     private static final String KEY_NAME = "name";
-    private static final String KEY_CATEGORY_IMAGE = "image";
 
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
-            KEY_CATEGORY_IMAGE + " BLOB" + ")";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT)";
 
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
@@ -299,6 +294,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean deleteCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle());
+
+        for (Bookmark bookmark: bookmarks) {
+            deleteBookmark(bookmark.getId());
+        }
         return db.delete(TABLE_CATEGORY, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()}) > 0;
     }

@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     private final CategoriesActivity categoriesActivity;
     private final ArrayList<Category> allCategories;
     private AlertDialog dialog;
-    public LinearLayout imageLayout;
 
     public CategoriesAdapter(ArrayList<Category> categories, CategoriesActivity categoriesActivity) {
         this.categories = categories;
@@ -221,7 +219,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             super.onPostExecute(aVoid);
             CategoriesAdapter categoryAdapter = activityReference.get();
             if (!result) {
-                Toast.makeText(categoryAdapter.categoriesActivity, "Impossibile eliminare i segnalibri!",
+                Toast.makeText(categoryAdapter.categoriesActivity, "Impossibile eliminare le categorie!",
                         Toast.LENGTH_LONG).show();
             }
         }

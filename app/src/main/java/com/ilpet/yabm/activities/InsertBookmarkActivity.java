@@ -1,17 +1,11 @@
 package com.ilpet.yabm.activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,15 +21,11 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -52,7 +42,6 @@ import com.ilpet.yabm.utils.Utils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,7 +56,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class InsertBookmarkActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    public static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final int DATE_ERROR = -1;
     private static final int TIME_ERROR = -2;
     private static final String REGEX = "^(([^:/?#]+):)?(//([^/?#]*))?";
@@ -84,10 +72,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private long alarmStartTime = -1;
     private boolean setRemainder = false;
     private boolean isEditMode = false;
-    private TextView addImageTitle;
-    private ImageButton addImageButton;
-    private ImageView categoryImage;
-    private Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,20 +203,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
-            addImageTitle = dialogView.findViewById(R.id.add_image_title);
-            addImageButton = dialogView.findViewById(R.id.add_image_button);
-            categoryImage = dialogView.findViewById(R.id.category_image);
             title.setText(R.string.new_category_title);
             input.setHint("Inserisci la categoria");
-
-            addImageButton.setOnClickListener(v1 -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
-                } else {
-                    getImageFromDevice();
-                }
-            });
 
             dialog.setOnShowListener(dialogInterface -> {
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -240,7 +212,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
-                        category.setCategoryImage(image);
                         boolean result = db.addCategory(category);
                         if (result) {
                             categories.add(category);
@@ -436,42 +407,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             link.setText(sharedText);
-        }
-    }
-
-    ActivityResultLauncher<Intent> importImageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                addImageTitle.setVisibility(View.GONE);
-                addImageButton.setVisibility(View.GONE);
-                categoryImage.setVisibility(View.VISIBLE);
-                Uri chosenImageUri = result.getData().getData();
-
-                try {
-                    image = MediaStore.Images.
-                            Media.getBitmap(this.getContentResolver(), chosenImageUri);
-                    categoryImage.setImageBitmap(image);
-                } catch (IOException e) {
-                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    });
-
-    public void getImageFromDevice() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        importImageLauncher.launch(intent);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                showWarningMessage();
-            }
         }
     }
 

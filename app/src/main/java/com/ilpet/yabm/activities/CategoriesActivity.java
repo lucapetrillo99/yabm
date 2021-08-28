@@ -218,33 +218,6 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         alertDialog.show();
     }
 
-    ActivityResultLauncher<Intent> imageLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                categoriesAdapter.addImageTitle.setVisibility(View.GONE);
-                categoriesAdapter.addImageButton.setVisibility(View.GONE);
-                categoriesAdapter.categoryImage.setVisibility(View.VISIBLE);
-                categoriesAdapter.imageLayout.setVisibility(View.VISIBLE);
-                Uri chosenImageUri = result.getData().getData();
-
-                try {
-                    categoriesAdapter.image = MediaStore.Images.
-                            Media.getBitmap(getContentResolver(), chosenImageUri);
-                    categoriesAdapter.categoryImage.setImageBitmap(categoriesAdapter.image);
-                } catch (IOException e) {
-                    Toast.makeText(getApplicationContext(), "Impossibile caricare l'immagine!",
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    });
-
-    public void getImageFromDevice() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        imageLauncher.launch(intent);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

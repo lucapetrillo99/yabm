@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
-            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks), null);
-            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), null);
+            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks));
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks));
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);

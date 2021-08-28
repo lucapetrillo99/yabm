@@ -21,21 +21,10 @@
             android:layout_marginStart="2dp"
             android:layout_marginTop="2dp">
 
-            <ImageView
-                android:id="@+id/category_setting_image"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="5dp"
-                android:adjustViewBounds="true">
-            </ImageView>
-
             <TextView
                 android:id="@+id/category_setting_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/category_setting_image"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:maxLines="1"

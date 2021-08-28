@@ -107,13 +107,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } else {
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, category.getCategoryTitle());
-            if (category.getCategoryImage() != null) {
-                Bitmap image = category.getCategoryImage();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
-                byte[] imageBytes = byteArrayOutputStream.toByteArray();
-                values.put(KEY_CATEGORY_IMAGE, imageBytes);
-            }
             db.insert(TABLE_CATEGORY, null, values);
             cursor.close();
             return true;
@@ -176,11 +169,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_CATEGORY_IMAGE));
-                if (imageBytes != null) {
-                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                    category.setCategoryImage(image);
-                }
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -200,11 +188,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndex(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(KEY_CATEGORY_IMAGE));
-                if (imageBytes != null) {
-                    Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                    category.setCategoryImage(image);
-                }
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -326,15 +309,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
-        if (category.getCategoryImage() != null) {
-            Bitmap image = category.getCategoryImage();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            image.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-            values.put(KEY_CATEGORY_IMAGE, imageBytes);
-        } else {
-            values.put(KEY_CATEGORY_IMAGE, (byte[]) null);
-        }
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[] { category.getCategoryId() });
 

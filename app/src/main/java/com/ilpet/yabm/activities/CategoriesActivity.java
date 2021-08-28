@@ -1,13 +1,10 @@
 package com.ilpet.yabm.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,8 +12,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -31,7 +26,6 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
@@ -116,7 +110,10 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 break;
             case R.id.delete:
                 if (selectedCategory > 0) {
-                    confirmDeleteDialog();
+                    confirmDeletionDialog();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "Seleziona una categoria", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.select_all:
@@ -185,7 +182,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         return false;
     }
 
-    private void confirmDeleteDialog() {
+    private void confirmDeletionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String message;
         String categoryQuestion;

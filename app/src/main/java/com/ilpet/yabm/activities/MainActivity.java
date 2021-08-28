@@ -23,15 +23,15 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ilpet.yabm.classes.Bookmark;
-import com.ilpet.yabm.adapters.BookmarksAdapter;
-import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
-import com.ilpet.yabm.classes.Category;
-import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.R;
-import com.ilpet.yabm.utils.SettingsManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.ilpet.yabm.R;
+import com.ilpet.yabm.adapters.BookmarksAdapter;
+import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
+import com.ilpet.yabm.classes.Bookmark;
+import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -124,10 +124,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         removedFromArchive = new ArrayList<>();
         categories = db.getAllCategories();
         setAdapter();
-
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
 
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
@@ -314,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-
     public void confirmDialog(String id, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -361,10 +356,16 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         archiveUrl();
         setBookmarksLabel();
         if (previousCategory != null) {
-            if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                bookmarks = db.getAllBookmarks();
+            String result = db.getCategoryId(previousCategory);
+            if (result != null) {
+                if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
+                    bookmarks = db.getAllBookmarks();
+                } else {
+                    bookmarks = db.getBookmarksByCategory(previousCategory);
+                }
             } else {
-                bookmarks = db.getBookmarksByCategory(previousCategory);
+                toolbarTitle.setText(R.string.all_bookmarks_title);
+                bookmarks = db.getAllBookmarks();
             }
             setAdapter();
         }

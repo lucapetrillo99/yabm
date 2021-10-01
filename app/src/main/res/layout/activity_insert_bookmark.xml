@@ -30,7 +30,8 @@
         <EditText
             android:id="@+id/insert_link"
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="wrap_content"
+            android:minHeight="45dp"
             android:layout_marginStart="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="10dp"
@@ -43,6 +44,7 @@
             android:paddingRight="10dp"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true"
+            android:inputType="textMultiLine"
             tools:targetApi="lollipop">
         </EditText>
 

@@ -408,7 +408,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void updateCounter() {
-        toolbarTitle.setText(String.valueOf(counter));
+        if(counter == 0) {
+            toolbarTitle.setText(previousCategory);
+        } else {
+            toolbarTitle.setText(String.valueOf(counter));
+        }
     }
 
     public void removeContextualActionMode() {

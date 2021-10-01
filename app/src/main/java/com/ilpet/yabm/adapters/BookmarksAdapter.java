@@ -97,9 +97,11 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         if (mainActivity.isContextualMenuEnable) {
             holder.checkbox.setVisibility(View.VISIBLE);
             holder.image.setVisibility(View.INVISIBLE);
+            holder.options.setVisibility(View.INVISIBLE);
         } else {
             holder.checkbox.setVisibility(View.INVISIBLE);
             holder.image.setVisibility(View.VISIBLE);
+            holder.options.setVisibility(View.VISIBLE);
         }
 
         if (description != null) {

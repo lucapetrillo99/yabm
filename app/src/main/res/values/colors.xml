@@ -2,8 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="orange">#FD5A2C</color>
-    <color name="orange_dead">#FF9C67</color>
+    <color name="orange">#F26B3A</color>
+    <color name="orange_dead">#FF9c67</color>
     <color name="light_black">#141414</color>
     <color name="dirty_white">#FAFAFA</color>
     <color name="red">#FF0000</color>

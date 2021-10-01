@@ -8,10 +8,10 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/orange</item>
         <item name="colorSecondaryVariant">@color/orange_dead</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/gray</item>
         <item name="background">@color/black</item>
         <item name="backgroundColor">@color/white</item>
-        <item name="strokeColor">@color/light_black</item>
+        <item name="strokeColor">@color/white</item>
         <item name="cardBackgroundColor">@color/light_black</item>
 
         <!-- Status bar color. -->

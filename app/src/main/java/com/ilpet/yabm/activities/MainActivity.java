@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public boolean isContextualMenuEnable = false;
     public boolean areAllSelected = false;
     public boolean isArchiveModeEnabled = false;
+    private boolean refreshCategories = false;
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     }
                 });
                 searchView.setOnQueryTextFocusChangeListener((view, queryTextFocused) -> {
-                    if(!queryTextFocused) {
+                    if (!queryTextFocused) {
                         if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
                             bookmarks = db.getAllBookmarks();
@@ -232,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void initSwipe() {
-
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
             @Override
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
                 switch (direction) {
                     case ItemTouchHelper.LEFT:
-                        if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
+                        if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                             Bookmark unarchivedBookmark = bookmarks.get(position);
                             removedFromArchive.add(bookmarks.get(position));
                             bookmarksAdapter.removeBookmark(position);
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if(toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
+                if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
                     new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                             .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
                             .addSwipeRightActionIcon(R.drawable.ic_delete)
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     public void archiveUrl() {
         if (archivedUrl != null) {
-            if (archivedUrl.size() > 0){
+            if (archivedUrl.size() > 0) {
                 for (int i = 0; i < archivedUrl.size(); i++)
                     db.addToArchive(archivedUrl.get(i).getId(), archivedUrl.get(i).getCategory());
             }
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     public void unarchiveBookmark() {
         if (removedFromArchive != null) {
-            if (removedFromArchive.size() > 0){
+            if (removedFromArchive.size() > 0) {
                 for (int i = 0; i < removedFromArchive.size(); i++)
                     db.removeFromArchive(removedFromArchive.get(i).getId());
             }
@@ -367,15 +367,30 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 toolbarTitle.setText(R.string.all_bookmarks_title);
                 bookmarks = db.getAllBookmarks();
             }
-            setAdapter();
+        } else {
+            SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
+            String result = settingsManager.getCategory();
+            String category = db.getCategoryId(previousCategory);
+            if (category != null) {
+                if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
+                    bookmarks = db.getAllBookmarks();
+                } else {
+                    bookmarks = db.getBookmarksByCategory(result);
+                }
+            } else {
+                toolbarTitle.setText(R.string.all_bookmarks_title);
+                bookmarks = db.getAllBookmarks();
+            }
         }
         categories.clear();
         categories = db.getAllCategories();
         invalidateOptionsMenu();
+        setAdapter();
     }
 
     @Override
     public boolean onLongClick(View v) {
+        refreshCategories = true;
         previousCategory = toolbarTitle.getText().toString();
         isContextualMenuEnable = true;
         toolbar.getMenu().clear();
@@ -397,18 +412,18 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void makeSelection(View view, int position) {
-        if (((CheckBox)view).isChecked()) {
+        if (((CheckBox) view).isChecked()) {
             selectedBookmarks.add(bookmarks.get(position));
-            counter ++;
+            counter++;
         } else {
             selectedBookmarks.remove(bookmarks.get(position));
-            counter --;
+            counter--;
         }
         updateCounter();
     }
 
     public void updateCounter() {
-        if(counter == 0) {
+        if (counter == 0) {
             toolbarTitle.setText(previousCategory);
         } else {
             toolbarTitle.setText(String.valueOf(counter));
@@ -421,20 +436,24 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         toolbarTitle.setText(previousCategory);
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
-        toolbar.inflateMenu(R.menu.menu);
-        addFilterCategories();
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
         counter = 0;
         selectedBookmarks.clear();
         bookmarksAdapter.notifyDataSetChanged();
-
     }
 
     private void addFilterCategories() {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        categoriesRecyclerview.setLayoutManager(layoutManager);
-        categoriesRecyclerview.setHasFixedSize(true);
-        CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this, toolbarTitle.getText().toString());
-        categoriesRecyclerview.setAdapter(categoriesMenuAdapter);
+        if (!refreshCategories) {
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            categoriesRecyclerview.setLayoutManager(layoutManager);
+            categoriesRecyclerview.setHasFixedSize(true);
+            CategoriesMenuAdapter categoriesMenuAdapter = new CategoriesMenuAdapter(categories, this, toolbarTitle.getText().toString());
+            categoriesRecyclerview.setAdapter(categoriesMenuAdapter);
+        }
     }
 
     @Override
@@ -517,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         alertDialog.show();
     }
 
-    private void setBookmarksLabel(){
+    private void setBookmarksLabel() {
         if (bookmarks.size() == 0) {
             noBookmarks.setVisibility(View.VISIBLE);
         } else {
@@ -541,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void filterByCategory(String categoryName) {
-         if (categoryName.equals(getString(R.string.all_bookmarks_title))){
+        if (categoryName.equals(getString(R.string.all_bookmarks_title))) {
             toolbarTitle.setText(categoryName);
             previousCategory = categoryName;
             fab.setVisibility(View.VISIBLE);
@@ -549,21 +568,21 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             unarchiveBookmark();
             bookmarks.clear();
             bookmarks = db.getAllBookmarks();
-         } else {
-             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
-                 isArchiveModeEnabled = true;
-                 fab.setVisibility(View.INVISIBLE);
-             } else {
-                 isArchiveModeEnabled = false;
-                 fab.setVisibility(View.VISIBLE);
-             }
-             toolbarTitle.setText(categoryName);
-             previousCategory = categoryName;
-             archiveUrl();
-             unarchiveBookmark();
-             bookmarks.clear();
-             bookmarks = db.getBookmarksByCategory(categoryName);
-         }
+        } else {
+            if (categoryName.equals(getString(R.string.archived_bookmarks))) {
+                isArchiveModeEnabled = true;
+                fab.setVisibility(View.INVISIBLE);
+            } else {
+                isArchiveModeEnabled = false;
+                fab.setVisibility(View.VISIBLE);
+            }
+            toolbarTitle.setText(categoryName);
+            previousCategory = categoryName;
+            archiveUrl();
+            unarchiveBookmark();
+            bookmarks.clear();
+            bookmarks = db.getBookmarksByCategory(categoryName);
+        }
         setAdapter();
         drawerLayout.closeDrawers();
     }

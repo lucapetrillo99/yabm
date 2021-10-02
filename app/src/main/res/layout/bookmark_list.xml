@@ -10,7 +10,6 @@
         android:layout_width="360dp"
         android:layout_height="wrap_content"
         cardview:strokeColor="?attr/strokeColor"
-        cardview:strokeWidth="1dp"
         cardview:cardCornerRadius="5dp"
         android:layout_marginStart="5dp"
         app:cardUseCompatPadding="true">
@@ -39,8 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_bookmark_option">
-            </ImageView>
+                android:src="@drawable/ic_bookmark_option" />
 
             <TextView
                 android:id="@+id/link"
@@ -61,7 +59,7 @@
                 android:layout_marginTop="27dp"
                 android:layout_width="3dp"
                 android:layout_height="100dp"
-                android:background="?attr/colorOnSecondary" />
+                android:background="?attr/strokeColor" />
 
             <TextView
                 android:id="@+id/description"

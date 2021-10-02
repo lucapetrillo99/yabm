@@ -7,6 +7,7 @@
                     <stroke android:width="2dp" android:color="@color/orange" />
                     <corners android:radius="10dp" />
                     <padding android:right="10dp" />
+                    <solid android:color="?attr/colorOnSecondary" />
                 </shape>
             </item>
             <item android:drawable="@drawable/ic_drop_down_circle" android:gravity="center|end" />

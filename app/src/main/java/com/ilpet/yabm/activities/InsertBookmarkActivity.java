@@ -253,7 +253,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 if (isPressed) {
                     datePicker.setVisibility(View.VISIBLE);
                     timePicker.setVisibility(View.INVISIBLE);
-                    confirmButton.setText(R.string.cancel);
+                    confirmButton.setText(R.string.next);
                     isPressed = false;
                     pressedCounter = 0;
                 } else {

@@ -1,15 +1,16 @@
 package com.ilpet.yabm.activities;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +31,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
@@ -108,14 +108,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             }
         }
 
-        for(Category category: categories) {
+        for (Category category : categories) {
             filteredCategories.add(category.getCategoryTitle());
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, filteredCategories);
         spinnerCategories.setAdapter(adapter);
 
-        if(intent.getExtras() != null){
+        if (intent.getExtras() != null) {
             if (intent.getSerializableExtra("bookmark") != null) {
                 isEditMode = true;
                 bookmark = (Bookmark) intent.getSerializableExtra("bookmark");
@@ -175,7 +175,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         link.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -189,7 +190,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             }
 
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         newCategory.setOnClickListener(view -> {
@@ -236,7 +238,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         addRemainder.setOnClickListener(view -> {
             Calendar calendar = Calendar.getInstance();
             final AlertDialog.Builder alert = new AlertDialog.Builder(InsertBookmarkActivity.this);
-            View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
+            View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker, null);
             DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
             TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
             Button cancelButton = dialogView.findViewById(R.id.previous);
@@ -267,7 +269,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 datePicker.setVisibility(View.INVISIBLE);
                 timePicker.setVisibility(View.VISIBLE);
                 isPressed = true;
-                pressedCounter ++;
+                pressedCounter++;
                 if (pressedCounter > 1) {
                     hour = timePicker.getCurrentHour();
                     minute = timePicker.getCurrentMinute();
@@ -284,12 +286,12 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                     "La data non è valida", Toast.LENGTH_LONG)
                                     .show();
 
-                        } else if (result == TIME_ERROR){
+                        } else if (result == TIME_ERROR) {
                             Toast.makeText(getApplicationContext(),
                                     "L'orario non è valido", Toast.LENGTH_LONG)
                                     .show();
                         } else {
-                            date.setText( DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
+                            date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
 
                             addRemainder.setVisibility(View.INVISIBLE);
                             date.setVisibility(View.VISIBLE);
@@ -318,7 +320,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         modifyRemainder.setOnClickListener(view -> {
             Calendar calendar = Calendar.getInstance();
             final AlertDialog.Builder alert = new AlertDialog.Builder(InsertBookmarkActivity.this);
-            View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker,null);
+            View dialogView = getLayoutInflater().inflate(R.layout.date_time_picker, null);
             DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
             TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
             Button cancelButton = dialogView.findViewById(R.id.previous);
@@ -351,7 +353,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 datePicker.setVisibility(View.INVISIBLE);
                 timePicker.setVisibility(View.VISIBLE);
                 isPressed = true;
-                pressedCounter ++;
+                pressedCounter++;
                 if (pressedCounter > 1) {
                     hour = timePicker.getCurrentHour();
                     minute = timePicker.getCurrentMinute();
@@ -367,7 +369,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                     "La data non è valida", Toast.LENGTH_LONG)
                                     .show();
 
-                        } else if (result == TIME_ERROR){
+                        } else if (result == TIME_ERROR) {
                             Toast.makeText(getApplicationContext(),
                                     "L'orario non è valido", Toast.LENGTH_LONG)
                                     .show();
@@ -403,7 +405,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         });
     }
 
-    void handleSendText (Intent intent){
+    void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             link.setText(sharedText);
@@ -411,8 +413,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     }
 
     public void setSpinnerItem(String category) {
-        for (int i = 0; i <  spinnerCategories.getCount(); i ++) {
-            if(spinnerCategories.getItemAtPosition(i).equals(category)) {
+        for (int i = 0; i < spinnerCategories.getCount(); i++) {
+            if (spinnerCategories.getItemAtPosition(i).equals(category)) {
                 spinnerCategories.setSelection(i);
                 return;
             }
@@ -444,7 +446,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) { }
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -483,7 +486,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                         if (matcher.find()) {
                                             if (!Objects.equals(matcher.group(0), "")) {
                                                 bookmark.setImage(element.attr("content"));
-                                            }else {
+                                            } else {
                                                 bookmark.setImage(matcher.group(0) + element.attr("content"));
                                             }
                                         }
@@ -506,7 +509,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 bookmark.setLink(link);
                                 if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
                                     bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                                } else if(!isEditMode) {
+                                } else if (!isEditMode) {
                                     if (!title.getText().toString().isEmpty()) {
                                         bookmark.setTitle(title.getText().toString());
                                     }
@@ -519,7 +522,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 Toast.makeText(getApplicationContext(),
                                         "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
                                         .show();
-                            }},
+                            }
+                        },
                         error -> {
                             Toast.makeText(getApplicationContext(),
                                     "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
@@ -610,10 +614,13 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
-                intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                Log.i("FHO", String.valueOf(isActivityRunning()));
+                if (!isActivityRunning()) {
+                    Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                    startActivity(activityIntent);
+                }
                 finish();
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro già presente!", Toast.LENGTH_LONG)
@@ -629,6 +636,11 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    Log.i("FHO", String.valueOf(isActivityRunning()));
+                    if (!isActivityRunning()) {
+                        Intent intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
                     finish();
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 });
@@ -658,23 +670,16 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         }
     }
 
-    private void showWarningMessage() {
-        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), "",
-                Snackbar.LENGTH_LONG);
+    private boolean isActivityRunning() {
+        ArrayList<String> runningActivities = new ArrayList<>();
 
-        View customView = View.inflate(this, R.layout.storage_warning_dialog, null);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setPadding(0, 0, 0, 0);
+        ActivityManager activityManager = (ActivityManager) getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
 
-        customView.findViewById(R.id.go_to_settings).setOnClickListener(v -> {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
+        ArrayList<ActivityManager.RunningTaskInfo> services = (ArrayList<ActivityManager.RunningTaskInfo>) activityManager.getRunningTasks(Integer.MAX_VALUE);
 
-        customView.findViewById(R.id.warning_close_button).setOnClickListener(v -> snackbar.dismiss());
-        snackbarLayout.addView(customView, 0);
-        snackbar.show();
+        for (ActivityManager.RunningTaskInfo service : services) {
+            runningActivities.add(service.toString());
+        }
+        return runningActivities.contains("ComponentInfo{com.app/com.app.main.MyActivity}");
     }
 }

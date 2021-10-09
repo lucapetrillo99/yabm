@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_YABM);
         setAppTheme();
         db = DatabaseHandler.getInstance(getApplicationContext());
         SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);

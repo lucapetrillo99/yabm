@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private static final int ARCHIVE_OPTION = 2;
     private static final int UNARCHIVE_OPTION = 3;
     private static final String CATEGORY = "category";
-    private Intent activityIntent;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
@@ -64,14 +63,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public boolean areAllSelected = false;
     public boolean isArchiveModeEnabled = false;
     private boolean refreshCategories = false;
-    private static final int SYSTEM_DEFAULT = 0;
-    private static final int LIGHT_MODE = 1;
-    private static final int NIGHT_MODE = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAppTheme();
         db = DatabaseHandler.getInstance(getApplicationContext());
         SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
         String result = settingsManager.getCategory();
@@ -129,14 +125,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
             previousCategory = toolbarTitle.getText().toString();
-            activityIntent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
-            startActivity(activityIntent);
+            Intent intent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
+            startActivity(intent);;
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             if (isContextualMenuEnable) {
                 removeContextualActionMode();
             }
         });
-
         setBookmarksLabel();
     }
 
@@ -162,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         int id = item.getItemId();
         switch (id) {
             case R.id.settings:
-                activityIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(activityIntent);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 if (isContextualMenuEnable) {
                     removeContextualActionMode();
@@ -541,21 +536,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             noBookmarks.setVisibility(View.VISIBLE);
         } else {
             noBookmarks.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    public void setAppTheme() {
-        SettingsManager settingsManager = new SettingsManager(this, "theme");
-        int theme = settingsManager.getTheme();
-        switch (theme) {
-            case NIGHT_MODE:
-                settingsManager.setTheme(NIGHT_MODE);
-                break;
-            case LIGHT_MODE:
-                settingsManager.setTheme(LIGHT_MODE);
-                break;
-            default:
-                settingsManager.setTheme(SYSTEM_DEFAULT);
         }
     }
 

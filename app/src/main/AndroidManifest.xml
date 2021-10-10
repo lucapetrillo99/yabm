@@ -15,7 +15,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/SplashScreen"
+        android:theme="@style/Theme.YABM"
         android:usesCleartextTraffic="true">
         <activity android:name="com.ilpet.yabm.activities.InfoAppActivity" />
         <activity android:name="com.ilpet.yabm.activities.BackupActivity" />
@@ -37,6 +37,7 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

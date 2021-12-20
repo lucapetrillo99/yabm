@@ -39,7 +39,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.prova)
+                    .setSmallIcon(R.drawable.ic_stat_name)
                     .setContentTitle(context.getString(R.string.reminder))
                     .setContentText(message)
                     .setContentIntent(contentIntent)

@@ -8,6 +8,6 @@
         android:top="0dp" />
 
     <item
-        android:drawable="@drawable/prova"
+        android:drawable="@drawable/ic_app_logo_round"
         android:gravity="center" />
 </layer-list>

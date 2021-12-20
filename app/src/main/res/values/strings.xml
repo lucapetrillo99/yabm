@@ -19,7 +19,7 @@
     <string name="next">Avanti</string>
     <string name="new_reminder">Inserisci un promemoria:</string>
     <string name="settings_title">Impostazioni</string>
-    <string name="reminder">Promemoria</string>
+    <string name="reminder">Ricorda di leggere questo link</string>
     <string name="imported">Importati</string>
     <string name="insert_category_title">Inserisci la categoria</string>
     <string name="backup_description">Tieni i tuoi segnalibri al sicuro!</string>
@@ -51,7 +51,7 @@
     <string name="copy">Copia</string>
     <string name="reminder_title">Inserisci un promemoria</string>
     <string name="add_image">Aggiungi un\'immagine</string>
-    <string name="loading">Caricamento...</string>
+    <string name="loading">Caricamento…</string>
     <string name="automatic_restore">Ripristina automaticamente</string>
     <string name="manual_restore">Ripristina manualmente</string>
     <string name="warning_description">Per effettuare l\'operazione consenti di accedere alla memoria di archiviazione</string>

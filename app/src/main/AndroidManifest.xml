@@ -36,6 +36,7 @@
         <activity android:name=".activities.CategoriesActivity" />
         <activity
             android:name=".activities.InsertBookmarkActivity"
+            android:exported="false"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

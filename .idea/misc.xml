@@ -6,13 +6,16 @@
         <entry key="app/src/main/res/drawable-mdpi/ic_app_logo_round.xml" value="0.17777777777777778" />
         <entry key="app/src/main/res/drawable/bg_launcher.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/custom_background_edit_text.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/ic_app_logo_prova.xml" value="0.2125" />
         <entry key="app/src/main/res/drawable/ic_app_logo_round.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_archive.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/ic_prova.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_select_all.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_small_delete.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_unarchive.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/prova.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/splash_screen.xml" value="0.21510416666666668" />
         <entry key="app/src/main/res/drawable/splash_screen_background.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/style_spinner.xml" value="0.3734375" />
@@ -20,7 +23,7 @@
         <entry key="app/src/main/res/layout/activity_bookmarks_manager.xml" value="0.3572916666666667" />
         <entry key="app/src/main/res/layout/activity_categories.xml" value="0.3572916666666667" />
         <entry key="app/src/main/res/layout/activity_feedback.xml" value="0.3572916666666667" />
-        <entry key="app/src/main/res/layout/activity_info_app.xml" value="0.3572916666666667" />
+        <entry key="app/src/main/res/layout/activity_info_app.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_insert_bookmark.xml" value="0.3572916666666667" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/layout/activity_settings.xml" value="0.3572916666666667" />

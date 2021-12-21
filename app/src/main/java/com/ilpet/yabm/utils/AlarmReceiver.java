@@ -21,6 +21,7 @@ import com.ilpet.yabm.R;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "SAMPLE_CHANNEL";
+    private static final String CHANNEL_NAME = "Promemoria Segnalibri";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -38,10 +39,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                CharSequence channelName = "Promemoria Segnalibri";
                 int importance = NotificationManager.IMPORTANCE_HIGH;
 
-                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, importance);
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
                 notificationManager = context.getSystemService(NotificationManager.class);
                 notificationManager.createNotificationChannel(channel);
 

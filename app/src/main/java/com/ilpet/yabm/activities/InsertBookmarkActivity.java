@@ -60,7 +60,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private static final int TIME_ERROR = -2;
     private static final String REGEX = "^(([^:/?#]+):)?(//([^/?#]*))?";
     private EditText link, title;
-    private TextView reminderTitle;
+    private TextView reminderTitle, optionalField;
     private String category;
     private DatabaseHandler db;
     private Bookmark bookmark;
@@ -89,6 +89,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         link = findViewById(R.id.insert_link);
         title = findViewById(R.id.insert_title);
         reminderTitle = findViewById(R.id.reminder_title);
+        optionalField = findViewById(R.id.optional_field);
         ImageButton newCategory = findViewById(R.id.new_category);
         ImageButton addRemainder = findViewById(R.id.add_remainder);
         TextView date = findViewById(R.id.inserted_date);
@@ -297,6 +298,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             date.setVisibility(View.VISIBLE);
                             modifyRemainder.setVisibility(View.VISIBLE);
                             removeRemainder.setVisibility(View.VISIBLE);
+                            optionalField.setVisibility(View.INVISIBLE);
 
                             reminderTitle.setText(R.string.reminder_inserted);
                             date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
@@ -397,6 +399,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             date.setVisibility(View.INVISIBLE);
             modifyRemainder.setVisibility(View.INVISIBLE);
             removeRemainder.setVisibility(View.INVISIBLE);
+            optionalField.setVisibility(View.VISIBLE);
             reminderTitle.setText(R.string.new_reminder);
             Toast.makeText(getApplicationContext(),
                     "Promemoria eliminato", Toast.LENGTH_LONG)

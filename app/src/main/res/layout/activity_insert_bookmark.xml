@@ -44,8 +44,7 @@
             android:paddingRight="10dp"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true"
-            android:inputType="textMultiLine"
-            tools:targetApi="lollipop">
+            android:inputType="textMultiLine">
         </EditText>
 
         <TextView
@@ -82,8 +81,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="10dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_weight="1"
+            android:text="@string/optional">
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="25dp"
             android:text="@string/bookmark_category"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -128,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="35dp"
-            android:text="Inserisci un promemoria:"
+            android:text="@string/insert_reminder"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginEnd="8dp" />
@@ -152,6 +162,17 @@
                 android:src="@drawable/ic_calendar">
             </ImageButton>
 
+            <TextView
+                android:id="@+id/optional_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="10dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:text="@string/optional">
+            </TextView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -159,14 +180,13 @@
 
                 <TextView
                     android:id="@+id/inserted_date"
-                    android:layout_marginTop="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:textSize="18sp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginEnd="8dp"
-                    android:visibility="invisible">
-                </TextView>
+                    android:textSize="18sp"
+                    android:visibility="invisible" />
 
                 <GridLayout
                     android:layout_width="match_parent"
@@ -174,27 +194,25 @@
 
                     <ImageButton
                         android:id="@+id/modify_reminder"
-                        android:layout_marginTop="20dp"
-                        android:layout_height="match_parent"
                         android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_column="0"
-                        android:src="@drawable/ic_small_calendar"
-                        android:visibility="invisible"
+                        android:layout_marginStart="100dp"
+                        android:layout_marginTop="20dp"
                         android:background="@null"
-                        android:layout_marginStart="100dp">
-                    </ImageButton>
+                        android:src="@drawable/ic_small_calendar"
+                        android:visibility="invisible" />
 
                     <ImageButton
                         android:id="@+id/remove_reminder"
-                        android:layout_marginTop="20dp"
-                        android:layout_height="match_parent"
                         android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_column="1"
-                        android:src="@drawable/ic_delete"
                         android:layout_gravity="center"
+                        android:layout_marginTop="20dp"
                         android:background="@null"
-                        android:visibility="invisible">
-                    </ImageButton>
+                        android:src="@drawable/ic_delete"
+                        android:visibility="invisible" />
                 </GridLayout>
 
             </LinearLayout>

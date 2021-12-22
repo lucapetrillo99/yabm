@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -49,6 +51,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -480,7 +486,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 .subscribe(result -> {
                             if (result != null) {
                                 Elements metaTags = result.getElementsByTag("meta");
-
                                 for (Element element : metaTags) {
                                     if (element.attr("property").equals("og:image")) {
                                         Pattern pattern = Pattern.compile(REGEX);
@@ -517,18 +522,29 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                     }
                                 }
                                 insertBookmark();
-                                loadingDialog.dismissLoading();
-
                             } else {
-                                loadingDialog.dismissLoading();
+                                bookmark.setLink(link);
+                                bookmark.setCategory(categoryId);
+                                if (!title.getText().toString().isEmpty()) {
+                                    bookmark.setTitle(title.getText().toString());
+                                }
+                                insertBookmark();
                                 Toast.makeText(getApplicationContext(),
                                         "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
                                         .show();
                             }
+                            loadingDialog.dismissLoading();
                         },
                         error -> {
+                            bookmark.setLink(link);
+                            bookmark.setCategory(categoryId);
+                            if (!title.getText().toString().isEmpty()) {
+                                bookmark.setTitle(title.getText().toString());
+                            }
+                            insertBookmark();
                             Toast.makeText(getApplicationContext(),
-                                    "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
+                                    "Impossibile recuperare altre informazioni. " +
+                                    "\nRiprova più tardi", Toast.LENGTH_LONG)
                                     .show();
                             loadingDialog.dismissLoading();
                         });
@@ -616,7 +632,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
-                Log.i("FHO", String.valueOf(isActivityRunning()));
                 if (!isActivityRunning()) {
                     Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                     startActivity(activityIntent);

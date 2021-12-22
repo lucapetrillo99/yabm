@@ -1,7 +1,6 @@
 package com.ilpet.yabm.adapters;
 
 import android.content.res.Resources;
-import android.os.Build;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +27,10 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     private int touches = 0;
     private @ColorInt int color;
     private final Resources.Theme theme;
+    private static final String THEME = "theme";
+    private static final int SYSTEM_DEFAULT = 0;
+    private static final int LIGHT_MODE = 1;
+    private static final int NIGHT_MODE = 2;
 
     public CategoriesMenuAdapter(ArrayList<Category> categories, MainActivity mainActivity, String startCategory) {
         this.categories = categories;
@@ -66,10 +68,10 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
 
     @Override
     public void onBindViewHolder(@NonNull categoriesMenuViewHolder holder, int position) {
-        holder.title.setText(categories.get(position).getCategoryTitle());
+        holder.title.setText(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
         holder.relativeLayout.setBackgroundColor(color);
 
-        if (selectedPosition == position) {
+        if (selectedPosition == holder.getAbsoluteAdapterPosition()) {
             holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
                     R.drawable.category_background, null));
         }
@@ -78,18 +80,18 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         }
 
         holder.itemView.setOnClickListener(v -> {
-            mainActivity.filterByCategory(categories.get(position).getCategoryTitle());
-            if (categories.get(position).getCategoryTitle().equals(startCategory)) {
+            mainActivity.filterByCategory(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().equals(startCategory)) {
                 holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
                         R.drawable.category_background, null));
             }
-            selectedPosition = position;
+            selectedPosition = holder.getAbsoluteAdapterPosition();
             touches ++;
             notifyDataSetChanged();
         });
 
         if (touches == 0) {
-            if (categories.get(position).getCategoryTitle().equals(startCategory)) {
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().equals(startCategory)) {
                 holder.relativeLayout.setBackground(ResourcesCompat.getDrawable(mainActivity.getResources(),
                         R.drawable.category_background, null));
             }

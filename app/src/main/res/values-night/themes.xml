@@ -13,6 +13,7 @@
         <item name="backgroundColor">@color/white</item>
         <item name="strokeColor">@color/white</item>
         <item name="cardBackgroundColor">@color/light_black</item>
+        <item name="theme">@color/dirty_black</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>

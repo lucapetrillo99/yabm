@@ -26,10 +26,10 @@ public class HelpMenuActivity extends AppCompatActivity {
         toolbarTitle.setText(R.string.help);
         setSupportActionBar(toolbar);
 
-        addBookmark = findViewById(R.id.theme_setting);
-        modifyBookmark = findViewById(R.id.categories_setting);
-        deleteBookmark = findViewById(R.id.start_category_setting);
-        archiveBookmark = findViewById(R.id.import_export_setting);
+        addBookmark = findViewById(R.id.add_bookmark_help);
+        modifyBookmark = findViewById(R.id.modify_bookmark_help);
+        deleteBookmark = findViewById(R.id.delete_bookmark_help);
+        archiveBookmark = findViewById(R.id.archive_bookmark_help);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         toolbar.setNavigationOnClickListener(v -> {

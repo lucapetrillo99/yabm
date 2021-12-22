@@ -8,9 +8,9 @@
     tools:context=".activities.HelpActivity">
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+        android:id="@+id/image_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:layout_centerInParent="true">
     </androidx.viewpager2.widget.ViewPager2>
 
@@ -18,11 +18,12 @@
         android:id="@+id/dots_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/view_pager"
-        android:layout_marginTop="15dp"
+        android:layout_below="@id/image_container"
         android:layout_centerHorizontal="true"
-        android:gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal">
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal" >
     </LinearLayout>
+
 
 </RelativeLayout>

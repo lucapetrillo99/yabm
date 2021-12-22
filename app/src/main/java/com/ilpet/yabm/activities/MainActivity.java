@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         fab.setOnClickListener(view -> {
             previousCategory = toolbarTitle.getText().toString();
             Intent intent = new Intent(MainActivity.this, InsertBookmarkActivity.class);
-            startActivity(intent);;
+            startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             if (isContextualMenuEnable) {
                 removeContextualActionMode();

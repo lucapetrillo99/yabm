@@ -232,7 +232,7 @@ public class BackupActivity extends AppCompatActivity {
     private void createAutoBackupFile() {
         File dir = new File(getFilesDir() + File.separator +
                 getString(R.string.app_name));
-        if(!dir.exists()){
+        if (!dir.exists()) {
             dir.mkdir();
         }
         try {
@@ -253,7 +253,7 @@ public class BackupActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
                         Toast.LENGTH_LONG).show();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Impossibile impostare il backup automatico",
                     Toast.LENGTH_LONG).show();
         }
@@ -263,7 +263,8 @@ public class BackupActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         intent.setData(uri);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent,
+                PendingIntent.FLAG_IMMUTABLE);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());

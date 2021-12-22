@@ -465,7 +465,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         Intent intent = new Intent(InsertBookmarkActivity.this, SettingsActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        finish();
         return true;
     }
 

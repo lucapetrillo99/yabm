@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         toolbarTitle.setText(result);
         previousCategory = result;
-        archiveUrl();
+        archiveBookmark();
         unarchiveBookmark();
 
         archivedUrl = new ArrayList<>();
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         alertDialog.show();
     }
 
-    public void archiveUrl() {
+    public void archiveBookmark() {
         if (archivedUrl != null) {
             if (archivedUrl.size() > 0) {
                 for (int i = 0; i < archivedUrl.size(); i++)
@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     public void onResume() {
         super.onResume();
-        archiveUrl();
+        archiveBookmark();
         setBookmarksLabel();
         if (previousCategory != null) {
             String result = db.getCategoryId(previousCategory);
@@ -544,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             toolbarTitle.setText(categoryName);
             previousCategory = categoryName;
             fab.setVisibility(View.VISIBLE);
-            archiveUrl();
+            archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
             bookmarks = db.getAllBookmarks();
@@ -558,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
             toolbarTitle.setText(categoryName);
             previousCategory = categoryName;
-            archiveUrl();
+            archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
             bookmarks = db.getBookmarksByCategory(categoryName);

@@ -54,12 +54,30 @@ public class HelpMenuActivity extends AppCompatActivity {
     }
 
     private void modifyBookmarkClickListener() {
+        modifyBookmark.setOnClickListener(v -> {
+            Intent intent = new Intent(HelpMenuActivity.this, HelpActivity.class);
+            intent.putExtra("help", 2);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
     }
 
     private void deleteBookmarkClickListener() {
+        deleteBookmark.setOnClickListener(v -> {
+            Intent intent = new Intent(HelpMenuActivity.this, HelpActivity.class);
+            intent.putExtra("help", 3);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
     }
 
     private void archiveBookmarkClickListener() {
+        archiveBookmark.setOnClickListener(v -> {
+            Intent intent = new Intent(HelpMenuActivity.this, HelpActivity.class);
+            intent.putExtra("help", 4);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
 
     }
 }

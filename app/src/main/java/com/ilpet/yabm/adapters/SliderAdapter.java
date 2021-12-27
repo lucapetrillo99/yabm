@@ -35,7 +35,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHold
         return list.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         View view;
 
         public MyViewHolder(@NonNull View itemView) {

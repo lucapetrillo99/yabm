@@ -1,18 +1,21 @@
 package com.ilpet.yabm.activities;
 
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.text.Html;
+import android.util.TypedValue;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.content.res.TypedArray;
-import android.os.Bundle;
-import android.text.Html;
-import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.adapters.SliderAdapter;
+
 
 public class HelpActivity extends AppCompatActivity {
     private TypedArray images;
@@ -34,9 +37,8 @@ public class HelpActivity extends AppCompatActivity {
         ViewPager2 imageContainer = findViewById(R.id.image_container);
         layout = findViewById(R.id.dots_container);
 
-        Bundle helpType = getIntent().getExtras();
-        int help = helpType.getInt("help");
-        Log.i("HHH", String.valueOf(help));
+        Bundle bundle = getIntent().getExtras();
+        int help = bundle.getInt("help");
 
         switch (help) {
             case ADD_BOOKMARK:
@@ -54,18 +56,17 @@ public class HelpActivity extends AppCompatActivity {
             case DELETE_BOOKMARK:
                 toolbarTitle.setText(R.string.delete_bookmark_help);
                 setSupportActionBar(toolbar);
-                images = getResources().obtainTypedArray(R.array.modify_bookmark_images);
+                images = getResources().obtainTypedArray(R.array.delete_bookmark_images);
                 break;
 
             case ARCHIVE_BOOKMARK:
                 toolbarTitle.setText(R.string.archive_bookmark_help);
                 setSupportActionBar(toolbar);
-                images = getResources().obtainTypedArray(R.array.modify_bookmark_images);
+                images = getResources().obtainTypedArray(R.array.archive_bookmark_images);
                 break;
         }
 
-
-        dots = new TextView[5];
+        dots = new TextView[images.length()];
 
         SliderAdapter adapter = new SliderAdapter(images);
         imageContainer.setAdapter(adapter);
@@ -86,11 +87,16 @@ public class HelpActivity extends AppCompatActivity {
     }
 
     private void selectedDots(int position) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = getTheme();
+        theme.resolveAttribute(R.attr.strokeColor, typedValue, true);
+        @ColorInt int color = typedValue.data;
+
         for (int i = 0; i < dots.length; i++) {
             if (i == position) {
-                dots[i].setTextColor(getResources().getColor(R.color.red));
+                dots[i].setTextColor(getResources().getColor(R.color.orange));
             } else {
-                dots[i].setTextColor(getResources().getColor(R.color.gray));
+                dots[i].setTextColor(color);
             }
         }
     }
@@ -100,8 +106,8 @@ public class HelpActivity extends AppCompatActivity {
             dots[i] = new TextView(this);
             dots[i].setText(Html.fromHtml("&#9679;"));
             dots[i].setTextSize(18);
+            layout.setWeightSum(dots.length);
             layout.addView(dots[i]);
         }
-
     }
 }

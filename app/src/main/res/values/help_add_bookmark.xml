@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="add_bookmark_images">
+        <item>@drawable/add_bookmark_prova</item>
+        <item>@drawable/add_bookmark2</item>
+        <item>@drawable/add_bookmark3</item>
+        <item>@drawable/add_bookmark4</item>
+    </array>
+
+</resources>

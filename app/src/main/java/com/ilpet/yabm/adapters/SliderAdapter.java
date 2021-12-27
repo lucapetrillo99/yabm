@@ -1,5 +1,6 @@
 package com.ilpet.yabm.adapters;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +10,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ilpet.yabm.R;
 
-public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHolder> {
-    int list[];
+import java.util.ArrayList;
 
-    public SliderAdapter(int[] list) {
+public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHolder> {
+    ArrayList<Drawable> list;
+
+    public SliderAdapter(ArrayList<Drawable> list) {
         this.list = list;
     }
 
@@ -24,12 +27,12 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.view.setBackgroundColor(list[position]);
+        holder.view.setBackground(list.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return list.length;
+        return list.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

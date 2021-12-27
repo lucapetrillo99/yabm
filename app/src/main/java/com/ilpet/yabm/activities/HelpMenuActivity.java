@@ -46,6 +46,7 @@ public class HelpMenuActivity extends AppCompatActivity {
     private void addBookmarkClickListener() {
         addBookmark.setOnClickListener(v -> {
             Intent intent = new Intent(HelpMenuActivity.this, HelpActivity.class);
+            intent.putExtra("help", 1);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });

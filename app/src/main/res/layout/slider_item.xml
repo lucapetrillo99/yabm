@@ -3,10 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/slider_view"
+    <LinearLayout
+        android:id="@+id/image_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </View>
+        android:layout_height="400dp"
+        android:background="@drawable/help_borders"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/slider_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </View>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/help_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/image_layout"
+        android:textAlignment="center"
+        android:textSize="18sp">
+    </TextView>
 
 </RelativeLayout>

@@ -63,8 +63,14 @@
     <string name="insert_reminder">Inserisci un promemoria:</string>
     <string name="optional">Opzionale *</string>
     <string name="help">Aiuto</string>
+    <string name="skip">Salta</string>
+    <string name="finished">Finito</string>
     <string name="add_bookmark">Aggiungere un segnbalibro</string>
     <string name="modify_bookmark_help">Modificare un segnalibro</string>
     <string name="delete_bookmark_help">Eliminare un segnalibro</string>
     <string name="archive_bookmark_help">Archiviare un segnalibro</string>
+    <string name="browser_menu">Apri il menu del browser</string>
+    <string name="select_share">Seleziona condividi</string>
+    <string name="choose_app">Seleziona \"Yabm\"</string>
+    <string name="add_bookmark_help">Aggiungi il segnalibro</string>
 </resources>

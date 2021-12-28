@@ -8,6 +8,13 @@
         <item>@drawable/add_bookmark4</item>
     </array>
 
+    <array name="add_bookmark_info">
+        <item>@string/browser_menu</item>
+        <item>@string/select_share</item>
+        <item>@string/choose_app</item>
+        <item>@string/add_bookmark_help</item>
+    </array>
+
     <array name="modify_bookmark_images">
         <item>@drawable/ic_archive_help</item>
         <item>@drawable/ic_archive</item>

@@ -24,10 +24,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/image_container"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="40dp"
         app:tabBackground="@drawable/tab_page_selector"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp">
     </com.google.android.material.tabs.TabLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/help_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_gravity="start"
+            android:layout_marginStart="40dp"
+            android:padding="2dp"
+            android:text="@string/retry" />
+
+        <Button
+            android:id="@+id/help_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="end"
+            android:layout_marginEnd="40dp"
+            android:padding="2dp"
+            android:text="@string/next" />
+    </GridLayout>
 
 </RelativeLayout>

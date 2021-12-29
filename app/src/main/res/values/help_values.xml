@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="add_bookmark_images">
+        <item>@drawable/add_bookmark1</item>
+        <item>@drawable/add_bookmark2</item>
+        <item>@drawable/add_bookmark3</item>
+        <item>@drawable/add_bookmark4</item>
+    </array>
+
+    <array name="add_bookmark_info">
+        <item>@string/browser_menu</item>
+        <item>@string/select_share</item>
+        <item>@string/choose_app</item>
+        <item>@string/add_bookmark_help</item>
+    </array>
+
+    <array name="modify_bookmark_images">
+        <item>@drawable/option</item>
+        <item>@drawable/modify_bookmark1</item>
+        <item>@drawable/modify_bookmark2</item>
+    </array>
+
+    <array name="modify_bookmark_info">
+        <item>@string/bookmark_menu</item>
+        <item>@string/modify_help</item>
+        <item>@string/save_edit</item>
+    </array>
+
+    <array name="delete_bookmark_images">
+        <item>@drawable/option</item>
+        <item>@drawable/delete_bookmark1</item>
+        <item>@drawable/delete_bookmark2</item>
+    </array>
+
+    <array name="delete_bookmark_info">
+        <item>@string/bookmark_menu</item>
+        <item>@string/delete_help</item>
+        <item>@string/delete_swipe</item>
+    </array>
+
+    <array name="archive_bookmark_images">
+        <item>@drawable/archive_bookmark1</item>
+        <item>@drawable/archive_bookmark2</item>
+        <item>@drawable/archive_bookmark3</item>
+    </array>
+
+    <array name="archive_bookmark_info">
+        <item>@string/archive_swipe</item>
+        <item>@string/select_menu</item>
+        <item>@string/archive_help</item>
+    </array>
+
+</resources>

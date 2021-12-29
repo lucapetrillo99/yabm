@@ -27,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout importExport;
     private RelativeLayout backup;
     private RelativeLayout sendFeedback;
+    private RelativeLayout helpSetting;
     private RelativeLayout appInfo;
     private DatabaseHandler db;
 
@@ -47,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
         importExport = findViewById(R.id.import_export_setting);
         backup = findViewById(R.id.backup_setting);
         sendFeedback = findViewById(R.id.feedback_setting);
+        helpSetting = findViewById(R.id.help_setting);
         appInfo = findViewById(R.id.information_setting);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
@@ -61,8 +63,17 @@ public class SettingsActivity extends AppCompatActivity {
         starCategoryClickListener();
         importExportClickListener();
         backupClickListener();
+        helpClickListener();
         feedbackClickListener();
 
+    }
+
+    private void helpClickListener() {
+        helpSetting.setOnClickListener(v -> {
+            Intent intent = new Intent(SettingsActivity.this, HelpMenuActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
     }
 
     @Override

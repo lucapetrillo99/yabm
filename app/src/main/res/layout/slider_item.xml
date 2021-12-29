@@ -10,11 +10,12 @@
         android:background="@drawable/help_borders"
         android:orientation="vertical">
 
-        <View
+        <ImageView
             android:id="@+id/slider_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </View>
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop">
+        </ImageView>
     </LinearLayout>
 
     <TextView

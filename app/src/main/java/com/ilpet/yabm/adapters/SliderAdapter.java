@@ -4,6 +4,7 @@ import android.content.res.TypedArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,7 +29,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.view.setBackground(images.getDrawable(position));
+        holder.imageView.setImageResource(images.getResourceId(position, 0));
         holder.textInfo.setText(info.getText(position));
     }
 
@@ -38,12 +39,12 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.MyViewHold
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        View view;
+        ImageView imageView;
         TextView textInfo;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            view = itemView.findViewById(R.id.slider_view);
+            imageView = itemView.findViewById(R.id.slider_view);
             textInfo = itemView.findViewById(R.id.help_info);
         }
     }

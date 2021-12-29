@@ -55,21 +55,21 @@ public class HelpActivity extends AppCompatActivity {
                 toolbarTitle.setText(R.string.modify_bookmark_help);
                 setSupportActionBar(toolbar);
                 images = getResources().obtainTypedArray(R.array.modify_bookmark_images);
-                info = getResources().obtainTypedArray(R.array.add_bookmark_info);
+                info = getResources().obtainTypedArray(R.array.modify_bookmark_info);
                 break;
 
             case DELETE_BOOKMARK:
                 toolbarTitle.setText(R.string.delete_bookmark_help);
                 setSupportActionBar(toolbar);
                 images = getResources().obtainTypedArray(R.array.delete_bookmark_images);
-                info = getResources().obtainTypedArray(R.array.add_bookmark_info);
+                info = getResources().obtainTypedArray(R.array.delete_bookmark_info);
                 break;
 
             case ARCHIVE_BOOKMARK:
                 toolbarTitle.setText(R.string.archive_bookmark_help);
                 setSupportActionBar(toolbar);
                 images = getResources().obtainTypedArray(R.array.archive_bookmark_images);
-                info = getResources().obtainTypedArray(R.array.add_bookmark_info);
+                info = getResources().obtainTypedArray(R.array.archive_bookmark_info);
                 break;
         }
 
@@ -85,7 +85,7 @@ public class HelpActivity extends AppCompatActivity {
                     next.setText(getText(R.string.next));
                     skip = true;
                     finished = false;
-                }else if (position == adapter.getItemCount() - 1 ) {
+                } else if (position == adapter.getItemCount() - 1) {
                     next.setText(getText(R.string.finished));
                     finished = true;
                 } else {
@@ -99,7 +99,7 @@ public class HelpActivity extends AppCompatActivity {
 
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, imageContainer,
                 true, (tab, position) -> {
-                });
+        });
 
         tabLayoutMediator.attach();
 

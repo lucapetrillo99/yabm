@@ -22,8 +22,10 @@
         android:id="@+id/help_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:layout_below="@+id/image_layout"
+        android:layout_marginTop="15dp"
+        android:maxLines="2"
+        android:minHeight="50dp"
         android:textAlignment="center"
         android:textSize="18sp">
     </TextView>

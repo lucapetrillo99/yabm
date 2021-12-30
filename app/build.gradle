@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.example.linkcontainer"
+        applicationId "com.ilpet.yabm"
         minSdkVersion 19
         targetSdkVersion 31
         versionCode 1

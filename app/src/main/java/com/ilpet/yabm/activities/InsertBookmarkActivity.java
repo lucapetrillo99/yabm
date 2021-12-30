@@ -7,10 +7,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,6 +42,7 @@ import com.ilpet.yabm.utils.Utils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -149,6 +150,10 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             !bookmark.getCategory().equals(db.getCategoryId(category))) {
                         confirmDialog(link.getText().toString(), db.getCategoryId(category));
                     } else {
+                        if (!isActivityRunning()) {
+                            Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                            startActivity(activityIntent);
+                        }
                         finish();
                         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                     }
@@ -158,6 +163,10 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             !bookmark.getCategory().equals(db.getCategoryId(category))) {
                         confirmDialog(link.getText().toString(), db.getCategoryId(category));
                     } else {
+                        if (!isActivityRunning()) {
+                            Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                            startActivity(activityIntent);
+                        }
                         finish();
                         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                     }
@@ -586,13 +595,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         });
     }
 
-    private void setReminder(String message, String link) {
+    private void setReminder() {
         Intent intent = new Intent(InsertBookmarkActivity.this, AlarmReceiver.class);
-        final int notificationId = 0;
+        int notificationId = (int) SystemClock.uptimeMillis();
+        Bundle args = new Bundle();
+        args.putSerializable("bookmark",(Serializable) bookmark);
+        intent.putExtra("data", args);
         intent.putExtra("notificationId", notificationId);
-        intent.putExtra("message", message);
-        intent.putExtra("link", link);
-        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        intent.putExtra("category", category);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(
                 InsertBookmarkActivity.this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -641,11 +651,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             queryResult = db.updateBookmark(bookmark);
             if (queryResult) {
                 if (setRemainder) {
-                    if (bookmark.getTitle() != null) {
-                        setReminder(bookmark.getTitle(), bookmark.getLink());
-                    } else {
-                        setReminder(bookmark.getLink(), bookmark.getLink());
-                    }
+                    setReminder();
                 }
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro modificato!", Toast.LENGTH_LONG)
@@ -663,11 +669,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             queryResult = db.addBookmark(bookmark);
             if (queryResult) {
                 if (setRemainder) {
-                    if (bookmark.getTitle() != null) {
-                        setReminder(bookmark.getTitle(), bookmark.getLink());
-                    } else {
-                        setReminder(bookmark.getLink(), bookmark.getLink());
-                    }
+                    setReminder();
                 }
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
@@ -693,7 +695,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    Log.i("FHO", String.valueOf(isActivityRunning()));
                     if (!isActivityRunning()) {
                         Intent intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                         startActivity(intent);
@@ -714,11 +715,19 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     !bookmark.getCategory().equals(db.getCategoryId(category))) {
                 confirmDialog(link.getText().toString(), db.getCategoryId(category));
             } else {
+                if (!isActivityRunning()) {
+                    Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                    startActivity(activityIntent);
+                }
                 finish();
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             }
         } else {
             if (link.getText().toString().isEmpty()) {
+                if (!isActivityRunning()) {
+                    Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
+                    startActivity(activityIntent);
+                }
                 finish();
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {

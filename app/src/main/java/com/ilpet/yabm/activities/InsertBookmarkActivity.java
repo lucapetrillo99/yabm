@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -51,10 +49,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -149,14 +143,25 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
         toolbar.setNavigationOnClickListener(v -> {
             if (isEditMode) {
-                if (!bookmark.getLink().equals(link.getText().toString()) ||
-                        !bookmark.getTitle().equals(title.getText().toString()) ||
-                        !bookmark.getCategory().equals(db.getCategoryId(category))) {
-                    confirmDialog(link.getText().toString(), db.getCategoryId(category));
+                if (bookmark.getTitle() == null) {
+                    if (!bookmark.getLink().equals(link.getText().toString()) ||
+                            !bookmark.getCategory().equals(db.getCategoryId(category))) {
+                        confirmDialog(link.getText().toString(), db.getCategoryId(category));
+                    } else {
+                        finish();
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                    }
                 } else {
-                    finish();
-                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                    if (!bookmark.getLink().equals(link.getText().toString()) ||
+                            !bookmark.getTitle().equals(title.getText().toString()) ||
+                            !bookmark.getCategory().equals(db.getCategoryId(category))) {
+                        confirmDialog(link.getText().toString(), db.getCategoryId(category));
+                    } else {
+                        finish();
+                        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                    }
                 }
+
             } else {
                 if (link.getText().toString().isEmpty()) {
                     finish();
@@ -498,9 +503,11 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                             }
                                         }
                                     } else if (element.attr("property").equals("og:site_name")) {
-                                        if (isEditMode) {
-                                            if (!link.equals(bookmark.getLink())) {
+                                        if (!isEditMode) {
+                                            if (title.getText().toString().isEmpty()) {
                                                 bookmark.setTitle(element.attr("content"));
+                                            } else {
+                                                bookmark.setTitle(title.getText().toString());
                                             }
                                         } else {
                                             if (title.getText().toString().isEmpty()) {
@@ -514,19 +521,36 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 bookmark.setCategory(categoryId);
                                 bookmark.setReminder(alarmStartTime);
                                 bookmark.setLink(link);
-                                if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
-                                    bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                                } else if (!isEditMode) {
-                                    if (!title.getText().toString().isEmpty()) {
-                                        bookmark.setTitle(title.getText().toString());
+                                if (!isEditMode) {
+                                    if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                        bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                    }
+                                } else {
+                                    if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                        bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                    }else if (!title.getText().toString().isEmpty()) {
+                                        if (!bookmark.getTitle().equals(title.getText().toString())) {
+                                            bookmark.setTitle(title.getText().toString());
+                                        }
                                     }
                                 }
                                 insertBookmark();
                             } else {
                                 bookmark.setLink(link);
                                 bookmark.setCategory(categoryId);
-                                if (!title.getText().toString().isEmpty()) {
-                                    bookmark.setTitle(title.getText().toString());
+                                bookmark.setReminder(alarmStartTime);
+                                if (!isEditMode) {
+                                    if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                        bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                    }
+                                } else {
+                                    if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                        bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                    }else if (!title.getText().toString().isEmpty()) {
+                                        if (!bookmark.getTitle().equals(title.getText().toString())) {
+                                            bookmark.setTitle(title.getText().toString());
+                                        }
+                                    }
                                 }
                                 insertBookmark();
                                 Toast.makeText(getApplicationContext(),
@@ -538,13 +562,24 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         error -> {
                             bookmark.setLink(link);
                             bookmark.setCategory(categoryId);
-                            if (!title.getText().toString().isEmpty()) {
-                                bookmark.setTitle(title.getText().toString());
+                            bookmark.setReminder(alarmStartTime);
+                            if (!isEditMode) {
+                                if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                    bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                }
+                            } else {
+                                if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
+                                    bookmark.setTitle(link.split("//")[1].split("/")[0]);
+                                }else if (!title.getText().toString().isEmpty()) {
+                                    if (!bookmark.getTitle().equals(title.getText().toString())) {
+                                        bookmark.setTitle(title.getText().toString());
+                                    }
+                                }
                             }
                             insertBookmark();
                             Toast.makeText(getApplicationContext(),
                                     "Impossibile recuperare altre informazioni. " +
-                                    "\nRiprova più tardi", Toast.LENGTH_LONG)
+                                            "\nRiprova più tardi", Toast.LENGTH_LONG)
                                     .show();
                             loadingDialog.dismissLoading();
                         });
@@ -556,9 +591,12 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("message", message);
         intent.putExtra("link", link);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                InsertBookmarkActivity.this, 0, intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent alarmIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            alarmIntent = PendingIntent.getBroadcast(
+                    InsertBookmarkActivity.this, 0, intent,
+                    PendingIntent.FLAG_IMMUTABLE);
+        }
 
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.set(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);

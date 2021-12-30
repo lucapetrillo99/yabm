@@ -124,6 +124,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 toolbarTitle.setText(R.string.modify_bookmark);
                 if (bookmark.getReminder() != -1) {
                     addRemainder.setVisibility(View.INVISIBLE);
+                    optionalField.setVisibility(View.INVISIBLE);
                     date.setVisibility(View.VISIBLE);
                     modifyRemainder.setVisibility(View.VISIBLE);
                     removeRemainder.setVisibility(View.VISIBLE);
@@ -528,7 +529,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 } else {
                                     if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
                                         bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                                    }else if (!title.getText().toString().isEmpty()) {
+                                    } else if (!title.getText().toString().isEmpty()) {
                                         if (!bookmark.getTitle().equals(title.getText().toString())) {
                                             bookmark.setTitle(title.getText().toString());
                                         }
@@ -546,7 +547,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 } else {
                                     if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
                                         bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                                    }else if (!title.getText().toString().isEmpty()) {
+                                    } else if (!title.getText().toString().isEmpty()) {
                                         if (!bookmark.getTitle().equals(title.getText().toString())) {
                                             bookmark.setTitle(title.getText().toString());
                                         }
@@ -570,7 +571,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             } else {
                                 if (bookmark.getTitle() == null && title.getText().toString().isEmpty()) {
                                     bookmark.setTitle(link.split("//")[1].split("/")[0]);
-                                }else if (!title.getText().toString().isEmpty()) {
+                                } else if (!title.getText().toString().isEmpty()) {
                                     if (!bookmark.getTitle().equals(title.getText().toString())) {
                                         bookmark.setTitle(title.getText().toString());
                                     }
@@ -591,15 +592,16 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("message", message);
         intent.putExtra("link", link);
-        PendingIntent alarmIntent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            alarmIntent = PendingIntent.getBroadcast(
-                    InsertBookmarkActivity.this, 0, intent,
-                    PendingIntent.FLAG_IMMUTABLE);
-        }
-
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(
+                InsertBookmarkActivity.this, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm.set(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
+        } else {
+            alarm.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
+        }
     }
 
     private int setCalendar() throws ParseException {

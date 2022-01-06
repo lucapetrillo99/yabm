@@ -5,12 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
     private final Context context;
@@ -334,5 +337,56 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public String getDbPath(Context context) {
         return context.getDatabasePath(DATABASE_NAME).toString();
+    }
+
+    public void deleteBookmarks(ArrayList<Bookmark> bookmarks) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] whereArgs = new String[bookmarks.size()];
+        for (int i = 0; i < bookmarks.size(); i ++) {
+            whereArgs[i] = bookmarks.get(i).getId();
+        }
+
+        String args = TextUtils.join(", ", whereArgs);
+        db.execSQL(String.format("DELETE FROM " + TABLE_BOOKMARK +  " WHERE " + BOOKMARK_ID +
+                " IN (%s);", args));
+    }
+
+    public void archiveBookmarks(ArrayList<Bookmark> bookmarks) {
+        String id = bookmarks.get(0).getCategory();
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] whereArgs = new String[bookmarks.size()];
+        for (int i = 0; i < bookmarks.size(); i ++) {
+            whereArgs[i] = bookmarks.get(i).getId();
+        }
+
+
+        String args = TextUtils.join(", ", whereArgs);
+
+        db.execSQL(String.format("UPDATE %s SET %s =" +  2 + ", %s = " + id + " WHERE %s IN (%s);",
+                TABLE_BOOKMARK, KEY_CATEGORY, KEY_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+    }
+
+    public void unarchiveBookmarks(ArrayList<Bookmark> bookmarks) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] whereArgs = new String[bookmarks.size()];
+        String[] prevCategories = new String[bookmarks.size()];
+        for (int i = 0; i < bookmarks.size(); i ++) {
+            whereArgs[i] = bookmarks.get(i).getId();
+        }
+        String args = TextUtils.join(", ", whereArgs);
+
+        Cursor cursor = db.rawQuery("Select " + KEY_PREVIOUS_CATEGORY + " from " + TABLE_BOOKMARK
+        + " where " + BOOKMARK_ID + " IN (" + args + ") ", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                prevCategories[cursor.getPosition()] = cursor.getString(cursor.getColumnIndexOrThrow(KEY_PREVIOUS_CATEGORY));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        String setArgs = TextUtils.join(", ", prevCategories);
+        db.execSQL(String.format("UPDATE %s SET %s = %s" + " , %s = %s " + " WHERE %s IN (%s)",
+                TABLE_BOOKMARK, KEY_CATEGORY, setArgs, KEY_PREVIOUS_CATEGORY, null, BOOKMARK_ID, args));
     }
 }

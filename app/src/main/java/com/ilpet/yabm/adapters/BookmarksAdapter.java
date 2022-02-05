@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,10 +38,12 @@ import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.ImagePreview;
 import com.squareup.picasso.Picasso;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyViewHolder> implements Filterable {
+    private static final int DELETE_OPTION = 1;
+    private static final int ARCHIVE_OPTION = 2;
+    private static final int UNARCHIVE_OPTION = 3;
     private static final int DESCRIPTION_MAX_LENGTH = 120;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
@@ -204,10 +205,27 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
     }
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
-        UpdateBookmarks updateBookmarks = new UpdateBookmarks(selectedBookmarks, operation, this);
-        updateBookmarks.execute();
-        notifyDataSetChanged();
+        switch (operation) {
+            case DELETE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                db.deleteBookmarks(selectedBookmarks);
+                notifyDataSetChanged();
+                break;
+            case ARCHIVE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                db.archiveBookmarks(selectedBookmarks);
+                notifyDataSetChanged();
+                break;
+            case UNARCHIVE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                for (Bookmark bookmark: selectedBookmarks) {
+                    db.removeFromArchive(bookmark.getId());
+                }
+                notifyDataSetChanged();
+                break;
+        }
     }
+
 
     @Override
     public int getItemCount() {
@@ -215,65 +233,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
             return 0;
         } else {
             return bookmarks.size();
-        }
-    }
-
-    private static class UpdateBookmarks extends AsyncTask<Void, Void, Void> {
-        private final int operation;
-        private final ArrayList<Bookmark> list;
-        private final WeakReference<BookmarksAdapter> activityReference;
-
-        public UpdateBookmarks(ArrayList<Bookmark> bookmarks, int operation, BookmarksAdapter context) {
-            this.list = bookmarks;
-            this.operation = operation;
-            activityReference = new WeakReference<>(context);
-        }
-
-        boolean result = true;
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            BookmarksAdapter bookmarksAdapter = activityReference.get();
-            switch (operation) {
-                case 1:
-                    for (Bookmark selectedBookmark : list) {
-                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
-                        result = bookmarksAdapter.db.deleteBookmark(selectedBookmark.getId());
-                        if (!result) {
-                            break;
-                        }
-                    }
-                    break;
-                case 2:
-                    for (Bookmark selectedBookmark : list) {
-                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
-                        result = bookmarksAdapter.db.addToArchive(selectedBookmark.getId(), selectedBookmark.getCategory());
-                        if (!result) {
-                            break;
-                        }
-                    }
-                    break;
-                case 3:
-                    for (Bookmark selectedBookmark : list) {
-                        bookmarksAdapter.bookmarks.remove(selectedBookmark);
-                        result = bookmarksAdapter.db.removeFromArchive(selectedBookmark.getId());
-                        if (!result) {
-                            break;
-                        }
-                    }
-                    break;
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            BookmarksAdapter bookmarksAdapter = activityReference.get();
-            if (!result) {
-                Toast.makeText(bookmarksAdapter.mainActivity, "Impossibile eliminare i segnalibri!",
-                        Toast.LENGTH_LONG).show();
-            }
         }
     }
 

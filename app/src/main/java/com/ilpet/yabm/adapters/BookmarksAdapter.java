@@ -9,9 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,10 +38,12 @@ import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.ImagePreview;
 import com.squareup.picasso.Picasso;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyViewHolder> implements Filterable {
+    private static final int DELETE_OPTION = 1;
+    private static final int ARCHIVE_OPTION = 2;
+    private static final int UNARCHIVE_OPTION = 3;
     private static final int DESCRIPTION_MAX_LENGTH = 120;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
@@ -206,19 +206,21 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
 
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
         switch (operation) {
-            case 1:
+            case DELETE_OPTION:
                 bookmarks.removeAll(selectedBookmarks);
                 db.deleteBookmarks(selectedBookmarks);
                 notifyDataSetChanged();
                 break;
-            case 2:
+            case ARCHIVE_OPTION:
                 bookmarks.removeAll(selectedBookmarks);
                 db.archiveBookmarks(selectedBookmarks);
                 notifyDataSetChanged();
                 break;
-            case 3:
+            case UNARCHIVE_OPTION:
                 bookmarks.removeAll(selectedBookmarks);
-                db.unarchiveBookmarks(selectedBookmarks);
+                for (Bookmark bookmark: selectedBookmarks) {
+                    db.removeFromArchive(bookmark.getId());
+                }
                 notifyDataSetChanged();
                 break;
         }

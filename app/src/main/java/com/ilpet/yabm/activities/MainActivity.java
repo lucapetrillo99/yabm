@@ -514,14 +514,18 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     switch (operation) {
                         case DELETE_OPTION:
                             bookmarksAdapter.updateBookmarks(selectedBookmarks, DELETE_OPTION);
+                            setBookmarksLabel();
                             break;
                         case ARCHIVE_OPTION:
                             bookmarksAdapter.updateBookmarks(selectedBookmarks, ARCHIVE_OPTION);
+                            setBookmarksLabel();
                             break;
                         case UNARCHIVE_OPTION:
                             bookmarksAdapter.updateBookmarks(selectedBookmarks, UNARCHIVE_OPTION);
+                            setBookmarksLabel();
                             break;
                     }
+
                     Toast.makeText(getApplicationContext(), finalBookmarkMessage + finalDeletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();

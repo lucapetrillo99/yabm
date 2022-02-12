@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:cardview="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        cardview:strokeColor="?attr/strokeColor"
+        cardview:cardCornerRadius="5dp"
+        android:layout_marginStart="5dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:id="@+id/relative_layout_no_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="187dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textColor="@color/orange_dead"
+                android:textSize="17sp"
+                android:textStyle="bold">
+            </TextView>
+
+            <ImageView
+                android:id="@+id/bookmark_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_bookmark_option" />
+
+            <TextView
+                android:id="@+id/link"
+                android:layout_width="205dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="20dp"
+                android:layout_toStartOf="@+id/image"
+                android:layout_toEndOf="@+id/bar"
+                android:maxLines="1"
+                android:textSize="15sp">
+            </TextView>
+
+            <View
+                android:id="@+id/bar"
+                android:layout_marginTop="27dp"
+                android:layout_width="3dp"
+                android:layout_height="100dp"
+                android:background="?attr/strokeColor" />
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="5dp"
+                android:adjustViewBounds="true">
+            </ImageView>
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="50dp"
+                android:layout_marginEnd="10dp"
+                android:visibility="invisible">
+            </CheckBox>
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <ImageButton
+        android:id="@+id/share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:src="@drawable/ic_share">
+    </ImageButton>
+
+</LinearLayout>

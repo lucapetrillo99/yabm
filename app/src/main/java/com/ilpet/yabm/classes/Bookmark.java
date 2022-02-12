@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class Bookmark implements Serializable {
 
+    public enum ItemType {
+        SIMPLE, NO_DESCRIPTION, NO_IMAGE, NORMAL
+    }
+
     String id;
     String link;
     String title;
@@ -11,9 +15,10 @@ public class Bookmark implements Serializable {
     String image;
     String category;
     long reminder;
+    ItemType type;
 
     public Bookmark(String id, String link, String category,String title, String description,
-                    String image, long reminder) {
+                    String image, long reminder, ItemType type) {
 
         this.id = id;
         this.link = link;
@@ -22,6 +27,7 @@ public class Bookmark implements Serializable {
         this.description = description;
         this.image = image;
         this.reminder = reminder;
+        this.type = type;
     }
 
     public Bookmark() {}
@@ -80,5 +86,13 @@ public class Bookmark implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setType(ItemType type) {
+        this.type = type;
+    }
+
+    public ItemType getType() {
+        return type;
     }
 }

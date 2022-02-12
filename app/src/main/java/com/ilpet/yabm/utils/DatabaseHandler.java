@@ -32,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CATEGORY = "category";
     private static final String KEY_REMINDER = "reminder";
     private static final String KEY_PREVIOUS_CATEGORY = "prev_category";
+    private static final String KEY_TYPE = "type";
 
     private static final String KEY_NAME = "name";
 
@@ -41,7 +42,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
-            + KEY_REMINDER + " LONG,"  + KEY_PREVIOUS_CATEGORY + " TEXT,"
+            + KEY_REMINDER + " LONG,"  + KEY_PREVIOUS_CATEGORY + " TEXT," + KEY_TYPE + " TEXT,"
             + KEY_CATEGORY + " INTEGER ," + " FOREIGN KEY ("+KEY_CATEGORY+")" +
             " REFERENCES "+TABLE_CATEGORY+"("+CATEGORY_ID+"));";
 
@@ -86,6 +87,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_IMAGE, bookmark.getImage());
             values.put(KEY_CATEGORY, bookmark.getCategory());
             values.put(KEY_REMINDER, bookmark.getReminder());
+            values.put(KEY_TYPE, String.valueOf(bookmark.getType()));
             db.insert(TABLE_BOOKMARK, null, values);
             cursor.close();
             return true;
@@ -214,6 +216,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     bookmark.setImage(cursor.getString(cursor.getColumnIndexOrThrow(KEY_IMAGE)));
                     bookmark.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
                     bookmark.setReminder(cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER)));
+                    String type = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TYPE));
+                    bookmark.setType(Bookmark.ItemType.valueOf(type));
                     bookmarks.add(bookmark);
                 } while (cursor.moveToNext());
             }
@@ -275,6 +279,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     bookmark.setImage(cursor.getString(cursor.getColumnIndexOrThrow(KEY_IMAGE)));
                     bookmark.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
                     bookmark.setReminder(cursor.getLong(cursor.getColumnIndexOrThrow(KEY_REMINDER)));
+                    String type = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TYPE));
+                    bookmark.setType(Bookmark.ItemType.valueOf(type));
                     bookmarks.add(bookmark);
 
                 } while (cursor.moveToNext());
@@ -326,6 +332,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_IMAGE, bookmark.getImage());
         values.put(KEY_CATEGORY, bookmark.getCategory());
         values.put(KEY_REMINDER, bookmark.getReminder());
+        values.put(KEY_TYPE, String.valueOf(bookmark.getType()));
 
         int result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
                 new String[] { String.valueOf(bookmark.getId()) });

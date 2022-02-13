@@ -544,6 +544,15 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                         }
                                     }
                                 }
+                                if (bookmark.getDescription() == null && bookmark.getImage() == null) {
+                                    bookmark.setType(Bookmark.ItemType.SIMPLE);
+                                } else if (bookmark.getDescription() == null && bookmark.getImage() != null) {
+                                    bookmark.setType(Bookmark.ItemType.NO_DESCRIPTION);
+                                } else if (bookmark.getDescription() != null && bookmark.getImage() == null) {
+                                    bookmark.setType(Bookmark.ItemType.NO_IMAGE);
+                                } else {
+                                    bookmark.setType(Bookmark.ItemType.NORMAL);
+                                }
                                 insertBookmark();
                             } else {
                                 bookmark.setLink(link);
@@ -562,6 +571,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                         }
                                     }
                                 }
+                                bookmark.setType(Bookmark.ItemType.SIMPLE);
                                 insertBookmark();
                                 Toast.makeText(getApplicationContext(),
                                         "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
@@ -586,6 +596,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                     }
                                 }
                             }
+                            bookmark.setType(Bookmark.ItemType.SIMPLE);
                             insertBookmark();
                             Toast.makeText(getApplicationContext(),
                                     "Impossibile recuperare altre informazioni. " +

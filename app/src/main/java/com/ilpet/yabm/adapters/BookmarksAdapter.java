@@ -18,7 +18,6 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -40,207 +39,18 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyViewHolder> implements Filterable {
+public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     private static final int DELETE_OPTION = 1;
     private static final int ARCHIVE_OPTION = 2;
     private static final int UNARCHIVE_OPTION = 3;
     private static final int DESCRIPTION_MAX_LENGTH = 120;
+    private static final int SIMPLE = 0;
+    private static final int NO_DESCRIPTION = 1;
+    private static final int NO_IMAGE = 2;
+    private static final int NORMAL = 3;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
-    private DatabaseHandler db;
     private final ArrayList<Bookmark> allBookmarks;
-
-    public BookmarksAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
-        this.bookmarks = bookmarkList;
-        this.mainActivity = mainActivity;
-        this.allBookmarks = new ArrayList<>(bookmarks);
-    }
-
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView link, title, description;
-        ImageView image, options;
-        ImageButton shareButton;
-        View view;
-        CheckBox checkbox;
-        RelativeLayout relativeLayout;
-
-        public MyViewHolder(final View itemView, MainActivity mainActivity) {
-            super(itemView);
-            title = itemView.findViewById(R.id.title);
-            link = itemView.findViewById(R.id.link);
-            description = itemView.findViewById(R.id.description);
-            image = itemView.findViewById(R.id.image);
-            options = itemView.findViewById(R.id.bookmark_options);
-            checkbox = itemView.findViewById(R.id.checkbox);
-            shareButton = itemView.findViewById(R.id.share);
-            relativeLayout = itemView.findViewById(R.id.relative_layout);
-            view = itemView;
-            view.setOnLongClickListener(mainActivity);
-        }
-    }
-
-    @NonNull
-    @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.bookmark_list, parent, false);
-        db = DatabaseHandler.getInstance(mainActivity);
-        return new MyViewHolder(itemView, mainActivity);
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        String description = bookmarks.get(position).getDescription();
-        holder.title.setText(bookmarks.get(position).getTitle());
-        holder.link.setText(bookmarks.get(position).getLink());
-
-        if (mainActivity.isContextualMenuEnable) {
-            holder.checkbox.setVisibility(View.VISIBLE);
-            holder.image.setVisibility(View.INVISIBLE);
-            holder.options.setVisibility(View.INVISIBLE);
-        } else {
-            holder.checkbox.setVisibility(View.INVISIBLE);
-            holder.image.setVisibility(View.VISIBLE);
-            holder.options.setVisibility(View.VISIBLE);
-        }
-
-        if (description != null) {
-            if (description.length() > DESCRIPTION_MAX_LENGTH) {
-                description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
-            }
-            holder.description.setText(description);
-        } else {
-            holder.description.setText("");
-        }
-
-        if (bookmarks.get(position).getImage() != null) {
-            Picasso.get().load(bookmarks.get(position).getImage())
-                    .fit()
-                    .centerCrop()
-                    .into(holder.image);
-
-            holder.image.setOnClickListener(v -> {
-                ImagePreview imagePreview = ImagePreview.newInstance(bookmarks.get(position)
-                        .getImage(), bookmarks.get(position).getTitle());
-                imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
-            });
-        }
-
-        holder.options.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(mainActivity, holder.options);
-            popup.getMenuInflater().inflate(R.menu.bookmark_menu_options, popup.getMenu());
-
-            popup.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.modify_bookmark:
-                        String category = db.getCategoryById(bookmarks.get(position).getCategory());
-                        Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
-                        intent.putExtra("bookmark", bookmarks.get(position));
-                        intent.putExtra("category", category);
-                        mainActivity.startActivity(intent);
-                        mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                        break;
-                    case R.id.delete_bookmark:
-                        mainActivity.confirmDialog(bookmarks.get(position).getId(), position);
-                        break;
-                }
-                return true;
-            });
-            popup.show();
-            });
-
-        if (description != null && bookmarks.get(position).getImage() == null) {
-            holder.image.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams descriptionLayoutParams = (RelativeLayout.LayoutParams) holder.description.getLayoutParams();
-            RelativeLayout.LayoutParams titleLayoutParams = (RelativeLayout.LayoutParams) holder.title.getLayoutParams();
-            descriptionLayoutParams.height = 200;
-            descriptionLayoutParams.width = 750;
-            titleLayoutParams.width = 1000;
-            holder.description.setLayoutParams(descriptionLayoutParams);
-        } else if (description == null && bookmarks.get(position).getImage() == null) {
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.relativeLayout.getLayoutParams();
-            layoutParams.height = 250;
-            holder.relativeLayout.setLayoutParams(layoutParams);
-            RelativeLayout.LayoutParams checkboxLayout = (RelativeLayout.LayoutParams) holder.checkbox.getLayoutParams();
-            checkboxLayout.setMargins(0, 25, 10, 0);
-            holder.checkbox.setLayoutParams(checkboxLayout);
-        }
-
-        holder.title.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(bookmarks.get(position).getLink()));
-            Intent chooser = Intent.createChooser(intent, "Apri con");
-            mainActivity.startActivity(chooser);
-        });
-
-        holder.title.setOnLongClickListener(v -> {
-            showDialog(position);
-            return false;
-        });
-
-        holder.shareButton.setOnClickListener(arg0 -> {
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
-            shareIntent.setType("text/plain");
-            mainActivity.startActivity(shareIntent);
-            if (mainActivity.isContextualMenuEnable) {
-                mainActivity.removeContextualActionMode();
-            }
-        });
-
-        holder.checkbox.setOnClickListener(v -> mainActivity.makeSelection(v, position));
-
-        if (mainActivity.areAllSelected) {
-            for (int i = 0; i < bookmarks.size(); i++) {
-                holder.checkbox.setChecked(true);
-            }
-        } else {
-            for (int i = 0; i < bookmarks.size(); i++) {
-                holder.checkbox.setChecked(false);
-            }
-        }
-    }
-
-    public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
-        switch (operation) {
-            case DELETE_OPTION:
-                bookmarks.removeAll(selectedBookmarks);
-                db.deleteBookmarks(selectedBookmarks);
-                notifyDataSetChanged();
-                break;
-            case ARCHIVE_OPTION:
-                bookmarks.removeAll(selectedBookmarks);
-                db.archiveBookmarks(selectedBookmarks);
-                notifyDataSetChanged();
-                break;
-            case UNARCHIVE_OPTION:
-                bookmarks.removeAll(selectedBookmarks);
-                for (Bookmark bookmark: selectedBookmarks) {
-                    db.removeFromArchive(bookmark.getId());
-                }
-                notifyDataSetChanged();
-                break;
-        }
-    }
-
-
-    @Override
-    public int getItemCount() {
-        if (bookmarks == null) {
-            return 0;
-        } else {
-            return bookmarks.size();
-        }
-    }
-
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
-
     Filter filter = new Filter() {
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
@@ -283,6 +93,203 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
             notifyDataSetChanged();
         }
     };
+    private DatabaseHandler db;
+
+    public BookmarksAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
+        this.bookmarks = bookmarkList;
+        this.mainActivity = mainActivity;
+        this.allBookmarks = new ArrayList<>(bookmarks);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Bookmark bookmark = bookmarks.get(position);
+        if (bookmark.getType() == Bookmark.ItemType.SIMPLE) {
+            return SIMPLE;
+        } else if (bookmark.getType() == Bookmark.ItemType.NO_DESCRIPTION) {
+            return NO_DESCRIPTION;
+        } else if (bookmark.getType() == Bookmark.ItemType.NO_IMAGE) {
+            return NO_IMAGE;
+        } else if (bookmark.getType() == Bookmark.ItemType.NORMAL) {
+            return NORMAL;
+        } else {
+            return -1;
+        }
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        db = DatabaseHandler.getInstance(mainActivity);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        View view;
+        switch (viewType) {
+            case SIMPLE:
+                view = layoutInflater.inflate(R.layout.bookmark_list_simple, parent, false);
+                return new MainViewHolder(view, mainActivity);
+            case NO_DESCRIPTION:
+                view = layoutInflater.inflate(R.layout.bookmark_list_no_image, parent, false);
+                MainViewHolder mainViewHolderImage = new MainViewHolder(view, mainActivity);
+                mainViewHolderImage.setImage();
+                return mainViewHolderImage;
+            case NO_IMAGE:
+                view = layoutInflater.inflate(R.layout.bookmark_list, parent, false);
+                MainViewHolder mainViewHolderDescription = new MainViewHolder(view, mainActivity);
+                mainViewHolderDescription.setDescription();
+                return mainViewHolderDescription;
+            case NORMAL:
+                view = layoutInflater.inflate(R.layout.bookmark_list, parent, false);
+                MainViewHolder mainViewHolder = new MainViewHolder(view, mainActivity);
+                mainViewHolder.setImage();
+                mainViewHolder.setDescription();
+                return mainViewHolder;
+            default:
+                throw new IllegalStateException("Unexpected value: " + viewType);
+        }
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        setOptions((MainViewHolder) holder, position);
+        String description = bookmarks.get(position).getDescription();
+        switch (holder.getItemViewType()) {
+            case NORMAL:
+                Picasso.get().load(bookmarks.get(position).getImage())
+                        .fit()
+                        .centerCrop()
+                        .into(((MainViewHolder) holder).image);
+
+                ((MainViewHolder) holder).image.setOnClickListener(v -> {
+                    ImagePreview imagePreview = ImagePreview.newInstance(bookmarks.get(position)
+                            .getImage(), bookmarks.get(position).getTitle());
+                    imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
+                });
+
+                if (description.length() > DESCRIPTION_MAX_LENGTH) {
+                    description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
+                }
+                ((MainViewHolder) holder).description.setText(description);
+                break;
+            case NO_DESCRIPTION:
+                Picasso.get().load(bookmarks.get(position).getImage())
+                        .fit()
+                        .centerCrop()
+                        .into(((MainViewHolder) holder).image);
+                break;
+            case NO_IMAGE:
+                if (description.length() > DESCRIPTION_MAX_LENGTH) {
+                    description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
+                }
+                ((MainViewHolder) holder).description.setText(description);
+                break;
+            case SIMPLE:
+            default:
+                break;
+        }
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    private void setOptions(MainViewHolder holder, int position) {
+        holder.title.setText(bookmarks.get(position).getTitle());
+        holder.link.setText(bookmarks.get(position).getLink());
+
+        holder.title.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(bookmarks.get(position).getLink()));
+            Intent chooser = Intent.createChooser(intent, "Apri con");
+            mainActivity.startActivity(chooser);
+        });
+
+        holder.title.setOnLongClickListener(v -> {
+            showDialog(position);
+            return false;
+        });
+
+        holder.shareButton.setOnClickListener(arg0 -> {
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, bookmarks.get(position).getLink());
+            shareIntent.setType("text/plain");
+            mainActivity.startActivity(shareIntent);
+            if (mainActivity.isContextualMenuEnable) {
+                mainActivity.removeContextualActionMode();
+            }
+        });
+
+        holder.options.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(mainActivity, holder.options);
+            popup.getMenuInflater().inflate(R.menu.bookmark_menu_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.modify_bookmark:
+                        String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                        Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
+                        intent.putExtra("bookmark", bookmarks.get(position));
+                        intent.putExtra("category", category);
+                        mainActivity.startActivity(intent);
+                        mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        break;
+                    case R.id.delete_bookmark:
+                        mainActivity.confirmDialog(bookmarks.get(position).getId(), position);
+                        break;
+                }
+                return true;
+            });
+            popup.show();
+        });
+
+        holder.checkbox.setOnClickListener(v -> mainActivity.makeSelection(v, position));
+
+        if (mainActivity.areAllSelected) {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(true);
+            }
+        } else {
+            for (int i = 0; i < bookmarks.size(); i++) {
+                holder.checkbox.setChecked(false);
+            }
+        }
+    }
+
+    public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
+        switch (operation) {
+            case DELETE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                db.deleteBookmarks(selectedBookmarks);
+                notifyDataSetChanged();
+                break;
+            case ARCHIVE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                db.archiveBookmarks(selectedBookmarks);
+                notifyDataSetChanged();
+                break;
+            case UNARCHIVE_OPTION:
+                bookmarks.removeAll(selectedBookmarks);
+                for (Bookmark bookmark : selectedBookmarks) {
+                    db.removeFromArchive(bookmark.getId());
+                }
+                notifyDataSetChanged();
+                break;
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        if (bookmarks == null) {
+            return 0;
+        } else {
+            return bookmarks.size();
+        }
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
 
     public void removeBookmark(int position) {
         allBookmarks.remove(position);
@@ -318,4 +325,32 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.MyVi
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 
+    static class MainViewHolder extends RecyclerView.ViewHolder {
+        TextView link, title, description;
+        ImageView image, options;
+        ImageButton shareButton;
+        View view;
+        CheckBox checkbox;
+        RelativeLayout relativeLayout;
+
+        public MainViewHolder(@NonNull View itemView, MainActivity mainActivity) {
+            super(itemView);
+            title = itemView.findViewById(R.id.title);
+            link = itemView.findViewById(R.id.link);
+            options = itemView.findViewById(R.id.bookmark_options);
+            checkbox = itemView.findViewById(R.id.checkbox);
+            shareButton = itemView.findViewById(R.id.share);
+            relativeLayout = itemView.findViewById(R.id.relative_layout);
+            view = itemView;
+            view.setOnLongClickListener(mainActivity);
+        }
+
+        public void setDescription() {
+            description = view.findViewById(R.id.description);
+        }
+
+        public void setImage() {
+            image = view.findViewById(R.id.image);
+        }
+    }
 }

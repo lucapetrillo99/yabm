@@ -209,6 +209,15 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                                         bookmark.setDescription(descriptions.toArray()[descriptionCounter].toString());
                                     }
                                 }
+                                if (bookmark.getDescription() == null && bookmark.getImage() == null) {
+                                    bookmark.setType(Bookmark.ItemType.SIMPLE);
+                                } else if (bookmark.getDescription() == null && bookmark.getImage() != null) {
+                                    bookmark.setType(Bookmark.ItemType.NO_DESCRIPTION);
+                                } else if (bookmark.getDescription() != null && bookmark.getImage() == null) {
+                                    bookmark.setType(Bookmark.ItemType.NO_IMAGE);
+                                } else {
+                                    bookmark.setType(Bookmark.ItemType.NORMAL);
+                                }
                                 bookmark.setLink(link);
                                 bookmark.setCategory(categoryId);
                                 bookmark.setReminder(ALARM_START_TIME);

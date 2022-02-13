@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -125,7 +126,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
                 });
 
-                if (((MainViewHolder) holder).description.length() > DESCRIPTION_MAX_LENGTH) {
+                if (description.length() > DESCRIPTION_MAX_LENGTH) {
                     description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
                 }
                 ((MainViewHolder) holder).description.setText(description);
@@ -137,8 +138,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         .into(((MainViewHolder) holder).image);
                 break;
             case NO_IMAGE:
-                description = bookmarks.get(position).getDescription();
-                if (((MainViewHolder) holder).description.length() > DESCRIPTION_MAX_LENGTH) {
+                if (description.length() > DESCRIPTION_MAX_LENGTH) {
                     description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
                 }
                 ((MainViewHolder) holder).description.setText(description);

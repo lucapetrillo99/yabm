@@ -14,17 +14,12 @@ import com.ilpet.yabm.classes.Category;
 import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private final Context context;
-    private static DatabaseHandler instance;
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "yabm";
-
     private static final String TABLE_BOOKMARK = "bookmark";
     private static final String TABLE_CATEGORY = "category";
-
     private static final String BOOKMARK_ID = "bookmark_id";
     private static final String CATEGORY_ID = "category_id";
-
     private static final String KEY_LINK = "link";
     private static final String KEY_TITLE = "title";
     private static final String KEY_DESCRIPTION = "description";
@@ -33,28 +28,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_REMINDER = "reminder";
     private static final String KEY_PREVIOUS_CATEGORY = "prev_category";
     private static final String KEY_TYPE = "type";
-
     private static final String KEY_NAME = "name";
-
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
             + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT)";
-
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
-            + KEY_REMINDER + " LONG,"  + KEY_PREVIOUS_CATEGORY + " TEXT," + KEY_TYPE + " TEXT,"
-            + KEY_CATEGORY + " INTEGER ," + " FOREIGN KEY ("+KEY_CATEGORY+")" +
-            " REFERENCES "+TABLE_CATEGORY+"("+CATEGORY_ID+"));";
+            + KEY_REMINDER + " LONG," + KEY_PREVIOUS_CATEGORY + " TEXT," + KEY_TYPE + " TEXT,"
+            + KEY_CATEGORY + " INTEGER ," + " FOREIGN KEY (" + KEY_CATEGORY + ")" +
+            " REFERENCES " + TABLE_CATEGORY + "(" + CATEGORY_ID + "));";
+    private static DatabaseHandler instance;
+    private final Context context;
+
+    public DatabaseHandler(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context.getApplicationContext();
+    }
 
     public static synchronized DatabaseHandler getInstance(Context context) {
         if (instance == null)
             instance = new DatabaseHandler(context.getApplicationContext());
         return instance;
-    }
-
-    public DatabaseHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -124,7 +118,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_CATEGORY, id);
             values.put(KEY_PREVIOUS_CATEGORY, category);
             result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
-                    new String[] { bookmarkId });
+                    new String[]{bookmarkId});
 
         } else {
             return false;
@@ -145,7 +139,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_CATEGORY, id);
             values.put(KEY_PREVIOUS_CATEGORY, (byte[]) null);
             result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
-                    new String[] { bookmarkId });
+                    new String[]{bookmarkId});
 
         } else {
             return false;
@@ -264,7 +258,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
                 " where " + KEY_NAME + " = ?", new String[]{category});
 
-        if (c.moveToFirst()){
+        if (c.moveToFirst()) {
             String id = c.getString(c.getColumnIndexOrThrow(CATEGORY_ID));
             Cursor cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where "
                     + KEY_CATEGORY + " = ?", new String[]{id});
@@ -303,7 +297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle());
 
-        for (Bookmark bookmark: bookmarks) {
+        for (Bookmark bookmark : bookmarks) {
             deleteBookmark(bookmark.getId());
         }
         return db.delete(TABLE_CATEGORY, CATEGORY_ID + " = ?",
@@ -317,7 +311,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
-                new String[] { category.getCategoryId() });
+                new String[]{category.getCategoryId()});
 
         return result == 1;
     }
@@ -335,7 +329,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_TYPE, String.valueOf(bookmark.getType()));
 
         int result = db.update(TABLE_BOOKMARK, values, BOOKMARK_ID + " = ?",
-                new String[] { String.valueOf(bookmark.getId()) });
+                new String[]{String.valueOf(bookmark.getId())});
 
         return result == 1;
     }
@@ -347,12 +341,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void deleteBookmarks(ArrayList<Bookmark> bookmarks) {
         SQLiteDatabase db = this.getWritableDatabase();
         String[] whereArgs = new String[bookmarks.size()];
-        for (int i = 0; i < bookmarks.size(); i ++) {
+        for (int i = 0; i < bookmarks.size(); i++) {
             whereArgs[i] = bookmarks.get(i).getId();
         }
 
         String args = TextUtils.join(", ", whereArgs);
-        db.execSQL(String.format("DELETE FROM " + TABLE_BOOKMARK +  " WHERE " + BOOKMARK_ID +
+        db.execSQL(String.format("DELETE FROM " + TABLE_BOOKMARK + " WHERE " + BOOKMARK_ID +
                 " IN (%s);", args));
     }
 
@@ -360,13 +354,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String id = bookmarks.get(0).getCategory();
         SQLiteDatabase db = this.getWritableDatabase();
         String[] whereArgs = new String[bookmarks.size()];
-        for (int i = 0; i < bookmarks.size(); i ++) {
+        for (int i = 0; i < bookmarks.size(); i++) {
             whereArgs[i] = bookmarks.get(i).getId();
         }
 
         String args = TextUtils.join(", ", whereArgs);
 
-        db.execSQL(String.format("UPDATE %s SET %s =" +  2 + ", %s = " + id + " WHERE %s IN (%s);",
+        db.execSQL(String.format("UPDATE %s SET %s =" + 2 + ", %s = " + id + " WHERE %s IN (%s);",
                 TABLE_BOOKMARK, KEY_CATEGORY, KEY_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
     }
 }

@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,8 +50,50 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private static final int NORMAL = 3;
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
-    private DatabaseHandler db;
     private final ArrayList<Bookmark> allBookmarks;
+    Filter filter = new Filter() {
+        @Override
+        protected Filter.FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<Bookmark> filteredBookmarks = new ArrayList<>();
+
+            if (constraint.toString().isEmpty()) {
+                filteredBookmarks.addAll(allBookmarks);
+            } else {
+                for (Bookmark bookmark : allBookmarks) {
+                    if (bookmark.getTitle() == null) {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
+                    } else if (bookmark.getDescription() == null) {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
+                    } else {
+                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
+                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredBookmarks.add(bookmark);
+                        }
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredBookmarks;
+
+            return filterResults;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            bookmarks.clear();
+            bookmarks.addAll((ArrayList<Bookmark>) results.values);
+            notifyDataSetChanged();
+        }
+    };
+    private DatabaseHandler db;
 
     public BookmarksAdapter(ArrayList<Bookmark> bookmarkList, MainActivity mainActivity) {
         this.bookmarks = bookmarkList;
@@ -67,7 +108,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             return SIMPLE;
         } else if (bookmark.getType() == Bookmark.ItemType.NO_DESCRIPTION) {
             return NO_DESCRIPTION;
-        }  else if (bookmark.getType() == Bookmark.ItemType.NO_IMAGE) {
+        } else if (bookmark.getType() == Bookmark.ItemType.NO_IMAGE) {
             return NO_IMAGE;
         } else if (bookmark.getType() == Bookmark.ItemType.NORMAL) {
             return NORMAL;
@@ -214,8 +255,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-
-
     public void updateBookmarks(ArrayList<Bookmark> selectedBookmarks, int operation) {
         switch (operation) {
             case DELETE_OPTION:
@@ -230,14 +269,13 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 break;
             case UNARCHIVE_OPTION:
                 bookmarks.removeAll(selectedBookmarks);
-                for (Bookmark bookmark: selectedBookmarks) {
+                for (Bookmark bookmark : selectedBookmarks) {
                     db.removeFromArchive(bookmark.getId());
                 }
                 notifyDataSetChanged();
                 break;
         }
     }
-
 
     @Override
     public int getItemCount() {
@@ -252,49 +290,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public Filter getFilter() {
         return filter;
     }
-
-    Filter filter = new Filter() {
-        @Override
-        protected Filter.FilterResults performFiltering(CharSequence constraint) {
-            ArrayList<Bookmark> filteredBookmarks = new ArrayList<>();
-
-            if (constraint.toString().isEmpty()) {
-                filteredBookmarks.addAll(allBookmarks);
-            } else {
-                for (Bookmark bookmark : allBookmarks) {
-                    if (bookmark.getTitle() == null) {
-                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
-                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                            filteredBookmarks.add(bookmark);
-                        }
-                    } else if (bookmark.getDescription() == null) {
-                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
-                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                            filteredBookmarks.add(bookmark);
-                        }
-                    } else {
-                        if (bookmark.getLink().toLowerCase().contains(constraint.toString().toLowerCase())
-                                || bookmark.getTitle().toLowerCase().contains(constraint.toString().toLowerCase())
-                                || bookmark.getDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                            filteredBookmarks.add(bookmark);
-                        }
-                    }
-                }
-            }
-            FilterResults filterResults = new FilterResults();
-            filterResults.values = filteredBookmarks;
-
-            return filterResults;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            bookmarks.clear();
-            bookmarks.addAll((ArrayList<Bookmark>) results.values);
-            notifyDataSetChanged();
-        }
-    };
 
     public void removeBookmark(int position) {
         allBookmarks.remove(position);
@@ -331,12 +326,13 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
-        TextView link, title,description;
+        TextView link, title, description;
         ImageView image, options;
         ImageButton shareButton;
         View view;
         CheckBox checkbox;
         RelativeLayout relativeLayout;
+
         public MainViewHolder(@NonNull View itemView, MainActivity mainActivity) {
             super(itemView);
             title = itemView.findViewById(R.id.title);

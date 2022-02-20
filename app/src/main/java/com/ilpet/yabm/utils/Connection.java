@@ -20,14 +20,15 @@ public class Connection implements Runnable {
     private final String url;
     private final String title;
     private final Boolean isEditMode;
-    private final Bookmark bookmark = new Bookmark();
+    private final Bookmark bookmark;
     private final Context context;
 
-    public Connection(String url, String title, Boolean isEditMode, Context context) {
+    public Connection(String url, String title, Boolean isEditMode, Context context, Bookmark bookmark) {
         this.url = url;
         this.title = title;
         this.isEditMode = isEditMode;
         this.context = context;
+        this.bookmark = bookmark;
     }
 
     @Override
@@ -71,8 +72,7 @@ public class Connection implements Runnable {
                 } else {
                     if (bookmark.getTitle() == null && title.isEmpty()) {
                         bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    } else if (!title.isEmpty()) {
-                        assert bookmark.getTitle() != null;
+                    } else if (!title.isEmpty() && bookmark.getTitle() != null) {
                         if (!bookmark.getTitle().equals(title)) {
                             bookmark.setTitle(title);
                         }
@@ -96,8 +96,7 @@ public class Connection implements Runnable {
                 } else {
                     if (bookmark.getTitle() == null && title.isEmpty()) {
                         bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    } else if (!title.isEmpty()) {
-                        assert bookmark.getTitle() != null;
+                    } else if (!title.isEmpty() && bookmark.getTitle() != null) {
                         if (!bookmark.getTitle().equals(title)) {
                             bookmark.setTitle(title);
                         }
@@ -117,8 +116,7 @@ public class Connection implements Runnable {
             } else {
                 if (bookmark.getTitle() == null && title.isEmpty()) {
                     bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                } else if (!title.isEmpty()) {
-                    assert bookmark.getTitle() != null;
+                } else if (!title.isEmpty() && bookmark.getTitle() != null) {
                     if (!bookmark.getTitle().equals(title)) {
                         bookmark.setTitle(title);
                     }

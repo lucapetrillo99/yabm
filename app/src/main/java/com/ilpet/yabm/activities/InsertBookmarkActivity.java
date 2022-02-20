@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -39,7 +40,6 @@ import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,6 +64,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private long alarmStartTime = -1;
     private boolean setRemainder = false;
     private boolean isEditMode = false;
+    private LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         bookmark = new Bookmark();
         categories = db.getCategories();
         ArrayList<String> filteredCategories = new ArrayList<>();
+        loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -438,20 +440,22 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
     private void confirmDialog(String link, String categoryId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
+        Handler handler = new Handler();
         if (isEditMode) {
             builder.setMessage("Sei sicuro di voler modificare il segnalibro?")
                     .setCancelable(false)
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                    .setPositiveButton("Sì", (dialogInterface, i) -> getBookmarkInformation(link, categoryId));
+                    .setPositiveButton("Sì", (dialogInterface, i) -> {
+                        loadingDialog.startLoading();
+                        handler.postDelayed(() -> getBookmarkInformation(link, categoryId), 2);
+                    });
         } else {
             builder.setMessage("Sei sicuro di voler inserire il segnalibro?")
                     .setCancelable(false)
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                     .setPositiveButton("Sì", (dialogInterface, i) -> {
-                        LoadingDialog loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
                         loadingDialog.startLoading();
-                        getBookmarkInformation(link, categoryId);
+                        handler.postDelayed(() -> getBookmarkInformation(link, categoryId), 2);
                     });
         }
 
@@ -488,12 +492,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         if (isEditMode) {
             bookmark.setImage(null);
         }
-        Connection connection = new Connection(link, title.getText().toString(), isEditMode, getApplicationContext());
+        Connection connection = new Connection(link, title.getText().toString(), isEditMode, getApplicationContext(), bookmark);
         Thread thread = new Thread(connection);
         thread.start();
         try {
             thread.join();
+            loadingDialog.dismissLoading();
         } catch (InterruptedException e) {
+            loadingDialog.dismissLoading();
             Toast.makeText(getApplicationContext(),
                     "Qualcosa è andato storto. Riprova più tardi", Toast.LENGTH_LONG)
                     .show();
@@ -508,7 +514,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         Intent intent = new Intent(InsertBookmarkActivity.this, AlarmReceiver.class);
         int notificationId = (int) SystemClock.uptimeMillis();
         Bundle args = new Bundle();
-        args.putSerializable("bookmark",(Serializable) bookmark);
+        args.putSerializable("bookmark", bookmark);
         intent.putExtra("data", args);
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("category", category);

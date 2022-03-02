@@ -30,6 +30,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ilpet.yabm.R;
@@ -92,7 +96,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         categories = db.getCategories();
         ArrayList<String> filteredCategories = new ArrayList<>();
         loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
-
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
@@ -229,8 +232,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
-                        boolean result = db.addCategory(category);
-                        if (result) {
+                        String result = db.addCategory(category);
+                        if (result != null) {
                             categories.add(category);
                             filteredCategories.add(category.getCategoryTitle());
                             dialog.dismiss();
@@ -447,7 +450,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                     .setPositiveButton("Sì", (dialogInterface, i) -> {
                         loadingDialog.startLoading();
-                        handler.postDelayed(() -> getBookmarkInformation(link, categoryId), 2);
+                        getBookmarkInformation(link, categoryId);
+                        handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
                     });
         } else {
             builder.setMessage("Sei sicuro di voler inserire il segnalibro?")
@@ -455,7 +459,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                     .setPositiveButton("Sì", (dialogInterface, i) -> {
                         loadingDialog.startLoading();
-                        handler.postDelayed(() -> getBookmarkInformation(link, categoryId), 2);
+                        getBookmarkInformation(link, categoryId);
+                        handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
                     });
         }
 
@@ -492,22 +497,45 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         if (isEditMode) {
             bookmark.setImage(null);
         }
-        Connection connection = new Connection(link, title.getText().toString(), isEditMode, getApplicationContext(), bookmark);
-        Thread thread = new Thread(connection);
-        thread.start();
-        try {
-            thread.join();
-            loadingDialog.dismissLoading();
-        } catch (InterruptedException e) {
-            loadingDialog.dismissLoading();
-            Toast.makeText(getApplicationContext(),
-                    "Qualcosa è andato storto. Riprova più tardi", Toast.LENGTH_LONG)
-                    .show();
-        }
-        bookmark = connection.getBookmark();
-        bookmark.setCategory(categoryId);
-        bookmark.setReminder(alarmStartTime);
-        insertBookmark();
+
+        Data data = new Data.Builder()
+                .putString("link", String.valueOf(link))
+                .build();
+
+        WorkRequest workRequest =
+                new OneTimeWorkRequest.Builder(Connection.class)
+                        .setInputData(data)
+                        .build();
+
+        WorkManager.getInstance(this).enqueue(workRequest);
+
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(workRequest.getId())
+                .observe(this, info -> {
+                    if (info != null && info.getState().isFinished()) {
+                        bookmark.setLink(link);
+                        bookmark.setReminder(alarmStartTime);
+                        bookmark.setCategory(categoryId);
+                        String titleText = info.getOutputData().getString("title");
+
+                        if (isEditMode) {
+                            if (!title.getText().toString().isEmpty()) {
+                                if (!bookmark.getTitle().equals(title.getText().toString())) {
+                                    bookmark.setTitle(title.getText().toString());
+                                }
+                            }
+                        } else {
+                            if (title.getText().toString().isEmpty()) {
+                                bookmark.setTitle(titleText);
+                            } else {
+                                bookmark.setTitle(title.getText().toString());
+                            }
+                        }
+                        bookmark.setImage(info.getOutputData().getString("image"));
+                        bookmark.setDescription(info.getOutputData().getString("description"));
+                        bookmark.setType(Bookmark.ItemType.valueOf(info.getOutputData().getString("itemType")));
+                        insertBookmark();
+                    }
+                });
     }
 
     private void setReminder() {

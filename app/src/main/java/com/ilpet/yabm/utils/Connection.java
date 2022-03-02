@@ -1,7 +1,11 @@
 package com.ilpet.yabm.utils;
 
 import android.content.Context;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.ilpet.yabm.classes.Bookmark;
 
@@ -15,26 +19,21 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Connection implements Runnable {
+public class Connection extends Worker {
     private static final String REGEX = "^(([^:/?#]+):)?(//([^/?#]*))?";
-    private final String url;
-    private final String title;
-    private final Boolean isEditMode;
-    private final Bookmark bookmark;
-    private final Context context;
 
-    public Connection(String url, String title, Boolean isEditMode, Context context, Bookmark bookmark) {
-        this.url = url;
-        this.title = title;
-        this.isEditMode = isEditMode;
-        this.context = context;
-        this.bookmark = bookmark;
+    public Connection(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
+    @NonNull
     @Override
-    public void run() {
+    public Result doWork() {
+        Data data = getInputData();
+        String link = data.getString("link");
+        String image = null, description = null, title = null, itemType = "vuoto";
         try {
-            Document document = Jsoup.connect(url).get();
+            Document document = Jsoup.connect(link).get();
             if (document != null) {
                 Elements metaTags = document.getElementsByTag("meta");
                 for (Element element : metaTags) {
@@ -43,95 +42,42 @@ public class Connection implements Runnable {
                         Matcher matcher = pattern.matcher(element.attr("content"));
                         if (matcher.find()) {
                             if (!Objects.equals(matcher.group(0), "")) {
-                                bookmark.setImage(element.attr("content"));
+                                image = element.attr("content");
                             } else {
-                                bookmark.setImage(matcher.group(0) + element.attr("content"));
+                                image = matcher.group(0) + element.attr("content");
                             }
                         }
                     } else if (element.attr("property").equals("og:site_name")) {
-                        if (!isEditMode) {
-                            if (title.isEmpty()) {
-                                bookmark.setTitle(element.attr("content"));
-                            } else {
-                                bookmark.setTitle(title);
-                            }
-                        } else {
-                            if (title.isEmpty()) {
-                                bookmark.setTitle(element.attr("content"));
-                            }
-                        }
+                        title = element.attr("content");
                     } else if (element.attr("name").equals("description")) {
-                        bookmark.setDescription(element.attr("content"));
+                        description = element.attr("content");
                     }
                 }
-                bookmark.setLink(url);
-                if (!isEditMode) {
-                    if (bookmark.getTitle() == null && title.isEmpty()) {
-                        bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    }
+                if (title == null) {
+                    assert link != null;
+                    title = link.split("//")[1].split("/")[0];
+                }
+                if (description == null && image == null) {
+                    itemType = String.valueOf(Bookmark.ItemType.SIMPLE);
+                } else if (description == null) {
+                    itemType = String.valueOf(Bookmark.ItemType.NO_DESCRIPTION);
+                } else if (image == null) {
+                    itemType = String.valueOf(Bookmark.ItemType.NO_IMAGE);
                 } else {
-                    if (bookmark.getTitle() == null && title.isEmpty()) {
-                        bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    } else if (!title.isEmpty() && bookmark.getTitle() != null) {
-                        if (!bookmark.getTitle().equals(title)) {
-                            bookmark.setTitle(title);
-                        }
-                    }
+                    itemType = String.valueOf(Bookmark.ItemType.NORMAL);
                 }
-                if (bookmark.getDescription() == null && bookmark.getImage() == null) {
-                    bookmark.setType(Bookmark.ItemType.SIMPLE);
-                } else if (bookmark.getDescription() == null && bookmark.getImage() != null) {
-                    bookmark.setType(Bookmark.ItemType.NO_DESCRIPTION);
-                } else if (bookmark.getDescription() != null && bookmark.getImage() == null) {
-                    bookmark.setType(Bookmark.ItemType.NO_IMAGE);
-                } else {
-                    bookmark.setType(Bookmark.ItemType.NORMAL);
-                }
-            } else {
-                bookmark.setLink(url);
-                if (!isEditMode) {
-                    if (bookmark.getTitle() == null && title.isEmpty()) {
-                        bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    }
-                } else {
-                    if (bookmark.getTitle() == null && title.isEmpty()) {
-                        bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                    } else if (!title.isEmpty() && bookmark.getTitle() != null) {
-                        if (!bookmark.getTitle().equals(title)) {
-                            bookmark.setTitle(title);
-                        }
-                    }
-                }
-                bookmark.setType(Bookmark.ItemType.SIMPLE);
-                Toast.makeText(context,
-                        "Non è possibile recuperare le informazioni per questo link!", Toast.LENGTH_LONG)
-                        .show();
             }
         } catch (IOException e) {
-            bookmark.setLink(url);
-            if (!isEditMode) {
-                if (bookmark.getTitle() == null && title.isEmpty()) {
-                    bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                }
-            } else {
-                if (bookmark.getTitle() == null && title.isEmpty()) {
-                    bookmark.setTitle(url.split("//")[1].split("/")[0]);
-                } else if (!title.isEmpty() && bookmark.getTitle() != null) {
-                    if (!bookmark.getTitle().equals(title)) {
-                        bookmark.setTitle(title);
-                    }
-                }
-            }
-            bookmark.setType(Bookmark.ItemType.SIMPLE);
-            Toast.makeText(context,
-                    "Impossibile recuperare altre informazioni. " +
-                            "\nRiprova più tardi", Toast.LENGTH_LONG)
-                    .show();
+            return Result.failure();
         }
-    }
 
-    public Bookmark getBookmark() {
-        return bookmark;
-    }
+        Data result = new Data.Builder()
+                .putString("image", image)
+                .putString("title", title)
+                .putString("description", description)
+                .putString("itemType", itemType)
+                .build();
 
+        return Result.success(result);
+    }
 }

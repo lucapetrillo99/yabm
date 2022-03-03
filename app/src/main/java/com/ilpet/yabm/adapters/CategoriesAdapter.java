@@ -166,8 +166,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
-                        boolean result = db.addCategory(category);
-                        if (result) {
+                        String result = db.addCategory(category);
+                        if (result != null) {
                             dialog.dismiss();
                             categories.add(category);
                             notifyItemInserted(getItemCount());

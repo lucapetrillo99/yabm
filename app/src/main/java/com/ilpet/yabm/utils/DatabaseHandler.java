@@ -88,22 +88,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addCategory(Category category) {
+    public String addCategory(Category category) {
+        String categoryId = null;
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
                 + KEY_NAME + " = ?", new String[]{category.getCategoryTitle()});
 
-        if (cursor.moveToFirst()) {
-            return false;
-        } else {
+        if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, category.getCategoryTitle());
-            db.insert(TABLE_CATEGORY, null, values);
+            categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
-            return true;
         }
 
+        return categoryId;
     }
 
     public boolean addToArchive(String bookmarkId, String category) {

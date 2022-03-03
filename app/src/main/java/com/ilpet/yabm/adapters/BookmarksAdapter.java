@@ -128,12 +128,12 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 view = layoutInflater.inflate(R.layout.bookmark_list_simple, parent, false);
                 return new MainViewHolder(view, mainActivity);
             case NO_DESCRIPTION:
-                view = layoutInflater.inflate(R.layout.bookmark_list_no_image, parent, false);
+                view = layoutInflater.inflate(R.layout.bookmark_list_no_description, parent, false);
                 MainViewHolder mainViewHolderImage = new MainViewHolder(view, mainActivity);
                 mainViewHolderImage.setImage();
                 return mainViewHolderImage;
             case NO_IMAGE:
-                view = layoutInflater.inflate(R.layout.bookmark_list, parent, false);
+                view = layoutInflater.inflate(R.layout.bookmark_list_no_image, parent, false);
                 MainViewHolder mainViewHolderDescription = new MainViewHolder(view, mainActivity);
                 mainViewHolderDescription.setDescription();
                 return mainViewHolderDescription;

@@ -12,8 +12,8 @@ import com.ilpet.yabm.R;
 
 public class LoadingDialog {
 
-    Activity activity;
-    AlertDialog dialog;
+    private final Activity activity;
+    private AlertDialog dialog;
 
     public LoadingDialog (Activity activity) {
         this.activity = activity;

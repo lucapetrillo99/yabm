@@ -22,9 +22,10 @@
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="187dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
+                android:layout_marginEnd="35dp"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:textColor="@color/orange_dead"

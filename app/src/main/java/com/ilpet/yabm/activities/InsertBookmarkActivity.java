@@ -203,7 +203,25 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     fab.setEnabled(true);
                 } else {
                     fab.setEnabled(false);
-                    link.setError("Link non valido");
+                    link.setError(getString(R.string.invalid_link));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        title.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (title.getText().toString().length() >= 30) {
+                    title.setError(getString(R.string.max_title));
                 }
             }
 

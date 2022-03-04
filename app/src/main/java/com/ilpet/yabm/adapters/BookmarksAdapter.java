@@ -51,6 +51,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
     private final ArrayList<Bookmark> allBookmarks;
+
     Filter filter = new Filter() {
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
@@ -161,6 +162,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         .centerCrop()
                         .into(((MainViewHolder) holder).image);
 
+
                 ((MainViewHolder) holder).image.setOnClickListener(v -> {
                     ImagePreview imagePreview = ImagePreview.newInstance(bookmarks.get(position)
                             .getImage(), bookmarks.get(position).getTitle());
@@ -171,20 +173,25 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
                 }
                 ((MainViewHolder) holder).description.setText(description);
+
+                setCheckbox((MainViewHolder) holder, NORMAL);
                 break;
             case NO_DESCRIPTION:
                 Picasso.get().load(bookmarks.get(position).getImage())
                         .fit()
                         .centerCrop()
                         .into(((MainViewHolder) holder).image);
+                setCheckbox((MainViewHolder) holder, NO_DESCRIPTION);
                 break;
             case NO_IMAGE:
                 if (description.length() > DESCRIPTION_MAX_LENGTH) {
                     description = description.substring(0, DESCRIPTION_MAX_LENGTH) + "...";
                 }
                 ((MainViewHolder) holder).description.setText(description);
+                setCheckbox((MainViewHolder) holder, NO_IMAGE);
                 break;
             case SIMPLE:
+                setCheckbox((MainViewHolder) holder, SIMPLE);
             default:
                 break;
         }
@@ -295,7 +302,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         allBookmarks.remove(position);
     }
 
-    public void showDialog(int position) {
+    private void showDialog(int position) {
         final Dialog dialog = new Dialog(mainActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.link_actions_dialog);
@@ -325,6 +332,44 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 
+    private void setCheckbox(MainViewHolder holder, int itemType) {
+        switch (itemType) {
+            case NORMAL:
+            case NO_DESCRIPTION:
+                if (mainActivity.isContextualMenuEnable) {
+                    holder.checkbox.setVisibility(View.VISIBLE);
+                    holder.image.setVisibility(View.INVISIBLE);
+                    holder.options.setVisibility(View.INVISIBLE);
+                } else {
+                    holder.checkbox.setVisibility(View.INVISIBLE);
+                    holder.image.setVisibility(View.VISIBLE);
+                    holder.options.setVisibility(View.VISIBLE);
+                }
+                break;
+            case NO_IMAGE:
+                if (mainActivity.isContextualMenuEnable) {
+                    holder.checkbox.setVisibility(View.VISIBLE);
+                    holder.description.setVisibility(View.INVISIBLE);
+                    holder.options.setVisibility(View.INVISIBLE);
+                } else {
+                    holder.checkbox.setVisibility(View.INVISIBLE);
+                    holder.description.setVisibility(View.VISIBLE);
+                    holder.options.setVisibility(View.VISIBLE);
+                }
+                break;
+            case SIMPLE:
+                if (mainActivity.isContextualMenuEnable) {
+                    holder.checkbox.setVisibility(View.VISIBLE);
+                    holder.options.setVisibility(View.INVISIBLE);
+                } else {
+                    holder.checkbox.setVisibility(View.INVISIBLE);
+                    holder.options.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+
+    }
+
     static class MainViewHolder extends RecyclerView.ViewHolder {
         TextView link, title, description;
         ImageView image, options;
@@ -333,7 +378,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         CheckBox checkbox;
         RelativeLayout relativeLayout;
 
-        public MainViewHolder(@NonNull View itemView, MainActivity mainActivity) {
+        private MainViewHolder(@NonNull View itemView, MainActivity mainActivity) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             link = itemView.findViewById(R.id.link);
@@ -345,11 +390,11 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             view.setOnLongClickListener(mainActivity);
         }
 
-        public void setDescription() {
+        private void setDescription() {
             description = view.findViewById(R.id.description);
         }
 
-        public void setImage() {
+        private void setImage() {
             image = view.findViewById(R.id.image);
         }
     }

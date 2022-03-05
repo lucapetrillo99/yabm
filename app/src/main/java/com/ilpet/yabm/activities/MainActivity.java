@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,11 +35,11 @@ import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.ImagePreview;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -150,8 +151,30 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 popup.setForceShowIcon(true);
             }
-
             popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.date_ascending:
+                        Collections.sort(bookmarks, Bookmark.DateAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.date_descending:
+                        Collections.sort(bookmarks, Bookmark.DateDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_ascending:
+                        Collections.sort(bookmarks, Bookmark.TitleAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_descending:
+                        Collections.sort(bookmarks, Bookmark.TitleDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                }
                 return true;
             });
             popup.show();

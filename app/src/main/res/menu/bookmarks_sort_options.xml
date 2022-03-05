@@ -12,12 +12,12 @@
             android:title="@string/descending_date_sort" />
 
         <item
-            android:id="@+id/name_ascending"
+            android:id="@+id/title_ascending"
             android:icon="@drawable/ic_name_sort"
             android:title="@string/ascending_name_sort" />
 
         <item
-            android:id="@+id/name_descending"
+            android:id="@+id/title_descending"
             android:icon="@drawable/ic_name_sort"
             android:title="@string/descending_name_sort" />
     </group>

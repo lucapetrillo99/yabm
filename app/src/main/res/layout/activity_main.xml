@@ -14,11 +14,22 @@
             layout="@layout/toolbar">
         </include>
 
+        <ImageView
+            android:id="@+id/bookmark_options_sort"
+            android:layout_below="@+id/toolbar"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_sort" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="80dp"
+            android:layout_below="@+id/bookmark_options_sort"
             android:layout_marginBottom="40dp"/>
 
         <LinearLayout
@@ -45,12 +56,12 @@
 
         <TextView
             android:id="@+id/no_bookmarks"
-            android:layout_marginTop="80dp"
-            android:text="@string/no_bookmarks"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="80dp"
             android:gravity="center"
+            android:text="@string/no_bookmarks"
             android:textAlignment="center"
             android:visibility="invisible" />
 

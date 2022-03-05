@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.ImagePreview;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private TextView toolbarTitle;
     private DrawerLayout drawerLayout;
     private TextView noBookmarks;
+    private ImageView sortOptions;
     private FloatingActionButton fab;
     private ArrayList<Category> categories;
     private ArrayList<Bookmark> archivedUrl;
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
         }
+        sortOptions = findViewById(R.id.bookmark_options_sort);
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -133,6 +139,23 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         });
         setBookmarksLabel();
+        setSortOptions();
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    private void setSortOptions() {
+        sortOptions.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(this, sortOptions);
+            popup.getMenuInflater().inflate(R.menu.bookmarks_sort_options, popup.getMenu());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                popup.setForceShowIcon(true);
+            }
+
+            popup.setOnMenuItemClickListener(item -> {
+                return true;
+            });
+            popup.show();
+        });
     }
 
     private void setAdapter() {

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private static final int ARCHIVE_OPTION = 2;
     private static final int UNARCHIVE_OPTION = 3;
     private static final String CATEGORY = "category";
+    public boolean isContextualMenuEnable = false;
+    public boolean areAllSelected = false;
+    public boolean isArchiveModeEnabled = false;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
@@ -65,17 +67,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private ArrayList<Bookmark> selectedBookmarks;
     private int counter = 0;
     private String previousCategory;
-    public boolean isContextualMenuEnable = false;
-    public boolean areAllSelected = false;
-    public boolean isArchiveModeEnabled = false;
     private boolean refreshCategories = false;
+    private SettingsManager settingsManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = DatabaseHandler.getInstance(getApplicationContext());
-        SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
+        settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
         String result = settingsManager.getCategory();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
@@ -114,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if (result.equals(getString(R.string.all_bookmarks_title))) {
-            bookmarks = new ArrayList<>(db.getAllBookmarks());
+            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
         } else {
-            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result));
+            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
         }
         toolbarTitle.setText(result);
         previousCategory = result;
@@ -231,11 +231,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     if (!queryTextFocused) {
                         if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
-                            bookmarks = db.getAllBookmarks();
+                            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                             setAdapter();
                         } else {
                             bookmarks.clear();
-                            bookmarks = db.getBookmarksByCategory(previousCategory);
+                            bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                             setAdapter();
                         }
                     }
@@ -400,13 +400,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String result = db.getCategoryId(previousCategory);
             if (result != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks();
+                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(previousCategory);
+                    bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks();
+                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
             }
         } else {
             SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
@@ -414,13 +414,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String category = db.getCategoryId(previousCategory);
             if (category != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks();
+                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(result);
+                    bookmarks = db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks();
+                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
             }
         }
         categories.clear();
@@ -597,7 +597,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getAllBookmarks();
+            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
         } else {
             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
                 isArchiveModeEnabled = true;
@@ -611,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getBookmarksByCategory(categoryName);
+            bookmarks = db.getBookmarksByCategory(categoryName, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
         }
         setAdapter();
         drawerLayout.closeDrawers();

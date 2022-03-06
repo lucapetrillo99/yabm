@@ -13,9 +13,14 @@ public class SettingsManager {
     private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FIRST_ACCESS = "first_access";
     private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
+    private static final String SORT_ORDER_BY = "sort_order_by";
+    private static final String SORT_ORDER_TYPE = "sort_order_type";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
+    public enum SortOrder {
+        date, title, ASC, DESC
+    }
 
     public SettingsManager(Context context, String setting) {
         this.settingsManager = context.getSharedPreferences(setting, Context.MODE_PRIVATE);
@@ -80,5 +85,25 @@ public class SettingsManager {
 
     public String getAutoBackupUri() {
         return settingsManager.getString(AUTO_BACKUP_URI, null);
+    }
+
+    public void setSortOrderBy(SortOrder sortOrder) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putString(SORT_ORDER_BY, String.valueOf(sortOrder));
+        editor.apply();
+    }
+
+    public String getSortOrderBy() {
+        return settingsManager.getString(SORT_ORDER_BY, String.valueOf(SortOrder.date));
+    }
+
+    public void setSortOrderType(SortOrder sortOrder) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putString(SORT_ORDER_TYPE, String.valueOf(sortOrder));
+        editor.apply();
+    }
+
+    public String getSortOrderType() {
+        return settingsManager.getString(SORT_ORDER_TYPE, String.valueOf(SortOrder.ASC));
     }
 }

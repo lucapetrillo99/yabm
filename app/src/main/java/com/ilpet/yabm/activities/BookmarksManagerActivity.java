@@ -125,7 +125,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
-                ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+                ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
                 if (bookmarks.size() == 0) {
                     Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
                             .show();
@@ -301,7 +301,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void writeBookmarksFile(Uri uri) {
-        ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+        ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
         ArrayList<Category> categories = db.getAllCategories();
         final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
                 "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +

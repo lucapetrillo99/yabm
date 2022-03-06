@@ -151,27 +151,49 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 popup.setForceShowIcon(true);
             }
+
+            if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(0).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(1).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(2).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(3).setChecked(true);
+            }
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 switch (id) {
                     case R.id.date_ascending:
                         Collections.sort(bookmarks, Bookmark.DateAscendingOrder);
                         item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.date_descending:
                         Collections.sort(bookmarks, Bookmark.DateDescendingOrder);
                         item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_ascending:
                         Collections.sort(bookmarks, Bookmark.TitleAscendingOrder);
                         item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_descending:
                         Collections.sort(bookmarks, Bookmark.TitleDescendingOrder);
                         item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                 }

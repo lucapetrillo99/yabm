@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +38,7 @@ import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -43,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private static final int ARCHIVE_OPTION = 2;
     private static final int UNARCHIVE_OPTION = 3;
     private static final String CATEGORY = "category";
+    public boolean isContextualMenuEnable = false;
+    public boolean areAllSelected = false;
+    public boolean isArchiveModeEnabled = false;
     private DatabaseHandler db;
     private ArrayList<Bookmark> bookmarks;
     private RecyclerView recyclerView;
@@ -52,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private TextView toolbarTitle;
     private DrawerLayout drawerLayout;
     private TextView noBookmarks;
+    private ImageView sortOptions;
     private FloatingActionButton fab;
     private ArrayList<Category> categories;
     private ArrayList<Bookmark> archivedUrl;
@@ -59,17 +67,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private ArrayList<Bookmark> selectedBookmarks;
     private int counter = 0;
     private String previousCategory;
-    public boolean isContextualMenuEnable = false;
-    public boolean areAllSelected = false;
-    public boolean isArchiveModeEnabled = false;
     private boolean refreshCategories = false;
+    private SettingsManager settingsManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = DatabaseHandler.getInstance(getApplicationContext());
-        SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
+        settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
         String result = settingsManager.getCategory();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
         }
+        sortOptions = findViewById(R.id.bookmark_options_sort);
         noBookmarks = findViewById(R.id.no_bookmarks);
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -107,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if (result.equals(getString(R.string.all_bookmarks_title))) {
-            bookmarks = new ArrayList<>(db.getAllBookmarks());
+            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
         } else {
-            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result));
+            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
         }
         toolbarTitle.setText(result);
         previousCategory = result;
@@ -133,6 +140,67 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         });
         setBookmarksLabel();
+        setSortOptions();
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    private void setSortOptions() {
+        sortOptions.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(this, sortOptions);
+            popup.getMenuInflater().inflate(R.menu.bookmarks_sort_options, popup.getMenu());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                popup.setForceShowIcon(true);
+            }
+
+            if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(0).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(1).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(2).setChecked(true);
+            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(3).setChecked(true);
+            }
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.date_ascending:
+                        Collections.sort(bookmarks, Bookmark.DateAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.date_descending:
+                        Collections.sort(bookmarks, Bookmark.DateDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_ascending:
+                        Collections.sort(bookmarks, Bookmark.TitleAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_descending:
+                        Collections.sort(bookmarks, Bookmark.TitleDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
+                        bookmarksAdapter.notifyDataSetChanged();
+                        break;
+                }
+                return true;
+            });
+            popup.show();
+        });
     }
 
     private void setAdapter() {
@@ -185,11 +253,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     if (!queryTextFocused) {
                         if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
-                            bookmarks = db.getAllBookmarks();
+                            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                             setAdapter();
                         } else {
                             bookmarks.clear();
-                            bookmarks = db.getBookmarksByCategory(previousCategory);
+                            bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                             setAdapter();
                         }
                     }
@@ -354,13 +422,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String result = db.getCategoryId(previousCategory);
             if (result != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks();
+                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(previousCategory);
+                    bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks();
+                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
             }
         } else {
             SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
@@ -368,13 +436,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String category = db.getCategoryId(previousCategory);
             if (category != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks();
+                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(result);
+                    bookmarks = db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks();
+                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
             }
         }
         categories.clear();
@@ -551,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getAllBookmarks();
+            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
         } else {
             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
                 isArchiveModeEnabled = true;
@@ -565,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getBookmarksByCategory(categoryName);
+            bookmarks = db.getBookmarksByCategory(categoryName, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
         }
         setAdapter();
         drawerLayout.closeDrawers();

@@ -43,11 +43,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -122,7 +125,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
-                ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+                ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
                 if (bookmarks.size() == 0) {
                     Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
                             .show();
@@ -264,7 +267,17 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                                     bookmark.setTitle(info.getOutputData().getString("title"));
                                     bookmark.setImage(info.getOutputData().getString("image"));
                                     bookmark.setDescription(info.getOutputData().getString("description"));
-                                    bookmark.setType(Bookmark.ItemType.valueOf(info.getOutputData().getString("itemType")));
+                                    String itemType = info.getOutputData().getString("itemType");
+                                    if (itemType == null) {
+                                        bookmark.setType(Bookmark.ItemType.SIMPLE);
+                                    } else {
+
+                                        bookmark.setType(Bookmark.ItemType.valueOf(itemType));
+                                    }
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                                    Date date = new Date();
+                                    bookmark.setDate(dateFormat.format(date));
                                     db.addBookmark(bookmark);
                                 }
                             });
@@ -288,7 +301,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void writeBookmarksFile(Uri uri) {
-        ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+        ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
         ArrayList<Category> categories = db.getAllCategories();
         final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
                 "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +

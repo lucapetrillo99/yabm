@@ -31,7 +31,7 @@ public class Connection extends Worker {
     public Result doWork() {
         Data data = getInputData();
         String link = data.getString("link");
-        String image = null, description = null, title = null, itemType = "vuoto";
+        String image = null, description = null, title = null, itemType = null;
         try {
             Document document = Jsoup.connect(link).get();
             if (document != null) {
@@ -68,7 +68,15 @@ public class Connection extends Worker {
                 }
             }
         } catch (IOException e) {
-            return Result.failure();
+            itemType = String.valueOf(Bookmark.ItemType.SIMPLE);
+            Data result = new Data.Builder()
+                    .putString("image", null)
+                    .putString("title", title)
+                    .putString("description", null)
+                    .putString("itemType", itemType)
+                    .build();
+
+            return Result.failure(result);
         }
 
         Data result = new Data.Builder()

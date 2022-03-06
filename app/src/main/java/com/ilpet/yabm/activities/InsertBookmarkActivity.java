@@ -550,7 +550,17 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         }
                         bookmark.setImage(info.getOutputData().getString("image"));
                         bookmark.setDescription(info.getOutputData().getString("description"));
-                        bookmark.setType(Bookmark.ItemType.valueOf(info.getOutputData().getString("itemType")));
+                        String itemType = info.getOutputData().getString("itemType");
+                        if (itemType == null) {
+                            bookmark.setType(Bookmark.ItemType.SIMPLE);
+                        } else {
+
+                            bookmark.setType(Bookmark.ItemType.valueOf(itemType));
+                        }
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        bookmark.setDate(dateFormat.format(date));
                         insertBookmark();
                     }
                 });

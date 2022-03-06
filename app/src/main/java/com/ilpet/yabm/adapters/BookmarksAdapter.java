@@ -182,6 +182,12 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         .centerCrop()
                         .into(((MainViewHolder) holder).image);
                 setCheckbox((MainViewHolder) holder, NO_DESCRIPTION);
+
+                ((MainViewHolder) holder).image.setOnClickListener(v -> {
+                    ImagePreview imagePreview = ImagePreview.newInstance(bookmarks.get(position)
+                            .getImage(), bookmarks.get(position).getTitle());
+                    imagePreview.show(mainActivity.getSupportFragmentManager(), "tag");
+                });
                 break;
             case NO_IMAGE:
                 if (description.length() > DESCRIPTION_MAX_LENGTH) {

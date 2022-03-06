@@ -82,4 +82,9 @@
     <string name="archive_help">Seleziona Archiviati per vedere tutti i segnalibri archiviati</string>
     <string name="invalid_link">Link non valido</string>
     <string name="max_title">Lunghezza massima raggiunta</string>
+    <string name="ascending_name_sort">Per titolo (A - Z)</string>
+    <string name="descending_name_sort">Per titolo (Z - A)</string>
+    <string name="ascending_date_sort">Per data di creazione</string>
+    <string name="descending_date_sort">Per ultima modifica</string>
+
 </resources>

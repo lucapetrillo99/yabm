@@ -25,8 +25,11 @@ import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Locale;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
@@ -150,6 +153,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     Category category = new Category();
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(
+                            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    Date date = new Date();
+                    category.setDate(dateFormat.format(date));
                     boolean result = db.updateCategory(category);
                     if (result) {
                         Toast.makeText(v.getRootView().getContext(),
@@ -166,6 +173,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date date = new Date();
+                        category.setDate(dateFormat.format(date));
                         String result = db.addCategory(category);
                         if (result != null) {
                             dialog.dismiss();

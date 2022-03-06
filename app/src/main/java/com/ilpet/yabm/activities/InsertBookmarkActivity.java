@@ -250,6 +250,10 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date insertionDate = new Date();
+                        category.setDate(dateFormat.format(insertionDate));
                         String result = db.addCategory(category);
                         if (result != null) {
                             categories.add(category);

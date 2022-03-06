@@ -37,8 +37,11 @@ import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
@@ -92,8 +95,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         recyclerView = findViewById(R.id.recycler_view);
 
         if (settingsManager.isFirstAccess()) {
-            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks));
-            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks));
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date date = new Date();
+            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks), dateFormat.format(date));
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date));
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);

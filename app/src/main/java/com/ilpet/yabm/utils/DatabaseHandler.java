@@ -33,7 +33,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT)";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
+            KEY_DATE + " TEXT)";
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
@@ -100,6 +101,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, category.getCategoryTitle());
+            values.put(KEY_DATE, category.getDate());
             categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
         }
@@ -162,6 +164,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+                category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -181,6 +184,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+                category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -325,6 +329,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
+        values.put(KEY_DATE, category.getDate());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()});
 

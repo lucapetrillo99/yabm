@@ -74,7 +74,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     private void setSortOptions() {
         sortOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, sortOptions);
-            popup.getMenuInflater().inflate(R.menu.bookmarks_sort_options, popup.getMenu());
+            popup.getMenuInflater().inflate(R.menu.sort_options_menu, popup.getMenu());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 popup.setForceShowIcon(true);
             }

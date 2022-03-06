@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +39,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     private CategoriesAdapter categoriesAdapter;
     private Toolbar toolbar;
     private TextView toolbarTitle;
+    private ImageView sortOptions;
     private ArrayList<Category> categories;
     private ArrayList<Category> selectedCategories;
     private int selectedCategory = 0;
@@ -55,7 +59,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             finish();
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
-
+        sortOptions = findViewById(R.id.category_options_sort);
         recyclerView = findViewById(R.id.recycler_view);
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
 
@@ -63,8 +67,23 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         categories = db.getCategories();
         selectedCategories = new ArrayList<>();
         setAdapter();
-
+        setSortOptions();
         insertCategory.setOnClickListener(view -> categoriesAdapter.newCategoryDialog(0, false, view));
+    }
+
+    private void setSortOptions() {
+        sortOptions.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(this, sortOptions);
+            popup.getMenuInflater().inflate(R.menu.bookmarks_sort_options, popup.getMenu());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                popup.setForceShowIcon(true);
+            }
+
+            popup.setOnMenuItemClickListener(item -> {
+                return true;
+            });
+            popup.show();
+        });
     }
 
     private void setAdapter() {

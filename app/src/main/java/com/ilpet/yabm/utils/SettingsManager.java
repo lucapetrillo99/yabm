@@ -13,8 +13,10 @@ public class SettingsManager {
     private static final String AUTO_BACKUP_URI = "auto_backup_uri";
     private static final String FIRST_ACCESS = "first_access";
     private static final String ALL_BOOKMARKS = "Tutti i segnalibri";
-    private static final String SORT_ORDER_BY = "sort_order_by";
-    private static final String SORT_ORDER_TYPE = "sort_order_type";
+    private static final String BOOKMARK_ORDER_BY = "bookmark_order_by";
+    private static final String BOOKMARK_ORDER_TYPE = "bookmark_order_type";
+    private static final String CATEGORY_ORDER_BY = "category_order_by";
+    private static final String CATEGORY_ORDER_TYPE = "category_order_type";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
@@ -87,23 +89,43 @@ public class SettingsManager {
         return settingsManager.getString(AUTO_BACKUP_URI, null);
     }
 
-    public void setSortOrderBy(SortOrder sortOrder) {
+    public void setBookmarkOrderBy(SortOrder sortOrder) {
         SharedPreferences.Editor editor = settingsManager.edit();
-        editor.putString(SORT_ORDER_BY, String.valueOf(sortOrder));
+        editor.putString(BOOKMARK_ORDER_BY, String.valueOf(sortOrder));
         editor.apply();
     }
 
-    public String getSortOrderBy() {
-        return settingsManager.getString(SORT_ORDER_BY, String.valueOf(SortOrder.date));
+    public String getBookmarkOrderBy() {
+        return settingsManager.getString(BOOKMARK_ORDER_BY, String.valueOf(SortOrder.date));
     }
 
-    public void setSortOrderType(SortOrder sortOrder) {
+    public void setBookmarkOrderType(SortOrder sortOrder) {
         SharedPreferences.Editor editor = settingsManager.edit();
-        editor.putString(SORT_ORDER_TYPE, String.valueOf(sortOrder));
+        editor.putString(BOOKMARK_ORDER_TYPE, String.valueOf(sortOrder));
         editor.apply();
     }
 
-    public String getSortOrderType() {
-        return settingsManager.getString(SORT_ORDER_TYPE, String.valueOf(SortOrder.ASC));
+    public String getBookmarkOrderType() {
+        return settingsManager.getString(BOOKMARK_ORDER_TYPE, String.valueOf(SortOrder.ASC));
+    }
+
+    public void setCategoryOrderBy(SortOrder sortOrder) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putString(CATEGORY_ORDER_BY, String.valueOf(sortOrder));
+        editor.apply();
+    }
+
+    public String getCategoryOrderBy() {
+        return settingsManager.getString(CATEGORY_ORDER_BY, String.valueOf(SortOrder.date));
+    }
+
+    public void setCategoryOrderType(SortOrder sortOrder) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putString(CATEGORY_ORDER_TYPE, String.valueOf(sortOrder));
+        editor.apply();
+    }
+
+    public String getCategoryOrderType() {
+        return settingsManager.getString(CATEGORY_ORDER_TYPE, String.valueOf(SortOrder.ASC));
     }
 }

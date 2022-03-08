@@ -33,7 +33,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT)";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_NAME + " TEXT ," +
+            KEY_DATE + " TEXT)";
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_LINK
             + " TEXT," + KEY_TITLE + " TEXT," + KEY_DESCRIPTION + " TEXT," + KEY_IMAGE + " TEXT,"
@@ -100,6 +101,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, category.getCategoryTitle());
+            values.put(KEY_DATE, category.getDate());
             categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
         }
@@ -149,19 +151,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result == 1;
     }
 
-    public ArrayList<Category> getCategories() {
+    public ArrayList<Category> getCategories(String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Category> categories = new ArrayList<>();
+        Cursor cursor;
+        if (orderBy != null && orderType != null) {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
+                            + KEY_NAME + " != ?" + " order by " + orderBy + " " + orderType,
+                    new String[]{context.getString(R.string.archived_bookmarks)});
+        } else {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
+                    + KEY_NAME + " != ?", new String[]{context.getString(R.string.archived_bookmarks)});
+        }
 
-        Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
-                + KEY_NAME + " != ?", new String[]{context.getString(R.string.archived_bookmarks)});
 
         if (cursor.moveToFirst()) {
             do {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+                category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -169,18 +179,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return categories;
     }
 
-    public ArrayList<Category> getAllCategories() {
+    public ArrayList<Category> getAllCategories(String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Category> categories = new ArrayList<>();
+        Cursor cursor;
 
-        Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
+        if (orderBy != null && orderType != null) {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " order by " + orderBy
+                    + " " + orderType, null);
+        } else {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
+        }
 
         if (cursor.moveToFirst()) {
             do {
                 Category category = new Category();
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+                category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -325,6 +342,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_NAME, category.getCategoryTitle());
+        values.put(KEY_DATE, category.getDate());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()});
 

@@ -93,7 +93,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         ImageButton modifyRemainder = findViewById(R.id.modify_reminder);
         ImageButton removeRemainder = findViewById(R.id.remove_reminder);
         bookmark = new Bookmark();
-        categories = db.getCategories();
+        categories = db.getCategories(null, null);
         ArrayList<String> filteredCategories = new ArrayList<>();
         loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
         Intent intent = getIntent();
@@ -250,6 +250,10 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date insertionDate = new Date();
+                        category.setDate(dateFormat.format(insertionDate));
                         String result = db.addCategory(category);
                         if (result != null) {
                             categories.add(category);

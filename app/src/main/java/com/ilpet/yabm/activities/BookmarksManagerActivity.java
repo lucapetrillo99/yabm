@@ -302,7 +302,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     private void writeBookmarksFile(Uri uri) {
         ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
-        ArrayList<Category> categories = db.getAllCategories();
+        ArrayList<Category> categories = db.getAllCategories(null, null);
         final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
                 "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
                 "<TITLE>Bookmarks</TITLE>\n" +

@@ -22,14 +22,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.ilpet.yabm.R;
 import com.ilpet.yabm.adapters.CategoriesAdapter;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
@@ -43,6 +45,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     private ArrayList<Category> categories;
     private ArrayList<Category> selectedCategories;
     private int selectedCategory = 0;
+    private SettingsManager settingsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +67,15 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
 
         DatabaseHandler db = DatabaseHandler.getInstance(getApplicationContext());
-        categories = db.getCategories();
+        settingsManager = new SettingsManager(getApplicationContext(), "category");
+        categories = db.getCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         selectedCategories = new ArrayList<>();
         setAdapter();
         setSortOptions();
         insertCategory.setOnClickListener(view -> categoriesAdapter.newCategoryDialog(0, false, view));
     }
 
+    @SuppressLint({"NonConstantResourceId", "NotifyDataSetChanged"})
     private void setSortOptions() {
         sortOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, sortOptions);
@@ -79,7 +84,52 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 popup.setForceShowIcon(true);
             }
 
+            if (settingsManager.getCategoryOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getCategoryOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(0).setChecked(true);
+            } else if (settingsManager.getCategoryOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getCategoryOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(1).setChecked(true);
+            } else if (settingsManager.getCategoryOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getCategoryOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+                popup.getMenu().getItem(2).setChecked(true);
+            } else if (settingsManager.getCategoryOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getCategoryOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+                popup.getMenu().getItem(3).setChecked(true);
+            }
+
             popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.date_ascending:
+                        Collections.sort(categories, Category.DateAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setCategoryOrderType(SettingsManager.SortOrder.ASC);
+                        categoriesAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.date_descending:
+                        Collections.sort(categories, Category.DateDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setCategoryOrderType(SettingsManager.SortOrder.DESC);
+                        categoriesAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_ascending:
+                        Collections.sort(categories, Category.TitleAscendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setCategoryOrderType(SettingsManager.SortOrder.ASC);
+                        categoriesAdapter.notifyDataSetChanged();
+                        break;
+                    case R.id.title_descending:
+                        Collections.sort(categories, Category.TitleDescendingOrder);
+                        item.setChecked(!item.isChecked());
+                        settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setCategoryOrderType(SettingsManager.SortOrder.DESC);
+                        categoriesAdapter.notifyDataSetChanged();
+                        break;
+                }
                 return true;
             });
             popup.show();
@@ -152,7 +202,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     }
 
     public void makeSelection(View v, int position) {
-        if (((CheckBox)v).isChecked()) {
+        if (((CheckBox) v).isChecked()) {
             selectedCategories.add(categories.get(position));
             selectedCategory++;
         } else {

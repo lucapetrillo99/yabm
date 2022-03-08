@@ -93,7 +93,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         ImageButton modifyRemainder = findViewById(R.id.modify_reminder);
         ImageButton removeRemainder = findViewById(R.id.remove_reminder);
         bookmark = new Bookmark();
-        categories = db.getCategories();
+        categories = db.getCategories(null, null);
         ArrayList<String> filteredCategories = new ArrayList<>();
         loadingDialog = new LoadingDialog(InsertBookmarkActivity.this);
         Intent intent = getIntent();

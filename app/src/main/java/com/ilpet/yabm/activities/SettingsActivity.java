@@ -11,9 +11,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.R;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
             SettingsManager themeManager = new SettingsManager(getApplicationContext(), THEME);
             int checkedItem = themeManager.getTheme();
 
-            String[] themes = { "Default", "Chiaro", "Scuro" };
+            String[] themes = {"Default", "Chiaro", "Scuro"};
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(themes, checkedItem, (dialog, choice) -> {
                 if (themeManager.getTheme() != choice) {
@@ -116,10 +116,10 @@ public class SettingsActivity extends AppCompatActivity {
             SettingsManager categoryManager = new SettingsManager(getApplicationContext(), CATEGORY);
             int checkedItem = 0;
             String startCategory = categoryManager.getCategory();
-            ArrayList<Category> categoryList = new ArrayList<>(db.getAllCategories());
+            ArrayList<Category> categoryList = new ArrayList<>(db.getAllCategories(null, null));
             ArrayList<String> list = new ArrayList<>();
             list.add(getString(R.string.all_bookmarks_title));
-            for (Category category: categoryList) {
+            for (Category category : categoryList) {
                 list.add(category.getCategoryTitle());
             }
 
@@ -164,6 +164,7 @@ public class SettingsActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
     }
+
     private void appInfoClickListener() {
         appInfo.setOnClickListener(v -> {
             Intent intent = new Intent(SettingsActivity.this, InfoAppActivity.class);

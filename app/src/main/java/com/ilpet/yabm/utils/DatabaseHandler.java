@@ -151,13 +151,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return result == 1;
     }
 
-    public ArrayList<Category> getCategories() {
+    public ArrayList<Category> getCategories(String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Category> categories = new ArrayList<>();
+        Cursor cursor;
+        if (orderBy != null && orderType != null) {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
+                            + KEY_NAME + " != ?" + " order by " + orderBy + " " + orderType,
+                    new String[]{context.getString(R.string.archived_bookmarks)});
+        } else {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
+                    + KEY_NAME + " != ?", new String[]{context.getString(R.string.archived_bookmarks)});
+        }
 
-        Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " where "
-                + KEY_NAME + " != ?", new String[]{context.getString(R.string.archived_bookmarks)});
 
         if (cursor.moveToFirst()) {
             do {
@@ -172,12 +179,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return categories;
     }
 
-    public ArrayList<Category> getAllCategories() {
+    public ArrayList<Category> getAllCategories(String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<Category> categories = new ArrayList<>();
+        Cursor cursor;
 
-        Cursor cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
+        if (orderBy != null && orderType != null) {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY + " order by " + orderBy
+                    + " " + orderType, null);
+        } else {
+            cursor = db.rawQuery("Select  * from " + TABLE_CATEGORY, null);
+        }
 
         if (cursor.moveToFirst()) {
             do {

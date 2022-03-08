@@ -120,9 +120,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if (result.equals(getString(R.string.all_bookmarks_title))) {
-            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
+            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType()));
         } else {
-            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType()));
+            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType()));
         }
         toolbarTitle.setText(result);
         previousCategory = result;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         archivedUrl = new ArrayList<>();
         selectedBookmarks = new ArrayList<>();
         removedFromArchive = new ArrayList<>();
-        categories = db.getAllCategories();
+        categories = db.getAllCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         setAdapter();
 
         fab = findViewById(R.id.add_button);
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         setSortOptions();
     }
 
-    @SuppressLint("NonConstantResourceId")
+    @SuppressLint({"NonConstantResourceId", "NotifyDataSetChanged"})
     private void setSortOptions() {
         sortOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, sortOptions);
@@ -158,17 +158,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 popup.setForceShowIcon(true);
             }
 
-            if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
-                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+            if (settingsManager.getBookmarkOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getBookmarkOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
                 popup.getMenu().getItem(0).setChecked(true);
-            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
-                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+            } else if (settingsManager.getBookmarkOrderBy().equals(String.valueOf(SettingsManager.SortOrder.date)) &&
+                    settingsManager.getBookmarkOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
                 popup.getMenu().getItem(1).setChecked(true);
-            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
-                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
+            } else if (settingsManager.getBookmarkOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getBookmarkOrderType().equals(String.valueOf(SettingsManager.SortOrder.ASC))) {
                 popup.getMenu().getItem(2).setChecked(true);
-            } else if (settingsManager.getSortOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
-                    settingsManager.getSortOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
+            } else if (settingsManager.getBookmarkOrderBy().equals(String.valueOf(SettingsManager.SortOrder.title)) &&
+                    settingsManager.getBookmarkOrderType().equals(String.valueOf(SettingsManager.SortOrder.DESC))) {
                 popup.getMenu().getItem(3).setChecked(true);
             }
             popup.setOnMenuItemClickListener(item -> {
@@ -177,29 +177,29 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     case R.id.date_ascending:
                         Collections.sort(bookmarks, Bookmark.DateAscendingOrder);
                         item.setChecked(!item.isChecked());
-                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
-                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
+                        settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.date_descending:
                         Collections.sort(bookmarks, Bookmark.DateDescendingOrder);
                         item.setChecked(!item.isChecked());
-                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.date);
-                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
+                        settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.date);
+                        settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.DESC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_ascending:
                         Collections.sort(bookmarks, Bookmark.TitleAscendingOrder);
                         item.setChecked(!item.isChecked());
-                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
-                        settingsManager.setSortOrderType(SettingsManager.SortOrder.ASC);
+                        settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_descending:
                         Collections.sort(bookmarks, Bookmark.TitleDescendingOrder);
                         item.setChecked(!item.isChecked());
-                        settingsManager.setSortOrderBy(SettingsManager.SortOrder.title);
-                        settingsManager.setSortOrderType(SettingsManager.SortOrder.DESC);
+                        settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.title);
+                        settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.DESC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -259,11 +259,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     if (!queryTextFocused) {
                         if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
-                            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                            bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                             setAdapter();
                         } else {
                             bookmarks.clear();
-                            bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                            bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                             setAdapter();
                         }
                     }
@@ -428,13 +428,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String result = db.getCategoryId(previousCategory);
             if (result != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                    bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                    bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
             }
         } else {
             SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
@@ -442,17 +442,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String category = db.getCategoryId(previousCategory);
             if (category != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                    bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(result, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                    bookmarks = db.getBookmarksByCategory(result, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+                bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
             }
         }
         categories.clear();
-        categories = db.getAllCategories();
+        categories = db.getAllCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         invalidateOptionsMenu();
         setAdapter();
     }
@@ -625,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getAllBookmarks(settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+            bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
         } else {
             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
                 isArchiveModeEnabled = true;
@@ -639,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getBookmarksByCategory(categoryName, settingsManager.getSortOrderBy(), settingsManager.getSortOrderType());
+            bookmarks = db.getBookmarksByCategory(categoryName, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
         }
         setAdapter();
         drawerLayout.closeDrawers();

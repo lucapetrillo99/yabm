@@ -149,13 +149,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(
+                        "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                Date date = new Date();
                 if (isModify) {
                     Category category = new Category();
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(
-                            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                    Date date = new Date();
                     category.setDate(dateFormat.format(date));
                     boolean result = db.updateCategory(category);
                     if (result) {
@@ -173,13 +173,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
-                        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                        Date date = new Date();
                         category.setDate(dateFormat.format(date));
-                        String result = db.addCategory(category);
-                        if (result != null) {
+                        String categoryId = db.addCategory(category);
+                        if (categoryId != null) {
                             dialog.dismiss();
+                            category.setCategoryId(categoryId);
                             categories.add(category);
                             notifyItemInserted(getItemCount());
                         } else {
@@ -253,7 +251,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                         notifyItemRemoved(position);
                     } else {
                         Toast.makeText(v.getRootView().getContext(), "Impossibile eliminare la categoria", Toast.LENGTH_LONG).show();
-
                     }
                 });
         AlertDialog alertDialog = builder.create();

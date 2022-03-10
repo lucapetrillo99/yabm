@@ -71,14 +71,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     }
 
     @Override
-    public void onBindViewHolder(@NonNull categoriesViewHolder holder, int position){
-
+    public void onBindViewHolder(@NonNull categoriesViewHolder holder, int position) {
         db = DatabaseHandler.getInstance(categoriesActivity);
-
-        holder.title.setText(categories.get(position).getCategoryTitle());
+        holder.title.setText(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
 
         if (categoriesActivity.isContextualMenuEnable) {
-            if (categories.get(position).getCategoryTitle().equals(categoriesActivity.getString(R.string.default_bookmarks))) {
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
+                    equals(categoriesActivity.getString(R.string.default_bookmarks))) {
                 holder.checkbox.setVisibility(View.INVISIBLE);
             }else {
                 holder.checkbox.setVisibility(View.VISIBLE);
@@ -88,7 +87,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         } else {
             holder.checkbox.setVisibility(View.INVISIBLE);
-            if (categories.get(position).getCategoryTitle().equals(categoriesActivity.getString(R.string.default_bookmarks))) {
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
+                    equals(categoriesActivity.getString(R.string.default_bookmarks))) {
                 holder.modify.setVisibility(INVISIBLE);
                 holder.delete.setVisibility(INVISIBLE);
             } else {
@@ -97,9 +97,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             }
         }
 
-        holder.modify.setOnClickListener(v -> newCategoryDialog(position, true, v));
-        holder.delete.setOnClickListener(v -> confirmDialog(position, v));
-        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, position));
+        holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(), true, v));
+        holder.delete.setOnClickListener(v -> confirmDialog(holder.getAbsoluteAdapterPosition(), v));
+        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, holder.getAbsoluteAdapterPosition()));
 
         if (categoriesActivity.areAllSelected) {
             for (int i = 0; i < categories.size(); i++) {

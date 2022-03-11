@@ -32,11 +32,13 @@ import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     public boolean areAllSelected = false;
     public boolean isContextualMenuEnable = false;
+    private int selectedCategory = 0;
     private RecyclerView recyclerView;
     private CategoriesAdapter categoriesAdapter;
     private Toolbar toolbar;
@@ -44,8 +46,8 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     private ImageView sortOptions;
     private ArrayList<Category> categories;
     private ArrayList<Category> selectedCategories;
-    private int selectedCategory = 0;
     private SettingsManager settingsManager;
+    private DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +68,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         recyclerView = findViewById(R.id.recycler_view);
         FloatingActionButton insertCategory = findViewById(R.id.add_button);
 
-        DatabaseHandler db = DatabaseHandler.getInstance(getApplicationContext());
+        db = DatabaseHandler.getInstance(getApplicationContext());
         settingsManager = new SettingsManager(getApplicationContext(), "category");
         categories = db.getCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         selectedCategories = new ArrayList<>();
@@ -189,6 +191,8 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 if (!areAllSelected) {
                     areAllSelected = true;
                     selectedCategories.addAll(categories);
+                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals("Default"));
+                    selectedCategories.removeIf(pr);
                     selectedCategory = categories.size() - 1;
                 } else {
                     areAllSelected = false;
@@ -269,14 +273,14 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             categoryMessage = "Categoria";
         }
 
-        String finalBookmarkMessage = categoryMessage;
-        String finalDeletedQuestion = deletedQuestion;
         builder.setMessage(message + selectedCategory + categoryQuestion)
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    categoriesAdapter.updateCategories(selectedCategories);
-                    Toast.makeText(getApplicationContext(), finalBookmarkMessage + finalDeletedQuestion,
+                    db.deleteCategories(selectedCategories);
+                    categories.removeAll(selectedCategories);
+                    categoriesAdapter.notifyDataSetChanged();
+                    Toast.makeText(getApplicationContext(), categoryMessage + deletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();
                 });

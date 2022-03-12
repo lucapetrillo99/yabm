@@ -107,8 +107,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     private void importListener() {
         importOption.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
             } else {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -120,8 +119,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void exportListener() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
@@ -311,11 +309,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         final String FILE_FOOTER = "</DL><p>";
         final String INITIAL_FILE_CONTENT = "<DT><A HREF=";
         final String FINAL_FILE_CONTENT = "</A>";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            bookmarks.sort(Comparator.comparingInt(bookmark -> Integer.parseInt(bookmark.getCategory())));
-        }
-
+        bookmarks.sort(Comparator.comparingInt(bookmark -> Integer.parseInt(bookmark.getCategory())));
         try {
             OutputStream outputStream = getContentResolver().openOutputStream(uri);
             outputStream.write(FILE_HEADER.getBytes());
@@ -361,13 +355,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private String writeAndGetCategoryId(ArrayList<Category> categories, OutputStream outputStream, Bookmark bookmark) throws IOException {
-        Category category = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            category = categories.stream()
-                    .filter(category1 -> bookmark.getCategory().equals(category1.getCategoryId()))
-                    .findAny()
-                    .orElse(null);
-        }
+        Category category = categories.stream()
+                .filter(category1 -> bookmark.getCategory().equals(category1.getCategoryId()))
+                .findAny()
+                .orElse(null);
         String categoryId = bookmark.getCategory();
         outputStream.write("<DT><H3>".getBytes());
         if (category != null) {

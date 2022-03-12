@@ -31,7 +31,6 @@ import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.function.Predicate;
 
 public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
@@ -104,28 +103,28 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 int id = item.getItemId();
                 switch (id) {
                     case R.id.date_ascending:
-                        Collections.sort(categories, Category.DateAscendingOrder);
+                        categories.sort(Category.DateAscendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.date);
                         settingsManager.setCategoryOrderType(SettingsManager.SortOrder.ASC);
                         categoriesAdapter.notifyDataSetChanged();
                         break;
                     case R.id.date_descending:
-                        Collections.sort(categories, Category.DateDescendingOrder);
+                        categories.sort(Category.DateDescendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.date);
                         settingsManager.setCategoryOrderType(SettingsManager.SortOrder.DESC);
                         categoriesAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_ascending:
-                        Collections.sort(categories, Category.TitleAscendingOrder);
+                        categories.sort(Category.TitleAscendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.title);
                         settingsManager.setCategoryOrderType(SettingsManager.SortOrder.ASC);
                         categoriesAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_descending:
-                        Collections.sort(categories, Category.TitleDescendingOrder);
+                        categories.sort(Category.TitleDescendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setCategoryOrderBy(SettingsManager.SortOrder.title);
                         settingsManager.setCategoryOrderType(SettingsManager.SortOrder.DESC);

@@ -146,7 +146,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             !bookmark.getCategory().equals(db.getCategoryId(category))) {
                         confirmDialog(link.getText().toString(), db.getCategoryId(category));
                     } else {
-                        if (!isActivityRunning()) {
+                        if (isRunningActivity()) {
                             Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                             startActivity(activityIntent);
                         }
@@ -159,7 +159,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                             !bookmark.getCategory().equals(db.getCategoryId(category))) {
                         confirmDialog(link.getText().toString(), db.getCategoryId(category));
                     } else {
-                        if (!isActivityRunning()) {
+                        if (isRunningActivity()) {
                             Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                             startActivity(activityIntent);
                         }
@@ -311,8 +311,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 isPressed = true;
                 pressedCounter++;
                 if (pressedCounter > 1) {
-                    hour = timePicker.getCurrentHour();
-                    minute = timePicker.getCurrentMinute();
+                    hour = timePicker.getHour();
+                    minute = timePicker.getMinute();
 
                     day = datePicker.getDayOfMonth();
                     month = datePicker.getMonth();
@@ -396,8 +396,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 isPressed = true;
                 pressedCounter++;
                 if (pressedCounter > 1) {
-                    hour = timePicker.getCurrentHour();
-                    minute = timePicker.getCurrentMinute();
+                    hour = timePicker.getHour();
+                    minute = timePicker.getMinute();
                     day = datePicker.getDayOfMonth();
                     month = datePicker.getMonth();
                     year = datePicker.getYear();
@@ -582,11 +582,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 InsertBookmarkActivity.this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
-        } else {
-            alarm.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
-        }
+        alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
     }
 
     private int setCalendar() throws ParseException {
@@ -649,7 +645,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 Toast.makeText(getApplicationContext(),
                         "Segnalibro aggiunto!", Toast.LENGTH_LONG)
                         .show();
-                if (!isActivityRunning()) {
+                if (isRunningActivity()) {
                     Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                     startActivity(activityIntent);
                 }
@@ -670,7 +666,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    if (!isActivityRunning()) {
+                    if (isRunningActivity()) {
                         Intent intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
@@ -690,7 +686,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     !bookmark.getCategory().equals(db.getCategoryId(category))) {
                 confirmDialog(link.getText().toString(), db.getCategoryId(category));
             } else {
-                if (!isActivityRunning()) {
+                if (isRunningActivity()) {
                     Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                     startActivity(activityIntent);
                 }
@@ -699,7 +695,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             }
         } else {
             if (link.getText().toString().isEmpty()) {
-                if (!isActivityRunning()) {
+                if (isRunningActivity()) {
                     Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                     startActivity(activityIntent);
                 }
@@ -711,16 +707,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         }
     }
 
-    private boolean isActivityRunning() {
+    private boolean isRunningActivity() {
         ArrayList<String> runningActivities = new ArrayList<>();
-
         ActivityManager activityManager = (ActivityManager) getBaseContext().getSystemService(Context.ACTIVITY_SERVICE);
+        ArrayList<ActivityManager.AppTask> services = (ArrayList<ActivityManager.AppTask>) activityManager.getAppTasks();
 
-        ArrayList<ActivityManager.RunningTaskInfo> services = (ArrayList<ActivityManager.RunningTaskInfo>) activityManager.getRunningTasks(Integer.MAX_VALUE);
-
-        for (ActivityManager.RunningTaskInfo service : services) {
+        for (ActivityManager.AppTask service : services) {
             runningActivities.add(service.toString());
         }
-        return runningActivities.contains("ComponentInfo{com.app/com.app.main.MyActivity}");
+        return !runningActivities.contains("ComponentInfo{com.app/com.app.main.MyActivity}");
     }
 }

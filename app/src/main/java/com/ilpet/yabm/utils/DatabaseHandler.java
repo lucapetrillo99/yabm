@@ -397,4 +397,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(String.format("UPDATE %s SET %s =" + 2 + ", %s = " + id + " WHERE %s IN (%s);",
                 TABLE_BOOKMARK, KEY_CATEGORY, KEY_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
     }
+
+    public void deleteCategories(ArrayList<Category> categories) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String[] whereArgs = new String[categories.size()];
+        for (int i = 0; i < categories.size(); i++) {
+            whereArgs[i] = categories.get(i).getCategoryId();
+        }
+
+        String args = TextUtils.join(", ", whereArgs);
+        db.execSQL(String.format("DELETE FROM " + TABLE_CATEGORY + " WHERE " + CATEGORY_ID +
+                " IN (%s);", args));
+    }
 }

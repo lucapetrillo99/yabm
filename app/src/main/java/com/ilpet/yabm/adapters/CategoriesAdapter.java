@@ -2,7 +2,6 @@ package com.ilpet.yabm.adapters;
 
 import static android.view.View.INVISIBLE;
 
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
 
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,12 +77,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
                     equals(categoriesActivity.getString(R.string.default_bookmarks))) {
                 holder.checkbox.setVisibility(View.INVISIBLE);
-            }else {
+            } else {
                 holder.checkbox.setVisibility(View.VISIBLE);
             }
             holder.modify.setVisibility(View.INVISIBLE);
             holder.delete.setVisibility(INVISIBLE);
-
         } else {
             holder.checkbox.setVisibility(View.INVISIBLE);
             if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
@@ -96,7 +93,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 holder.delete.setVisibility(View.VISIBLE);
             }
         }
-
         holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(), true, v));
         holder.delete.setOnClickListener(v -> confirmDialog(holder.getAbsoluteAdapterPosition(), v));
         holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, holder.getAbsoluteAdapterPosition()));
@@ -112,12 +108,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         }
     }
 
-    public void updateCategories(ArrayList<Category> selectedCategories) {
-        UpdateCategories updateCategories = new UpdateCategories(selectedCategories, this);
-        updateCategories.execute();
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getItemCount() {
         return categories.size();
@@ -131,16 +121,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(categoriesActivity.getString(R.string.cancel), null)
                 .create();
-
         EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
-
         if (isModify) {
             title.setText(R.string.modify_category_title);
         } else {
             title.setText(R.string.new_category_title);
         }
-
         if (isModify) {
             input.setText(categories.get(position).getCategoryTitle());
         } else {
@@ -198,41 +185,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         dialog.dismiss();
     }
 
-    private static class UpdateCategories extends AsyncTask<Void, Void, Void> {
-        private final ArrayList<Category> list;
-        private final WeakReference<CategoriesAdapter> activityReference;
-
-        public UpdateCategories(ArrayList<Category> categories, CategoriesAdapter context) {
-            this.list = categories;
-            activityReference = new WeakReference<>(context);
-        }
-
-        boolean result = true;
-        @Override
-        protected Void doInBackground(Void... voids) {
-            CategoriesAdapter categoryAdapter = activityReference.get();
-            for (Category selectedCategory : list) {
-                if (!selectedCategory.getCategoryTitle().equals(categoryAdapter.categoriesActivity.getString(R.string.default_bookmarks))) {
-                    categoryAdapter.categories.remove(selectedCategory);
-                    result = categoryAdapter.db.deleteCategory(selectedCategory);
-                    if (!result) {
-                        break;
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            CategoriesAdapter categoryAdapter = activityReference.get();
-            if (!result) {
-                Toast.makeText(categoryAdapter.categoriesActivity, "Impossibile eliminare le categorie!",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 
     private void confirmDialog(int position, View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
@@ -262,11 +214,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         return filter;
     }
 
-    Filter filter = new Filter(){
+    private final Filter filter = new Filter(){
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
             ArrayList<Category> filteredCategories = new ArrayList<>();
-
             if (constraint.toString().isEmpty()) {
                 filteredCategories.addAll(allCategories);
             } else {
@@ -276,10 +227,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     }
                 }
             }
-
             FilterResults filterResults = new FilterResults();
             filterResults.values = filteredCategories;
-
             return filterResults;
         }
 

@@ -175,28 +175,28 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 int id = item.getItemId();
                 switch (id) {
                     case R.id.date_ascending:
-                        Collections.sort(bookmarks, Bookmark.DateAscendingOrder);
+                        bookmarks.sort(Bookmark.DateAscendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.date);
                         settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.date_descending:
-                        Collections.sort(bookmarks, Bookmark.DateDescendingOrder);
+                        bookmarks.sort(Bookmark.DateDescendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.date);
                         settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.DESC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_ascending:
-                        Collections.sort(bookmarks, Bookmark.TitleAscendingOrder);
+                        bookmarks.sort(Bookmark.TitleAscendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.title);
                         settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.ASC);
                         bookmarksAdapter.notifyDataSetChanged();
                         break;
                     case R.id.title_descending:
-                        Collections.sort(bookmarks, Bookmark.TitleDescendingOrder);
+                        bookmarks.sort(Bookmark.TitleDescendingOrder);
                         item.setChecked(!item.isChecked());
                         settingsManager.setBookmarkOrderBy(SettingsManager.SortOrder.title);
                         settingsManager.setBookmarkOrderType(SettingsManager.SortOrder.DESC);

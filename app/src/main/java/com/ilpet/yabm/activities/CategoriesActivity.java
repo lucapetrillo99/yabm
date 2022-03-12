@@ -191,7 +191,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 if (!areAllSelected) {
                     areAllSelected = true;
                     selectedCategories.addAll(categories);
-                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals("Default"));
+                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(getString(R.string.default_bookmarks)));
                     selectedCategories.removeIf(pr);
                     selectedCategory = categories.size() - 1;
                 } else {

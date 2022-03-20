@@ -3,31 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/move"
+        android:icon="@drawable/ic_move"
+        android:title="@string/move"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/delete"
-        android:title="Delete"
         android:icon="@drawable/ic_small_delete"
-        app:showAsAction="always">
-    </item>
+        android:title="@string/delete_title"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/archive"
-        android:title="Archive"
         android:icon="@drawable/ic_archive"
-        app:showAsAction="ifRoom">
-    </item>
+        android:title="@string/archive"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/unarchive"
-        android:title="Unarchive"
         android:icon="@drawable/ic_unarchive"
-        app:showAsAction="ifRoom">
-    </item>
+        android:title="@string/unarchive"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/select_all"
-        android:title="Share"
         android:icon="@drawable/ic_select_all"
-        app:showAsAction="ifRoom">
-    </item>
+        android:title="@string/select_all"
+        app:showAsAction="always"/>
 
 </menu>

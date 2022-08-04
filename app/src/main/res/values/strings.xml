@@ -91,4 +91,5 @@
     <string name="select_all">Select All</string>
     <string name="delete_title">Delete</string>
     <string name="move">Move</string>
+    <string name="category_selection">Scegli la categoria</string>
 </resources>

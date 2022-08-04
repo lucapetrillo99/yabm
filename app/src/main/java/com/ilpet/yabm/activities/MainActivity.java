@@ -34,6 +34,7 @@ import com.ilpet.yabm.adapters.BookmarksAdapter;
 import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.CategoriesSelectionDialog;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.SettingsManager;
 
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private String previousCategory;
     private boolean refreshCategories = false;
     private SettingsManager settingsManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -442,11 +442,30 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         ImageButton archive = contextualToolbar.findViewById(R.id.archive);
         ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
         ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
+
         if (previousCategory.equals(getString(R.string.archived_bookmarks))) {
             unarchive.setVisibility(View.VISIBLE);
+            archive.setVisibility(View.GONE);
         } else {
             archive.setVisibility(View.VISIBLE);
+            unarchive.setVisibility(View.GONE);
         }
+
+        move.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                CategoriesSelectionDialog categoriesSelection =
+                        new CategoriesSelectionDialog(MainActivity.this, previousCategory, selectedBookmarks,
+                                result -> {
+                                    if (result) {
+                                        bookmarks.removeAll(selectedBookmarks);
+                                        bookmarksAdapter.notifyDataSetChanged();
+                                        removeContextualActionMode();
+                                        setBookmarksLabel();
+                                    }
+                                });
+                categoriesSelection.show(getSupportFragmentManager(), "Categories dialog");
+            }
+        });
 
         delete.setOnClickListener(v12 -> {
             if (counter > 0) {

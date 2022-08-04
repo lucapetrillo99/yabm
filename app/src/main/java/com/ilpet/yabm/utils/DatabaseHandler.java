@@ -403,4 +403,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(String.format("DELETE FROM " + TABLE_CATEGORY + " WHERE " + CATEGORY_ID +
                 " IN (%s);", args));
     }
+
+    public boolean updateBookmarkCategory(ArrayList<Bookmark> bookmarks, String category) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY + " where "
+                + KEY_CATEGORY_TITLE + " = ?", new String[]{category});
+
+        if (cursor.moveToFirst()) {
+            String[] whereArgs = new String[bookmarks.size()];
+            for (int i = 0; i < bookmarks.size(); i++) {
+                whereArgs[i] = bookmarks.get(i).getId();
+            }
+
+            String args = TextUtils.join(", ", whereArgs);
+            String categoryId = cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID));
+            db.execSQL(String.format("UPDATE %s SET %s =" + categoryId + ", %s = " + null + " WHERE %s IN (%s);",
+                    TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

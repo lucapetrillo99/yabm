@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -33,13 +34,13 @@ import com.ilpet.yabm.adapters.BookmarksAdapter;
 import com.ilpet.yabm.adapters.CategoriesMenuAdapter;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.CategoriesSelectionDialog;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private RecyclerView recyclerView;
     private BookmarksAdapter bookmarksAdapter;
     private RecyclerView categoriesRecyclerview;
-    private Toolbar toolbar;
+    private Toolbar toolbar, contextualToolbar;
     private TextView toolbarTitle;
     private DrawerLayout drawerLayout;
     private TextView noBookmarks;
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private boolean refreshCategories = false;
     private SettingsManager settingsManager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         String result = settingsManager.getCategory();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
+        contextualToolbar = findViewById(R.id.contextual_toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
         drawerLayout = findViewById(R.id.drawer_layout);
         categoriesRecyclerview = findViewById(R.id.categories_recyclerview);
@@ -269,34 +270,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     }
                 });
                 break;
-            case R.id.delete:
-                if (counter > 0) {
-                    contextualModeDialog(DELETE_OPTION);
-                }
-                break;
-            case R.id.archive:
-                if (counter > 0) {
-                    contextualModeDialog(ARCHIVE_OPTION);
-                }
-                break;
-            case R.id.unarchive:
-                if (counter > 0) {
-                    contextualModeDialog(UNARCHIVE_OPTION);
-                }
-                break;
-            case R.id.select_all:
-                if (!areAllSelected) {
-                    areAllSelected = true;
-                    selectedBookmarks.addAll(bookmarks);
-                    counter = bookmarks.size();
-                } else {
-                    areAllSelected = false;
-                    selectedBookmarks.removeAll(bookmarks);
-                    counter = 0;
-                }
-                updateCounter();
-                bookmarksAdapter.notifyDataSetChanged();
-                break;
         }
         return true;
     }
@@ -462,19 +435,71 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         refreshCategories = true;
         previousCategory = toolbarTitle.getText().toString();
         isContextualMenuEnable = true;
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.contextual_menu);
-        MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
-        MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
-        if (previousCategory.equals(getString(R.string.archived_bookmarks))) {
-            archive.setVisible(false);
-            unarchive.setVisible(true);
-        } else {
-            archive.setVisible(true);
-            unarchive.setVisible(false);
-        }
-        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+        fab.setVisibility(View.GONE);
+        contextualToolbar.setVisibility(View.VISIBLE);
+        ImageButton move = contextualToolbar.findViewById(R.id.move);
+        ImageButton delete = contextualToolbar.findViewById(R.id.delete);
+        ImageButton archive = contextualToolbar.findViewById(R.id.archive);
+        ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
+        ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
 
+        if (previousCategory.equals(getString(R.string.archived_bookmarks))) {
+            unarchive.setVisibility(View.VISIBLE);
+            archive.setVisibility(View.GONE);
+        } else {
+            archive.setVisibility(View.VISIBLE);
+            unarchive.setVisibility(View.GONE);
+        }
+
+        move.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                CategoriesSelectionDialog categoriesSelection =
+                        new CategoriesSelectionDialog(MainActivity.this, previousCategory, selectedBookmarks,
+                                result -> {
+                                    if (result) {
+                                        bookmarks.removeAll(selectedBookmarks);
+                                        bookmarksAdapter.notifyDataSetChanged();
+                                        removeContextualActionMode();
+                                        setBookmarksLabel();
+                                    }
+                                });
+                categoriesSelection.show(getSupportFragmentManager(), "Categories dialog");
+            }
+        });
+
+        delete.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                contextualModeDialog(DELETE_OPTION);
+            }
+        });
+
+        archive.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                contextualModeDialog(ARCHIVE_OPTION);
+            }
+        });
+
+        unarchive.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                contextualModeDialog(UNARCHIVE_OPTION);
+            }
+        });
+
+        selectAll.setOnClickListener(v12 -> {
+            if (!areAllSelected) {
+                areAllSelected = true;
+                selectedBookmarks.addAll(bookmarks);
+                counter = bookmarks.size();
+            } else {
+                areAllSelected = false;
+                selectedBookmarks.removeAll(bookmarks);
+                counter = 0;
+            }
+            updateCounter();
+            bookmarksAdapter.notifyDataSetChanged();
+        });
+
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
         toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
         bookmarksAdapter.notifyDataSetChanged();
         return true;
@@ -510,6 +535,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
         }
+        contextualToolbar.setVisibility(View.GONE);
+        fab.setVisibility(View.VISIBLE);
         counter = 0;
         selectedBookmarks.clear();
         bookmarksAdapter.notifyDataSetChanged();

@@ -86,5 +86,11 @@
     <string name="descending_name_sort">Per titolo (Z - A)</string>
     <string name="ascending_date_sort">Per data di creazione</string>
     <string name="descending_date_sort">Per ultima modifica</string>
-
+    <string name="archive">Archive</string>
+    <string name="unarchive">Unarchive</string>
+    <string name="select_all">Select All</string>
+    <string name="delete_title">Delete</string>
+    <string name="move">Move</string>
+    <string name="category_selection">Scegli la categoria</string>
+    <string name="all_bookmarks_deleted">Tutti i segnalibri verranno eliminati!</string>
 </resources>

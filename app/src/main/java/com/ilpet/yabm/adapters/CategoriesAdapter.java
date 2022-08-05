@@ -190,7 +190,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
 
         builder.setMessage("Sei sicuro di voler eliminare la categoia?\nTutti i segnalibri " +
-                "verranno eliminati")
+                        "verranno eliminati")
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
@@ -209,19 +209,25 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         alertDialog.show();
     }
 
+    public void deleteCategories(ArrayList<Category> selectedCategories) {
+        categories.removeAll(selectedCategories);
+        db.deleteCategories(selectedCategories);
+        notifyDataSetChanged();
+    }
+
     @Override
     public Filter getFilter() {
         return filter;
     }
 
-    private final Filter filter = new Filter(){
+    private final Filter filter = new Filter() {
         @Override
         protected Filter.FilterResults performFiltering(CharSequence constraint) {
             ArrayList<Category> filteredCategories = new ArrayList<>();
             if (constraint.toString().isEmpty()) {
                 filteredCategories.addAll(allCategories);
             } else {
-                for (Category category: allCategories) {
+                for (Category category : allCategories) {
                     if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         filteredCategories.add(category);
                     }

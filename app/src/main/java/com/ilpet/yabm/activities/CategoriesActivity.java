@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -37,16 +38,16 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
     public boolean areAllSelected = false;
     public boolean isContextualMenuEnable = false;
-    private int selectedCategory = 0;
+    private int counter = 0;
     private RecyclerView recyclerView;
     private CategoriesAdapter categoriesAdapter;
-    private Toolbar toolbar;
+    private Toolbar toolbar, contextualToolbar;
     private TextView toolbarTitle;
     private ImageView sortOptions;
     private ArrayList<Category> categories;
     private ArrayList<Category> selectedCategories;
     private SettingsManager settingsManager;
-    private DatabaseHandler db;
+    private FloatingActionButton insertCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         setContentView(R.layout.activity_categories);
 
         toolbar = findViewById(R.id.toolbar);
+        contextualToolbar = findViewById(R.id.contextual_toolbar);
         toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText(R.string.categories_title);
         setSupportActionBar(toolbar);
@@ -65,9 +67,9 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         });
         sortOptions = findViewById(R.id.category_options_sort);
         recyclerView = findViewById(R.id.recycler_view);
-        FloatingActionButton insertCategory = findViewById(R.id.add_button);
+        insertCategory = findViewById(R.id.add_button);
 
-        db = DatabaseHandler.getInstance(getApplicationContext());
+        DatabaseHandler db = DatabaseHandler.getInstance(getApplicationContext());
         settingsManager = new SettingsManager(getApplicationContext(), "category");
         categories = db.getCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         selectedCategories = new ArrayList<>();
@@ -178,28 +180,6 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                     }
                 });
                 break;
-            case R.id.delete:
-                if (selectedCategory > 0) {
-                    confirmDeletionDialog();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Seleziona una categoria", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.select_all:
-                if (!areAllSelected) {
-                    areAllSelected = true;
-                    selectedCategories.addAll(categories);
-                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(getString(R.string.default_bookmarks)));
-                    selectedCategories.removeIf(pr);
-                    selectedCategory = categories.size() - 1;
-                } else {
-                    areAllSelected = false;
-                    selectedCategories.removeAll(categories);
-                    selectedCategory = 0;
-                }
-                updateCounter();
-                categoriesAdapter.notifyDataSetChanged();
         }
         return true;
     }
@@ -207,16 +187,16 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     public void makeSelection(View v, int position) {
         if (((CheckBox) v).isChecked()) {
             selectedCategories.add(categories.get(position));
-            selectedCategory++;
+            counter++;
         } else {
             selectedCategories.remove(categories.get(position));
-            selectedCategory--;
+            counter--;
         }
         updateCounter();
     }
 
     public void updateCounter() {
-        toolbarTitle.setText(String.valueOf(selectedCategory));
+        toolbarTitle.setText(String.valueOf(counter));
     }
 
     private void removeContextualActionMode() {
@@ -230,7 +210,9 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
         toolbar.inflateMenu(R.menu.menu);
-        selectedCategory = 0;
+        contextualToolbar.setVisibility(View.GONE);
+        insertCategory.setVisibility(View.VISIBLE);
+        counter = 0;
         selectedCategories.clear();
         categoriesAdapter.notifyDataSetChanged();
 
@@ -240,18 +222,44 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     public boolean onLongClick(View v) {
         if (categories.size() > 1) {
             isContextualMenuEnable = true;
-            toolbar.getMenu().clear();
-            toolbar.inflateMenu(R.menu.contextual_menu);
-            MenuItem archive = toolbar.getMenu().findItem(R.id.archive);
-            MenuItem unarchive = toolbar.getMenu().findItem(R.id.unarchive);
-            archive.setVisible(false);
-            unarchive.setVisible(false);
+            insertCategory.setVisibility(View.GONE);
+            contextualToolbar.setVisibility(View.VISIBLE);
+            ImageButton move = contextualToolbar.findViewById(R.id.move);
+            ImageButton delete = contextualToolbar.findViewById(R.id.delete);
+            ImageButton archive = contextualToolbar.findViewById(R.id.archive);
+            ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
+            ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
+            archive.setVisibility(View.GONE);
+            unarchive.setVisibility(View.GONE);
+            move.setVisibility(View.GONE);
+
+            delete.setOnClickListener(v12 -> {
+                if (counter > 0) {
+                    confirmDeletionDialog();
+                }
+            });
             toolbar.setNavigationIcon(R.drawable.ic_back_button);
             toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
             categoriesAdapter.notifyDataSetChanged();
+
+            selectAll.setOnClickListener(v12 -> {
+                if (!areAllSelected) {
+                    areAllSelected = true;
+                    selectedCategories.addAll(categories);
+                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(getString(R.string.default_bookmarks)));
+                    selectedCategories.removeIf(pr);
+                    counter = categories.size() - 1;
+                } else {
+                    areAllSelected = false;
+                    selectedCategories.removeAll(categories);
+                    counter = 0;
+                }
+                updateCounter();
+                categoriesAdapter.notifyDataSetChanged();
+            });
         }
 
-        return false;
+        return true;
     }
 
     private void confirmDeletionDialog() {
@@ -262,7 +270,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         String categoryMessage;
 
         message = "Sei sicuro di voler eliminare ";
-        if (selectedCategory > 1) {
+        if (counter > 1) {
             categoryQuestion = " categorie?";
             deletedQuestion = " eliminate!";
             categoryMessage = "Categorie";
@@ -271,14 +279,11 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             deletedQuestion = " eliminata!";
             categoryMessage = "Categoria";
         }
-
-        builder.setMessage(message + selectedCategory + categoryQuestion)
+        builder.setMessage(message + counter + categoryQuestion)
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    db.deleteCategories(selectedCategories);
-                    categories.removeAll(selectedCategories);
-                    categoriesAdapter.notifyDataSetChanged();
+                    categoriesAdapter.deleteCategories(selectedCategories);
                     Toast.makeText(getApplicationContext(), categoryMessage + deletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();

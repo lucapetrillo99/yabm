@@ -279,7 +279,8 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             deletedQuestion = " eliminata!";
             categoryMessage = "Categoria";
         }
-        builder.setMessage(message + counter + categoryQuestion)
+        builder.setMessage(message + counter + categoryQuestion + "\n" +
+                        getString(R.string.all_bookmarks_deleted))
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {

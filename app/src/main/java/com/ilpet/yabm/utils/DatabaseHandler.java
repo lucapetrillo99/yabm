@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
@@ -437,18 +436,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public String insertPassword(String password) {
+    public boolean insertPassword(String password) {
         PasswordManager passwordManager = PasswordManager.getInstance();
         String encryptedPassword = passwordManager.encryptPassword(password);
 
         if (encryptedPassword == null) {
-            return null;
+            return false;
         } else {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(KEY_USER_PASSWORD, encryptedPassword);
             db.insert(TABLE_PASSWORD, null, values);
-            return encryptedPassword;
+            return true;
         }
     }
 
@@ -464,6 +463,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } else {
             cursor.close();
             return null;
+        }
+    }
+
+    public boolean updatePassword(String newPassword) {
+        PasswordManager passwordManager = PasswordManager.getInstance();
+        String encryptedPassword = passwordManager.encryptPassword(newPassword);
+
+        if (encryptedPassword == null) {
+            return false;
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            return db.update(TABLE_PASSWORD, values, null, null) > 0;
         }
     }
 }

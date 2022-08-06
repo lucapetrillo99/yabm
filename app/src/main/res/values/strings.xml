@@ -97,4 +97,13 @@
     <string name="current_password">Password corrente</string>
     <string name="new_password">Inserisci una password</string>
     <string name="confirm_password">Conferma password</string>
+    <string name="add_password">Aggiungi una password</string>
+    <string name="change_password">Modifica la password</string>
+    <string name="empty_fields">I campi non possono essere vuoti!</string>
+    <string name="password_updated">Password aggiornata!</string>
+    <string name="impossible_update_password">Impossibile aggiornare la password!</string>
+    <string name="same_previous_password">La password è uguale alla precedente!</string>
+    <string name="passwords_not_match">Le password non corrispondono!</string>
+    <string name="password_added">Password aggiunta!</string>
+    <string name="impossible_add_password">Impossibile aggiungere la password!</string>
 </resources>

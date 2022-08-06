@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
@@ -18,7 +19,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "yabm";
     private static final String TABLE_BOOKMARK = "bookmark";
     private static final String TABLE_CATEGORY = "category";
+    private static final String TABLE_PASSWORD = "password";
     private static final String BOOKMARK_ID = "bookmark_id";
+    private static final String PASSWORD_ID = "password_id";
     private static final String CATEGORY_ID = "category_id";
     private static final String KEY_BOOKMARK_LINK = "link";
     private static final String KEY_BOOKMARK_TITLE = "title";
@@ -30,6 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_BOOKMARK_TYPE = "type";
     private static final String KEY_CATEGORY_TITLE = "title";
     private static final String KEY_DATE = "date";
+    private static final String KEY_USER_PASSWORD = "user_password";
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
@@ -41,6 +45,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BOOKMARK_REMINDER + " LONG," + KEY_BOOKMARK_PREVIOUS_CATEGORY + " TEXT," + KEY_BOOKMARK_TYPE + " TEXT,"
             + KEY_DATE + " TEXT," + KEY_BOOKMARK_CATEGORY + " INTEGER ," + " FOREIGN KEY (" + KEY_BOOKMARK_CATEGORY + ")"
             + " REFERENCES " + TABLE_CATEGORY + "(" + CATEGORY_ID + "));";
+    private static final String CREATE_TABLE_PASSWORD = "CREATE TABLE " + TABLE_PASSWORD
+            + "(" + PASSWORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_USER_PASSWORD + " TEXT)";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,13 +63,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_CATEGORY);
         db.execSQL(CREATE_TABLE_BOOKMARK);
+        db.execSQL(CREATE_TABLE_PASSWORD);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARK);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PASSWORD);
         onCreate(db);
     }
 
@@ -427,6 +434,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } else {
             cursor.close();
             return false;
+        }
+    }
+
+    public String insertPassword(String password) {
+        PasswordManager passwordManager = PasswordManager.getInstance();
+        String encryptedPassword = passwordManager.encryptPassword(password);
+
+        if (encryptedPassword == null) {
+            return null;
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            db.insert(TABLE_PASSWORD, null, values);
+            return encryptedPassword;
+        }
+    }
+
+    public String getPassword() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select " + KEY_USER_PASSWORD + " from " + TABLE_PASSWORD,
+                null);
+        if (cursor.moveToFirst()) {
+            String encryptedPassword = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));
+            PasswordManager passwordManager = PasswordManager.getInstance();
+            cursor.close();
+            return passwordManager.decryptPassword(encryptedPassword);
+        } else {
+            cursor.close();
+            return null;
         }
     }
 }

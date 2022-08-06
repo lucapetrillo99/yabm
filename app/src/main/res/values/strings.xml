@@ -43,6 +43,7 @@
     <string name="started_category_displayed">Categoria visualizzata all\'avvio</string>
     <string name="import_export">Importa/Esporta</string>
     <string name="backup">Backup</string>
+    <string name="handle_password">Gestisci password</string>
     <string name="send_feedback">Invia un feedback</string>
     <string name="info_app">Info App</string>
     <string name="action_title">Scegli l\'azione</string>
@@ -93,4 +94,7 @@
     <string name="move">Move</string>
     <string name="category_selection">Scegli la categoria</string>
     <string name="all_bookmarks_deleted">Tutti i segnalibri verranno eliminati!</string>
+    <string name="current_password">Password corrente</string>
+    <string name="new_password">Inserisci una password</string>
+    <string name="confirm_password">Conferma password</string>
 </resources>

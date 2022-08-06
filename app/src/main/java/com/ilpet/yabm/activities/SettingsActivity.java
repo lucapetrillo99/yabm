@@ -3,8 +3,13 @@ package com.ilpet.yabm.activities;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -26,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout startCategory;
     private RelativeLayout importExport;
     private RelativeLayout backup;
+    private RelativeLayout handlePassword;
     private RelativeLayout sendFeedback;
     private RelativeLayout helpSetting;
     private RelativeLayout appInfo;
@@ -47,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
         startCategory = findViewById(R.id.start_category_setting);
         importExport = findViewById(R.id.import_export_setting);
         backup = findViewById(R.id.backup_setting);
+        handlePassword = findViewById(R.id.password_setting);
         sendFeedback = findViewById(R.id.feedback_setting);
         helpSetting = findViewById(R.id.help_setting);
         appInfo = findViewById(R.id.information_setting);
@@ -63,6 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
         starCategoryClickListener();
         importExportClickListener();
         backupClickListener();
+        handlePasswordClickListener();
         helpClickListener();
         feedbackClickListener();
 
@@ -155,6 +163,12 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
+    }
+
+    private void handlePasswordClickListener() {
+        handlePassword.setOnClickListener(v -> {
+        });
+
     }
 
     private void feedbackClickListener() {

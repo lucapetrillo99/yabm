@@ -99,8 +99,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             SimpleDateFormat dateFormat = new SimpleDateFormat(
                     "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             Date date = new Date();
-            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks), dateFormat.format(date));
-            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date));
+            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks),
+                    dateFormat.format(date), Category.CategoryProtection.UNLOCK);
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date),
+                    Category.CategoryProtection.UNLOCK);
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);

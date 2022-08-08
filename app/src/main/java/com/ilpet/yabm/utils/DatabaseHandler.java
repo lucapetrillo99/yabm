@@ -32,12 +32,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_BOOKMARK_TYPE = "type";
     private static final String KEY_CATEGORY_TITLE = "title";
     private static final String KEY_DATE = "date";
+    private static final String KEY_PASSWORD = "password";
     private static final String KEY_USER_PASSWORD = "user_password";
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
             + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE + " TEXT ," +
-            KEY_DATE + " TEXT)";
+            KEY_DATE + " TEXT ," + KEY_PASSWORD + " INTEGER)";
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
             + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK
             + " TEXT," + KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," + KEY_BOOKMARK_IMAGE + " TEXT,"
@@ -108,6 +109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
             values.put(KEY_DATE, category.getDate());
+            values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
             categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
         }
@@ -172,6 +174,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+                category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -198,6 +202,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+                category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -343,6 +349,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
         values.put(KEY_DATE, category.getDate());
+        values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()});
 
@@ -433,6 +440,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } else {
             cursor.close();
             return false;
+        }
+    }
+
+    public void updateCategories(ArrayList<Category> categories) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        for (Category category: categories) {
+            ContentValues values = new ContentValues();
+            values.put(CATEGORY_ID, category.getCategoryId());
+            values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
+            values.put(KEY_DATE, category.getDate());
+            values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
+            db.update(TABLE_CATEGORY, values, null, null);
         }
     }
 

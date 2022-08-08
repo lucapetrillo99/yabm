@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
@@ -177,16 +178,17 @@ public class SettingsActivity extends AppCompatActivity {
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(getString(R.string.cancel), null)
                     .create();
+            TextInputLayout userPasswordLayout = dialogView.findViewById(R.id.current_password_layout);
             EditText passwordText = dialogView.findViewById(R.id.password);
             EditText confirmPasswordText = dialogView.findViewById(R.id.password_confirmation);
             EditText userPassword = dialogView.findViewById(R.id.current_password);
             TextView title = dialogView.findViewById(R.id.password_title);
             if (currentPassword != null) {
                 title.setText(getString(R.string.change_password));
-
-                userPassword.setVisibility(View.VISIBLE);
+                userPasswordLayout.setVisibility(View.VISIBLE);
             } else {
                 title.setText(getString(R.string.add_password));
+                userPasswordLayout.setVisibility(View.GONE);
             }
 
             dialog.setOnShowListener(dialogInterface -> {

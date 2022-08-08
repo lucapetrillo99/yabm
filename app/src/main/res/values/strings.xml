@@ -94,7 +94,7 @@
     <string name="move">Move</string>
     <string name="category_selection">Scegli la categoria</string>
     <string name="all_bookmarks_deleted">Tutti i segnalibri verranno eliminati!</string>
-    <string name="current_password">Password corrente</string>
+    <string name="password">Password</string>
     <string name="new_password">Inserisci una password</string>
     <string name="confirm_password">Conferma password</string>
     <string name="add_password">Aggiungi una password</string>
@@ -106,4 +106,5 @@
     <string name="passwords_not_match">Le password non corrispondono!</string>
     <string name="password_added">Password aggiunta!</string>
     <string name="impossible_add_password">Impossibile aggiungere la password!</string>
+    <string name="wrong_password">Password errata!</string>
 </resources>

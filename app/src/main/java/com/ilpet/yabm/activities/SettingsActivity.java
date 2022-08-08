@@ -16,7 +16,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
@@ -205,18 +204,27 @@ public class SettingsActivity extends AppCompatActivity {
                             passwordText.getText().clear();
                             confirmPasswordText.getText().clear();
                         } else {
-                            if (password.equals(confirmedPassword)) {
-                                if (!password.equals(oldPassword)) {
-                                    if (db.updatePassword(password)) {
-                                        Toast.makeText(this, getString(R.string.password_updated),
-                                                Toast.LENGTH_LONG).show();
+                            if (oldPassword.equals(currentPassword)) {
+                                if (password.equals(confirmedPassword)) {
+                                    if (!password.equals(oldPassword)) {
+                                        if (db.updatePassword(password)) {
+                                            Toast.makeText(this, getString(R.string.password_updated),
+                                                    Toast.LENGTH_LONG).show();
+                                        } else {
+                                            Toast.makeText(this, getString(R.string.
+                                                    impossible_update_password), Toast.LENGTH_LONG).show();
+                                        }
+                                        dialog.dismiss();
                                     } else {
-                                        Toast.makeText(this, getString(R.string.
-                                                impossible_update_password), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(this, getString(R.string.same_previous_password),
+                                                Toast.LENGTH_LONG).show();
+                                        userPassword.getText().clear();
+                                        passwordText.getText().clear();
+                                        confirmPasswordText.getText().clear();
                                     }
-                                    dialog.dismiss();
                                 } else {
-                                    Toast.makeText(this, getString(R.string.same_previous_password),
+                                    Toast.makeText(this,
+                                            getString(R.string.passwords_not_match),
                                             Toast.LENGTH_LONG).show();
                                     userPassword.getText().clear();
                                     passwordText.getText().clear();
@@ -224,12 +232,13 @@ public class SettingsActivity extends AppCompatActivity {
                                 }
                             } else {
                                 Toast.makeText(this,
-                                        getString(R.string.passwords_not_match),
+                                        getString(R.string.wrong_password),
                                         Toast.LENGTH_LONG).show();
                                 userPassword.getText().clear();
                                 passwordText.getText().clear();
                                 confirmPasswordText.getText().clear();
                             }
+
                         }
                     } else {
                         if (password.isEmpty() || confirmedPassword.isEmpty()) {

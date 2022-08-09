@@ -4,13 +4,13 @@
     android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginRight="10dp"
     android:orientation="vertical"
     android:padding="20dp"
     android:paddingStart="20dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginEnd="10dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginStart="10dp"
     tools:ignore="RtlSymmetry">
 
     <TextView
@@ -18,26 +18,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="18sp"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/user_input"
-        android:background="@drawable/custom_background_edit_text"
-        android:layout_gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:maxLength="30"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="30dp"
-        android:inputType="textCapSentences">
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:autofillHints="@null"
+        android:background="@drawable/custom_background_edit_text"
+        android:inputType="textCapSentences"
+        android:maxLength="30"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        tools:ignore="LabelFor" />
 
-    </EditText>
+    <CheckBox
+        android:id="@+id/protection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:text="@string/lock_with_password"
+        android:textSize="18sp" />
 
 </LinearLayout>

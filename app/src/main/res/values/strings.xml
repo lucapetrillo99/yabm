@@ -107,4 +107,7 @@
     <string name="password_added">Password aggiunta!</string>
     <string name="impossible_add_password">Impossibile aggiungere la password!</string>
     <string name="wrong_password">Password errata!</string>
+    <string name="lock_with_password">Blocca con password</string>
+    <string name="categories_updated">Categorie aggiornate!</string>
+    <string name="ok">OK</string>
 </resources>

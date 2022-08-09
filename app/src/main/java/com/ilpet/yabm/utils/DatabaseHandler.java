@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
@@ -443,16 +444,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void updateCategories(ArrayList<Category> categories) {
+    public void updateCategories(ArrayList<Category> categories, Category.CategoryProtection action) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        for (Category category: categories) {
+        for (Category category : categories) {
             ContentValues values = new ContentValues();
             values.put(CATEGORY_ID, category.getCategoryId());
             values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
             values.put(KEY_DATE, category.getDate());
+            category.setCategoryProtection(action);
             values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
-            db.update(TABLE_CATEGORY, values, null, null);
+            db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
+                    new String[]{String.valueOf(category.getCategoryId())});
         }
     }
 

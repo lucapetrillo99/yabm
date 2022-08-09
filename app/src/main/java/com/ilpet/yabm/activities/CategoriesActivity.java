@@ -28,6 +28,8 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.adapters.CategoriesAdapter;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordManagerDialog;
+import com.ilpet.yabm.utils.PasswordDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
@@ -36,6 +38,8 @@ import java.util.function.Predicate;
 
 public class CategoriesActivity extends AppCompatActivity implements View.OnLongClickListener {
     public static final int PERMISSION_REQUEST_STORAGE = 1000;
+    private static final int DELETE_OPTION = 1;
+    private static final int LOCK_UNLOCK_OPTION = 2;
     public boolean areAllSelected = false;
     public boolean isContextualMenuEnable = false;
     private int counter = 0;
@@ -48,6 +52,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     private ArrayList<Category> selectedCategories;
     private SettingsManager settingsManager;
     private FloatingActionButton insertCategory;
+    private DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +74,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         recyclerView = findViewById(R.id.recycler_view);
         insertCategory = findViewById(R.id.add_button);
 
-        DatabaseHandler db = DatabaseHandler.getInstance(getApplicationContext());
+        db = DatabaseHandler.getInstance(getApplicationContext());
         settingsManager = new SettingsManager(getApplicationContext(), "category");
         categories = db.getCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         selectedCategories = new ArrayList<>();
@@ -222,6 +227,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
     public boolean onLongClick(View v) {
         if (categories.size() > 1) {
             isContextualMenuEnable = true;
+            final boolean[] lock = {false};
             insertCategory.setVisibility(View.GONE);
             contextualToolbar.setVisibility(View.VISIBLE);
             ImageButton move = contextualToolbar.findViewById(R.id.move);
@@ -229,6 +235,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
             ImageButton archive = contextualToolbar.findViewById(R.id.archive);
             ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
             ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
+            ImageView protection = contextualToolbar.findViewById(R.id.handle_password);
             archive.setVisibility(View.GONE);
             unarchive.setVisibility(View.GONE);
             move.setVisibility(View.GONE);
@@ -246,9 +253,25 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 if (!areAllSelected) {
                     areAllSelected = true;
                     selectedCategories.addAll(categories);
-                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(getString(R.string.default_bookmarks)));
+                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(
+                            getString(R.string.default_bookmarks)));
                     selectedCategories.removeIf(pr);
                     counter = categories.size() - 1;
+                    int protectionCounter = 0;
+                    for (Category category : selectedCategories) {
+                        if (category.getPasswordProtection() == Category.CategoryProtection.LOCK) {
+                            protectionCounter += 1;
+                            lock[0] = true;
+                        } else {
+                            protectionCounter = 0;
+                            lock[0] = false;
+                        }
+                    }
+                    if (protectionCounter > 0) {
+                        protection.setImageResource(R.drawable.ic_unlock);
+                    } else {
+                        protection.setImageResource(R.drawable.ic_lock);
+                    }
                 } else {
                     areAllSelected = false;
                     selectedCategories.removeAll(categories);
@@ -257,8 +280,47 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 updateCounter();
                 categoriesAdapter.notifyDataSetChanged();
             });
-        }
 
+            protection.setOnClickListener(v12 -> {
+                if (counter > 0) {
+                    String currentPassword = db.getPassword();
+                    if (currentPassword == null) {
+                        PasswordManagerDialog passwordManagerDialog = new PasswordManagerDialog(
+                                this);
+                        passwordManagerDialog.createDialog();
+                    } else {
+                        if (lock[0]) {
+                            PasswordDialog passwordDialog = new PasswordDialog(this,
+                                    result -> {
+                                        if (result) {
+                                            categoriesAdapter.updateCategories(
+                                                    selectedCategories, LOCK_UNLOCK_OPTION,
+                                                    Category.CategoryProtection.UNLOCK);
+
+                                            removeContextualActionMode();
+                                            Toast.makeText(this,
+                                                    "Categorie aggiornate!",
+                                                    Toast.LENGTH_LONG).show();
+                                        } else {
+                                            Toast.makeText(this,
+                                                    getString(R.string.wrong_password),
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                            passwordDialog.show(getSupportFragmentManager(), "Password dialog");
+                        } else {
+                            categoriesAdapter.updateCategories(
+                                    selectedCategories, LOCK_UNLOCK_OPTION,
+                                    Category.CategoryProtection.LOCK);
+                            removeContextualActionMode();
+                            Toast.makeText(this,
+                                    getString(R.string.categories_updated),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
+        }
         return true;
     }
 
@@ -284,7 +346,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    categoriesAdapter.deleteCategories(selectedCategories);
+                    categoriesAdapter.updateCategories(selectedCategories, DELETE_OPTION, null);
                     Toast.makeText(getApplicationContext(), categoryMessage + deletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();

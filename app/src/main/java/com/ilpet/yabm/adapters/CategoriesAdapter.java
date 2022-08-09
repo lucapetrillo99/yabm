@@ -31,6 +31,8 @@ import java.util.Locale;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
+    private static final int DELETE_OPTION = 1;
+    private static final int LOCK_UNLOCK_OPTION = 2;
     private final ArrayList<Category> categories;
     private DatabaseHandler db;
     private final CategoriesActivity categoriesActivity;
@@ -123,14 +125,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .create();
         EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
+        CheckBox protection = dialogView.findViewById(R.id.protection);
         if (isModify) {
             title.setText(R.string.modify_category_title);
+            input.setText(categories.get(position).getCategoryTitle());
+            protection.setChecked(categories.get(position).getPasswordProtection() == Category.CategoryProtection.LOCK);
         } else {
             title.setText(R.string.new_category_title);
-        }
-        if (isModify) {
-            input.setText(categories.get(position).getCategoryTitle());
-        } else {
             input.setHint(R.string.insert_category_title);
         }
         dialog.setOnShowListener(dialogInterface -> {
@@ -144,6 +145,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
                     category.setDate(dateFormat.format(date));
+                    if (protection.isChecked()) {
+                        category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                    } else {
+                        category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                    }
                     boolean result = db.updateCategory(category);
                     if (result) {
                         Toast.makeText(v.getRootView().getContext(),
@@ -161,6 +167,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
                         category.setDate(dateFormat.format(date));
+                        if (protection.isChecked()) {
+                            category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                        } else {
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                        }
                         String categoryId = db.addCategory(category);
                         if (categoryId != null) {
                             dialog.dismiss();
@@ -209,10 +220,19 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         alertDialog.show();
     }
 
-    public void deleteCategories(ArrayList<Category> selectedCategories) {
-        categories.removeAll(selectedCategories);
-        db.deleteCategories(selectedCategories);
-        notifyDataSetChanged();
+    public void updateCategories(ArrayList<Category> selectedCategories, int operation,
+                                 Category.CategoryProtection action) {
+        switch (operation) {
+            case DELETE_OPTION:
+                categories.removeAll(selectedCategories);
+                db.deleteCategories(selectedCategories);
+                notifyDataSetChanged();
+                break;
+            case LOCK_UNLOCK_OPTION:
+                db.updateCategories(selectedCategories, action);
+                notifyDataSetChanged();
+                break;
+        }
     }
 
     @Override

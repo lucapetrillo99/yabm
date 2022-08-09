@@ -1,0 +1,130 @@
+package com.ilpet.yabm.utils;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputLayout;
+import com.ilpet.yabm.R;
+
+import java.util.Objects;
+
+public class PasswordManagerDialog {
+    private final Activity activity;
+
+    public PasswordManagerDialog(Activity activity) {
+        this.activity = activity;
+    }
+
+    public void createDialog() {
+        DatabaseHandler db = new DatabaseHandler(activity.getApplicationContext());
+        String currentPassword = db.getPassword();
+        LayoutInflater inflater = activity.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.password_manager_dialog, null);
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(activity.getString(R.string.cancel), null)
+                .create();
+        TextInputLayout userPasswordLayout = dialogView.findViewById(R.id.current_password_layout);
+        EditText passwordText = dialogView.findViewById(R.id.password);
+        EditText confirmPasswordText = dialogView.findViewById(R.id.password_confirmation);
+        EditText userPassword = dialogView.findViewById(R.id.current_password);
+        TextView title = dialogView.findViewById(R.id.password_title);
+        if (currentPassword != null) {
+            title.setText(activity.getString(R.string.change_password));
+            userPasswordLayout.setVisibility(View.VISIBLE);
+        } else {
+            title.setText(activity.getString(R.string.add_password));
+            userPasswordLayout.setVisibility(View.GONE);
+        }
+
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String password = Objects.requireNonNull(passwordText.getText()).toString();
+                String confirmedPassword = confirmPasswordText.getText().toString();
+                if (currentPassword != null) {
+                    String oldPassword = userPassword.getText().toString();
+                    if (oldPassword.isEmpty() || password.isEmpty() || confirmedPassword.isEmpty()) {
+                        Toast.makeText(activity,
+                                        activity.getString(R.string.empty_fields), Toast.LENGTH_LONG).
+                                show();
+                        passwordText.getText().clear();
+                        confirmPasswordText.getText().clear();
+                    } else {
+                        if (oldPassword.equals(currentPassword)) {
+                            if (password.equals(confirmedPassword)) {
+                                if (!password.equals(oldPassword)) {
+                                    if (db.updatePassword(password)) {
+                                        Toast.makeText(activity,
+                                                activity.getString(R.string.password_updated),
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(activity, activity.getString(R.string.
+                                                impossible_update_password), Toast.LENGTH_LONG).show();
+                                    }
+                                    dialog.dismiss();
+                                } else {
+                                    Toast.makeText(activity,
+                                            activity.getString(R.string.same_previous_password),
+                                            Toast.LENGTH_LONG).show();
+                                    userPassword.getText().clear();
+                                    passwordText.getText().clear();
+                                    confirmPasswordText.getText().clear();
+                                }
+                            } else {
+                                Toast.makeText(activity,
+                                        activity.getString(R.string.passwords_not_match),
+                                        Toast.LENGTH_LONG).show();
+                                userPassword.getText().clear();
+                                passwordText.getText().clear();
+                                confirmPasswordText.getText().clear();
+                            }
+                        } else {
+                            Toast.makeText(activity,
+                                    activity.getString(R.string.wrong_password),
+                                    Toast.LENGTH_LONG).show();
+                            userPassword.getText().clear();
+                            passwordText.getText().clear();
+                            confirmPasswordText.getText().clear();
+                        }
+
+                    }
+                } else {
+                    if (password.isEmpty() || confirmedPassword.isEmpty()) {
+                        Toast.makeText(activity,
+                                        activity.getString(R.string.empty_fields), Toast.LENGTH_LONG).
+                                show();
+                        passwordText.getText().clear();
+                        confirmPasswordText.getText().clear();
+                    } else {
+                        if (password.equals(confirmedPassword)) {
+                            if (db.insertPassword(password)) {
+                                Toast.makeText(activity, activity.getString(R.string.password_added),
+                                        Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(activity,
+                                        activity.getString(R.string.impossible_add_password),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(activity,
+                                    activity.getString(R.string.passwords_not_match),
+                                    Toast.LENGTH_LONG).show();
+                            passwordText.getText().clear();
+                            confirmPasswordText.getText().clear();
+                        }
+                    }
+                }
+            });
+        });
+        dialog.show();
+    }
+}

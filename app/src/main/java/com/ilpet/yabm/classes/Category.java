@@ -8,8 +8,8 @@ import java.util.Locale;
 
 public class Category {
     public enum CategoryProtection {
-        LOCK(0),
-        UNLOCK(1);
+        UNLOCK(0),
+        LOCK(1);
 
         private final int value;
 
@@ -20,11 +20,15 @@ public class Category {
         public static CategoryProtection castFromInt(int x) {
             switch(x) {
                 case 0:
-                    return LOCK;
-                case 1:
                     return UNLOCK;
+                case 1:
+                    return LOCK;
             }
             return null;
+        }
+
+        public int getValue() {
+            return value;
         }
     }
 

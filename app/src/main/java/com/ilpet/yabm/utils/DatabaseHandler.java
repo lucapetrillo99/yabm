@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
@@ -38,14 +37,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE + " TEXT ," +
-            KEY_DATE + " TEXT ," + KEY_PASSWORD + " INTEGER)";
-    private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
-            + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK
-            + " TEXT," + KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," + KEY_BOOKMARK_IMAGE + " TEXT,"
-            + KEY_BOOKMARK_REMINDER + " LONG," + KEY_BOOKMARK_PREVIOUS_CATEGORY + " TEXT," + KEY_BOOKMARK_TYPE + " TEXT,"
-            + KEY_DATE + " TEXT," + KEY_BOOKMARK_CATEGORY + " INTEGER ," + " FOREIGN KEY (" + KEY_BOOKMARK_CATEGORY + ")"
-            + " REFERENCES " + TABLE_CATEGORY + "(" + CATEGORY_ID + "));";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE +
+            " TEXT ," + KEY_DATE + " TEXT ," + KEY_PASSWORD + " INTEGER)";
+    private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE " + TABLE_BOOKMARK + "(" +
+            BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK + " TEXT," +
+            KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," +
+            KEY_BOOKMARK_IMAGE + " TEXT," + KEY_BOOKMARK_REMINDER + " LONG," +
+            KEY_BOOKMARK_PREVIOUS_CATEGORY + " TEXT," + KEY_BOOKMARK_TYPE + " TEXT," + KEY_DATE +
+            " TEXT," + KEY_BOOKMARK_CATEGORY + " INTEGER ," +
+            " FOREIGN KEY (" + KEY_BOOKMARK_CATEGORY + ")" + " REFERENCES " + TABLE_CATEGORY +
+            "(" + CATEGORY_ID + "));";
     private static final String CREATE_TABLE_PASSWORD = "CREATE TABLE " + TABLE_PASSWORD
             + "(" + PASSWORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_USER_PASSWORD + " TEXT)";
 
@@ -138,8 +139,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void removeFromArchive(String bookmarkId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("Select " + KEY_BOOKMARK_PREVIOUS_CATEGORY + " from " + TABLE_BOOKMARK + " where "
-                + BOOKMARK_ID + " = ?", new String[]{bookmarkId});
+        Cursor cursor = db.rawQuery("Select " + KEY_BOOKMARK_PREVIOUS_CATEGORY + " from "
+                + TABLE_BOOKMARK + " where " + BOOKMARK_ID + " = ?", new String[]{bookmarkId});
 
         if (cursor.moveToFirst()) {
             String id = cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_PREVIOUS_CATEGORY));
@@ -220,16 +221,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         " where " + KEY_CATEGORY_TITLE + " = ?",
                 new String[]{context.getString(R.string.archived_bookmarks)});
 
+        int lock = Category.CategoryProtection.LOCK.getValue();
+        Cursor cur = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
+                        " where " + KEY_PASSWORD + " = ?",
+                new String[]{String.valueOf(lock)});
+
+        ArrayList<String> categoriesLocked = new ArrayList<>();
+        if (cur.moveToFirst()) {
+            do {
+                categoriesLocked.add(cur.getString(cur.getColumnIndexOrThrow(CATEGORY_ID)));
+            } while (cur.moveToNext());
+        }
         if (c.moveToFirst()) {
+            categoriesLocked.add(c.getString(c.getColumnIndexOrThrow(CATEGORY_ID)));
             Cursor cursor;
-            String category = c.getString(c.getColumnIndexOrThrow(CATEGORY_ID));
+            String query;
             if (orderBy != null && orderType != null) {
-                cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where " + KEY_BOOKMARK_CATEGORY + " != ? "
-                        + " order by " + orderBy + " " + orderType, new String[]{category});
+                query = "SELECT * FROM " + TABLE_BOOKMARK + " WHERE " + KEY_BOOKMARK_CATEGORY +
+                        " NOT IN (" + makePlaceholders(categoriesLocked.size()) + ")" +
+                        " order by " + orderBy + " " + orderType;
+
             } else {
-                cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where " + KEY_BOOKMARK_CATEGORY + " != ? ",
-                        new String[]{category});
+                query = "SELECT * FROM " + TABLE_BOOKMARK + " WHERE " + KEY_BOOKMARK_CATEGORY +
+                        " NOT IN (" + makePlaceholders(categoriesLocked.size()) + ")";
             }
+            cursor = db.rawQuery(query, categoriesLocked.toArray(new String[0]));
 
             if (cursor.moveToFirst()) {
                 do {
@@ -250,6 +266,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
         }
         c.close();
+        cur.close();
         return bookmarks;
     }
 
@@ -295,7 +312,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String id = c.getString(c.getColumnIndexOrThrow(CATEGORY_ID));
             if (orderBy != null && orderType != null) {
                 cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where "
-                        + KEY_BOOKMARK_CATEGORY + " = ?" + "order by " + orderBy + " " + orderType, new String[]{id});
+                                + KEY_BOOKMARK_CATEGORY + " = ?" + "order by " + orderBy + " " + orderType,
+                        new String[]{id});
             } else {
                 cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where "
                         + KEY_BOOKMARK_CATEGORY + " = ?", new String[]{id});
@@ -334,7 +352,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean deleteCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle(), null, null);
+        ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle(),
+                null, null);
 
         for (Bookmark bookmark : bookmarks) {
             deleteBookmark(bookmark.getId());
@@ -403,7 +422,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String args = TextUtils.join(", ", whereArgs);
 
         db.execSQL(String.format("UPDATE %s SET %s =" + 2 + ", %s = " + id + " WHERE %s IN (%s);",
-                TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+                TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID,
+                args));
     }
 
     public void deleteCategories(ArrayList<Category> categories) {
@@ -434,8 +454,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String args = TextUtils.join(", ", whereArgs);
             String categoryId = cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID));
-            db.execSQL(String.format("UPDATE %s SET %s =" + categoryId + ", %s = " + null + " WHERE %s IN (%s);",
-                    TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+            db.execSQL(String.format("UPDATE %s SET %s =" + categoryId + ", %s = " + null +
+                            " WHERE %s IN (%s);",
+                    TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY,
+                    BOOKMARK_ID, args));
             cursor.close();
             return true;
         } else {
@@ -500,6 +522,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_PASSWORD, encryptedPassword);
             return db.update(TABLE_PASSWORD, values, null, null) > 0;
+        }
+    }
+
+    private String makePlaceholders(int len) {
+        if (len < 1) {
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
         }
     }
 }

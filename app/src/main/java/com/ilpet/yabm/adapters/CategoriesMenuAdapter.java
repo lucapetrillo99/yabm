@@ -104,10 +104,6 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
                                 result -> {
                                     if (result) {
                                         loadFilteredBookmarks(holder);
-                                    } else {
-                                        Toast.makeText(mainActivity,
-                                                mainActivity.getString(R.string.wrong_password),
-                                                Toast.LENGTH_LONG).show();
                                     }
                                     unlock = result;
                                 });

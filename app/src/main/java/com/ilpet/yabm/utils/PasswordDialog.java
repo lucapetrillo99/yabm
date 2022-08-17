@@ -37,12 +37,22 @@ public class PasswordDialog extends AppCompatDialogFragment {
             EditText input = customLayout.findViewById(R.id.password_input);
             String userInput = input.getText().toString();
             if (!userInput.isEmpty()) {
-                passwordListener.getResult(currentPassword.equals(userInput));
+                if (currentPassword.equals(userInput)) {
+                    passwordListener.getResult(true);
+                } else {
+                    passwordListener.getResult(false);
+                    Toast.makeText(activity, getString(R.string.wrong_password),
+                            Toast.LENGTH_LONG).show();
+                }
             } else {
+                passwordListener.getResult(false);
                 Toast.makeText(activity, getString(R.string.empty_fields),
                         Toast.LENGTH_LONG).show();
             }
         });
+
+        builder.setNegativeButton(activity.getString(R.string.cancel), ((dialogInterface, i) ->
+                passwordListener.getResult(false)));
 
         return builder.create();
     }

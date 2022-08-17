@@ -301,10 +301,6 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                                             Toast.makeText(this,
                                                     "Categorie aggiornate!",
                                                     Toast.LENGTH_LONG).show();
-                                        } else {
-                                            Toast.makeText(this,
-                                                    getString(R.string.wrong_password),
-                                                    Toast.LENGTH_LONG).show();
                                         }
                                     });
                             passwordDialog.show(getSupportFragmentManager(), "Password dialog");

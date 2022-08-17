@@ -2,6 +2,8 @@ package com.ilpet.yabm.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -9,19 +11,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDialogFragment;
+
 import com.google.android.material.textfield.TextInputLayout;
 import com.ilpet.yabm.R;
 
 import java.util.Objects;
 
-public class PasswordManagerDialog {
+public class PasswordManagerDialog extends AppCompatDialogFragment {
     private final Activity activity;
+    private final PasswordManagerDialog.PasswordManagerListener passwordManagerListener;
 
-    public PasswordManagerDialog(Activity activity) {
+    public PasswordManagerDialog(Activity activity, PasswordManagerListener passwordListener) {
         this.activity = activity;
+        this.passwordManagerListener = passwordListener;
     }
 
-    public void createDialog() {
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         DatabaseHandler db = new DatabaseHandler(activity.getApplicationContext());
         String currentPassword = db.getPassword();
         LayoutInflater inflater = activity.getLayoutInflater();
@@ -31,6 +41,7 @@ public class PasswordManagerDialog {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(activity.getString(R.string.cancel), null)
                 .create();
+
         TextInputLayout userPasswordLayout = dialogView.findViewById(R.id.current_password_layout);
         EditText passwordText = dialogView.findViewById(R.id.password);
         EditText confirmPasswordText = dialogView.findViewById(R.id.password_confirmation);
@@ -106,9 +117,11 @@ public class PasswordManagerDialog {
                     } else {
                         if (password.equals(confirmedPassword)) {
                             if (db.insertPassword(password)) {
+                                passwordManagerListener.getResult(true);
                                 Toast.makeText(activity, activity.getString(R.string.password_added),
                                         Toast.LENGTH_LONG).show();
                             } else {
+                                passwordManagerListener.getResult(false);
                                 Toast.makeText(activity,
                                         activity.getString(R.string.impossible_add_password),
                                         Toast.LENGTH_LONG).show();
@@ -125,6 +138,10 @@ public class PasswordManagerDialog {
                 }
             });
         });
-        dialog.show();
+        return dialog;
+    }
+
+    public interface PasswordManagerListener {
+        void getResult(boolean result);
     }
 }

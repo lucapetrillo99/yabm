@@ -163,8 +163,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void handlePasswordClickListener() {
         handlePassword.setOnClickListener(v -> {
-            PasswordManagerDialog passwordDialog = new PasswordManagerDialog(this);
-            passwordDialog.createDialog();
+            PasswordManagerDialog passwordManagerDialog = new
+                    PasswordManagerDialog(this,
+                    result -> { });
+            passwordManagerDialog.show(this.getSupportFragmentManager(),
+                    "Password Manager dialog");
         });
     }
 

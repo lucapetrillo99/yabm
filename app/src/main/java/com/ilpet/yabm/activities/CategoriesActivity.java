@@ -285,9 +285,23 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
                 if (counter > 0) {
                     String currentPassword = db.getPassword();
                     if (currentPassword == null) {
-                        PasswordManagerDialog passwordManagerDialog = new PasswordManagerDialog(
-                                this);
-                        passwordManagerDialog.createDialog();
+                        PasswordManagerDialog passwordManagerDialog = new
+                                PasswordManagerDialog(this,
+                                result -> {
+                                    if (result) {
+                                        removeContextualActionMode();
+                                        Toast.makeText(this,
+                                                getString(R.string.categories_updated),
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+                                        removeContextualActionMode();
+                                        Toast.makeText(this,
+                                                getString(R.string.impossible_update_categories),
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                        passwordManagerDialog.show(this.getSupportFragmentManager(),
+                                "Password Manager dialog");
                     } else {
                         if (lock[0]) {
                             PasswordDialog passwordDialog = new PasswordDialog(this,
@@ -299,7 +313,7 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
 
                                             removeContextualActionMode();
                                             Toast.makeText(this,
-                                                    "Categorie aggiornate!",
+                                                    getString(R.string.categories_updated),
                                                     Toast.LENGTH_LONG).show();
                                         }
                                     });

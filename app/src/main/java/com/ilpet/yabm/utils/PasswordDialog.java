@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -28,33 +30,37 @@ public class PasswordDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         DatabaseHandler db = new DatabaseHandler(activity.getApplicationContext());
         String currentPassword = db.getPassword();
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        LayoutInflater inflater = activity.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.password_dialog, null);
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setView(dialogView)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(activity.getString(R.string.cancel), null)
+                .create();
+        dialog.setCanceledOnTouchOutside(false);
 
-        final View customLayout = getLayoutInflater().inflate(R.layout.password_dialog, null);
-        builder.setView(customLayout);
-
-        builder.setPositiveButton(activity.getString(R.string.ok), (dialog, which) -> {
-            EditText input = customLayout.findViewById(R.id.password_input);
-            String userInput = input.getText().toString();
-            if (!userInput.isEmpty()) {
-                if (currentPassword.equals(userInput)) {
-                    passwordListener.getResult(true);
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                EditText input = dialogView.findViewById(R.id.password_input);
+                String userInput = input.getText().toString();
+                if (!userInput.isEmpty()) {
+                    if (currentPassword.equals(userInput)) {
+                        passwordListener.getResult(true);
+                    } else {
+                        passwordListener.getResult(false);
+                        Toast.makeText(activity, getString(R.string.wrong_password),
+                                Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     passwordListener.getResult(false);
-                    Toast.makeText(activity, getString(R.string.wrong_password),
+                    Toast.makeText(activity, getString(R.string.empty_fields),
                             Toast.LENGTH_LONG).show();
                 }
-            } else {
-                passwordListener.getResult(false);
-                Toast.makeText(activity, getString(R.string.empty_fields),
-                        Toast.LENGTH_LONG).show();
-            }
+            });
         });
 
-        builder.setNegativeButton(activity.getString(R.string.cancel), ((dialogInterface, i) ->
-                passwordListener.getResult(false)));
-
-        return builder.create();
+        return dialog;
     }
 
     public interface PasswordListener {

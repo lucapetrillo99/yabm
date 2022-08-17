@@ -41,6 +41,7 @@ public class PasswordManagerDialog extends AppCompatDialogFragment {
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(activity.getString(R.string.cancel), null)
                 .create();
+        dialog.setCanceledOnTouchOutside(false);
 
         TextInputLayout userPasswordLayout = dialogView.findViewById(R.id.current_password_layout);
         EditText passwordText = dialogView.findViewById(R.id.password);

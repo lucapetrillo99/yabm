@@ -22,6 +22,8 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.PasswordManagerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,9 +36,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     private static final int DELETE_OPTION = 1;
     private static final int LOCK_UNLOCK_OPTION = 2;
     private final ArrayList<Category> categories;
-    private DatabaseHandler db;
     private final CategoriesActivity categoriesActivity;
     private final ArrayList<Category> allCategories;
+    private DatabaseHandler db;
     private AlertDialog dialog;
 
     public CategoriesAdapter(ArrayList<Category> categories, CategoriesActivity categoriesActivity) {
@@ -95,9 +97,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 holder.delete.setVisibility(View.VISIBLE);
             }
         }
-        holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(), true, v));
+        holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(),
+                true, v));
         holder.delete.setOnClickListener(v -> confirmDialog(holder.getAbsoluteAdapterPosition(), v));
-        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, holder.getAbsoluteAdapterPosition()));
+        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v,
+                holder.getAbsoluteAdapterPosition()));
 
         if (categoriesActivity.areAllSelected) {
             for (int i = 0; i < categories.size(); i++) {
@@ -129,11 +133,43 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         if (isModify) {
             title.setText(R.string.modify_category_title);
             input.setText(categories.get(position).getCategoryTitle());
-            protection.setChecked(categories.get(position).getPasswordProtection() == Category.CategoryProtection.LOCK);
+            protection.setChecked(categories.get(position).getPasswordProtection() ==
+                    Category.CategoryProtection.LOCK);
         } else {
             title.setText(R.string.new_category_title);
             input.setHint(R.string.insert_category_title);
         }
+
+        boolean isChecked = protection.isChecked();
+        protection.setOnClickListener(view -> {
+            if (isModify) {
+                if (isChecked) {
+                    PasswordDialog passwordDialog = new PasswordDialog(categoriesActivity,
+                            result -> {
+                                if (result) {
+                                    protection.setChecked(false);
+                                } else {
+                                    protection.setChecked(true);
+                                    Toast.makeText(categoriesActivity,
+                                            categoriesActivity.getString(R.string.wrong_password),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                    passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
+                            "Password dialog");
+                }
+            } else {
+                String password = db.getPassword();
+                if (password == null) {
+                    protection.setChecked(false);
+                    PasswordManagerDialog passwordManagerDialog = new
+                            PasswordManagerDialog(categoriesActivity,
+                            protection::setChecked);
+                    passwordManagerDialog.show(categoriesActivity.getSupportFragmentManager(),
+                            "Password Manager dialog");
+                }
+            }
+        });
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
@@ -248,7 +284,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 filteredCategories.addAll(allCategories);
             } else {
                 for (Category category : allCategories) {
-                    if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().
+                            toLowerCase())) {
                         filteredCategories.add(category);
                     }
                 }

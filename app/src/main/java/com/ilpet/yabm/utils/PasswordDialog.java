@@ -47,6 +47,7 @@ public class PasswordDialog extends AppCompatDialogFragment {
                 if (!userInput.isEmpty()) {
                     if (currentPassword.equals(userInput)) {
                         passwordListener.getResult(true);
+                        dialog.dismiss();
                     } else {
                         passwordListener.getResult(false);
                         Toast.makeText(activity, getString(R.string.wrong_password),

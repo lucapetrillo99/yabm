@@ -166,7 +166,7 @@ public class SettingsActivity extends AppCompatActivity {
             PasswordManagerDialog passwordManagerDialog = new
                     PasswordManagerDialog(this,
                     result -> { });
-            passwordManagerDialog.show(this.getSupportFragmentManager(),
+            passwordManagerDialog.show(getSupportFragmentManager(),
                     "Password Manager dialog");
         });
     }

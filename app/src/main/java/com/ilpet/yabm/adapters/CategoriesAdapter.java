@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     static class categoriesViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageButton modify, delete;
+        ImageView protection;
         CheckBox checkbox;
         View view;
 
@@ -58,6 +60,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             title = itemView.findViewById(R.id.title);
             modify = itemView.findViewById(R.id.modify);
             delete = itemView.findViewById(R.id.delete);
+            protection = itemView.findViewById(R.id.category_protection);
             checkbox = itemView.findViewById(R.id.checkbox);
             view = itemView;
             view.setOnLongClickListener(categoriesActivity);
@@ -76,6 +79,16 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public void onBindViewHolder(@NonNull categoriesViewHolder holder, int position) {
         db = DatabaseHandler.getInstance(categoriesActivity);
         holder.title.setText(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
+
+        if (!categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
+                equals(categoriesActivity.getString(R.string.default_bookmarks))) {
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getPasswordProtection().
+                    equals(Category.CategoryProtection.LOCK)) {
+                holder.protection.setVisibility(View.VISIBLE);
+            } else {
+                holder.protection.setVisibility(View.GONE);
+            }
+        }
 
         if (categoriesActivity.isContextualMenuEnable) {
             if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().

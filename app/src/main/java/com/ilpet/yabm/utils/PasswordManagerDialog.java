@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +49,7 @@ public class PasswordManagerDialog extends AppCompatDialogFragment {
         EditText confirmPasswordText = dialogView.findViewById(R.id.password_confirmation);
         EditText userPassword = dialogView.findViewById(R.id.current_password);
         TextView title = dialogView.findViewById(R.id.password_title);
+        ImageButton info = dialogView.findViewById(R.id.info_button);
         if (currentPassword != null) {
             title.setText(activity.getString(R.string.change_password));
             userPasswordLayout.setVisibility(View.VISIBLE);
@@ -55,6 +57,16 @@ public class PasswordManagerDialog extends AppCompatDialogFragment {
             title.setText(activity.getString(R.string.add_password));
             userPasswordLayout.setVisibility(View.GONE);
         }
+
+        info.setOnClickListener(view -> {
+            LayoutInflater popupInflater = activity.getLayoutInflater();
+            View dialogView1 = popupInflater.inflate(R.layout.info_password_popup, null);
+            AlertDialog dialog1 = new AlertDialog.Builder(activity)
+                    .setView(dialogView1)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create();
+            dialog1.show();
+        });
 
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);

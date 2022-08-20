@@ -220,44 +220,43 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
 
     @Override
     public boolean onLongClick(View v) {
-        if (categories.size() > 1) {
-            isContextualMenuEnable = true;
-            insertCategory.setVisibility(View.GONE);
-            contextualToolbar.setVisibility(View.VISIBLE);
-            ImageButton move = contextualToolbar.findViewById(R.id.move);
-            ImageButton delete = contextualToolbar.findViewById(R.id.delete);
-            ImageButton archive = contextualToolbar.findViewById(R.id.archive);
-            ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
-            ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
-            archive.setVisibility(View.GONE);
-            unarchive.setVisibility(View.GONE);
-            move.setVisibility(View.GONE);
+        isContextualMenuEnable = true;
+        insertCategory.setVisibility(View.GONE);
+        contextualToolbar.setVisibility(View.VISIBLE);
+        ImageButton move = contextualToolbar.findViewById(R.id.move);
+        ImageButton delete = contextualToolbar.findViewById(R.id.delete);
+        ImageButton archive = contextualToolbar.findViewById(R.id.archive);
+        ImageButton unarchive = contextualToolbar.findViewById(R.id.unarchive);
+        ImageButton selectAll = contextualToolbar.findViewById(R.id.select_all);
+        archive.setVisibility(View.GONE);
+        unarchive.setVisibility(View.GONE);
+        move.setVisibility(View.GONE);
 
-            delete.setOnClickListener(v12 -> {
-                if (counter > 0) {
-                    confirmDeletionDialog();
-                }
-            });
-            toolbar.setNavigationIcon(R.drawable.ic_back_button);
-            toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
+        delete.setOnClickListener(v12 -> {
+            if (counter > 0) {
+                confirmDeletionDialog();
+            }
+        });
+        toolbar.setNavigationIcon(R.drawable.ic_back_button);
+        toolbar.setNavigationOnClickListener(v1 -> removeContextualActionMode());
+        categoriesAdapter.notifyDataSetChanged();
+
+        selectAll.setOnClickListener(v12 -> {
+            if (!areAllSelected) {
+                areAllSelected = true;
+                selectedCategories.addAll(categories);
+                Predicate<Category> pr = a -> (a.getCategoryTitle().equals(
+                        getString(R.string.default_bookmarks)));
+                selectedCategories.removeIf(pr);
+                counter = categories.size() - 1;
+            } else {
+                areAllSelected = false;
+                selectedCategories.removeAll(categories);
+                counter = 0;
+            }
+            updateCounter();
             categoriesAdapter.notifyDataSetChanged();
-
-            selectAll.setOnClickListener(v12 -> {
-                if (!areAllSelected) {
-                    areAllSelected = true;
-                    selectedCategories.addAll(categories);
-                    Predicate<Category> pr = a -> (a.getCategoryTitle().equals(getString(R.string.default_bookmarks)));
-                    selectedCategories.removeIf(pr);
-                    counter = categories.size() - 1;
-                } else {
-                    areAllSelected = false;
-                    selectedCategories.removeAll(categories);
-                    counter = 0;
-                }
-                updateCounter();
-                categoriesAdapter.notifyDataSetChanged();
-            });
-        }
+        });
 
         return true;
     }

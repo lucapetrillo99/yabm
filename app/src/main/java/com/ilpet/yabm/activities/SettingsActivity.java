@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordManagerDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout startCategory;
     private RelativeLayout importExport;
     private RelativeLayout backup;
+    private RelativeLayout handlePassword;
     private RelativeLayout sendFeedback;
     private RelativeLayout helpSetting;
     private RelativeLayout appInfo;
@@ -47,6 +49,7 @@ public class SettingsActivity extends AppCompatActivity {
         startCategory = findViewById(R.id.start_category_setting);
         importExport = findViewById(R.id.import_export_setting);
         backup = findViewById(R.id.backup_setting);
+        handlePassword = findViewById(R.id.password_setting);
         sendFeedback = findViewById(R.id.feedback_setting);
         helpSetting = findViewById(R.id.help_setting);
         appInfo = findViewById(R.id.information_setting);
@@ -63,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         starCategoryClickListener();
         importExportClickListener();
         backupClickListener();
+        handlePasswordClickListener();
         helpClickListener();
         feedbackClickListener();
 
@@ -154,6 +158,16 @@ public class SettingsActivity extends AppCompatActivity {
             Intent intent = new Intent(SettingsActivity.this, BackupActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        });
+    }
+
+    private void handlePasswordClickListener() {
+        handlePassword.setOnClickListener(v -> {
+            PasswordManagerDialog passwordManagerDialog = new
+                    PasswordManagerDialog(this,
+                    result -> { });
+            passwordManagerDialog.show(getSupportFragmentManager(),
+                    "Password Manager dialog");
         });
     }
 

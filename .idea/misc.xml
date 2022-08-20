@@ -8,26 +8,35 @@
         <entry key="app/src/main/res/drawable-mdpi/ic_app_logo_round.xml" value="0.17777777777777778" />
         <entry key="app/src/main/res/drawable/bg_launcher.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/category_background.xml" value="0.21302083333333333" />
-        <entry key="app/src/main/res/drawable/custom_background_edit_text.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/custom_background_edit_text.xml" value="0.22" />
         <entry key="app/src/main/res/drawable/default_page_selector.xml" value="0.36512820512820515" />
         <entry key="app/src/main/res/drawable/default_pager_dot.xml" value="0.36512820512820515" />
         <entry key="app/src/main/res/drawable/help_borders.xml" value="0.25" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.251" />
         <entry key="app/src/main/res/drawable/ic_app_logo_prova.xml" value="0.2125" />
         <entry key="app/src/main/res/drawable/ic_app_logo_round.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_app_logo_round_black.xml" value="0.37083333333333335" />
         <entry key="app/src/main/res/drawable/ic_archive.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/ic_auto_backup.xml" value="0.3375" />
         <entry key="app/src/main/res/drawable/ic_auto_restore.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/drawable/ic_backup.xml" value="0.3375" />
         <entry key="app/src/main/res/drawable/ic_delete.xml" value="0.218" />
+        <entry key="app/src/main/res/drawable/ic_delete_category.xml" value="0.251" />
         <entry key="app/src/main/res/drawable/ic_down_arrow.xml" value="0.1735" />
+        <entry key="app/src/main/res/drawable/ic_info.xml" value="0.251" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/ic_lock.xml" value="0.251" />
+        <entry key="app/src/main/res/drawable/ic_modify.xml" value="0.251" />
         <entry key="app/src/main/res/drawable/ic_move.xml" value="0.103" />
         <entry key="app/src/main/res/drawable/ic_name_sort.xml" value="0.1735" />
+        <entry key="app/src/main/res/drawable/ic_password.xml" value="0.3375" />
         <entry key="app/src/main/res/drawable/ic_prova.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_select_all.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_small_delete.xml" value="0.3734375" />
         <entry key="app/src/main/res/drawable/ic_sort.xml" value="0.1735" />
         <entry key="app/src/main/res/drawable/ic_unarchive.xml" value="0.3734375" />
+        <entry key="app/src/main/res/drawable/ic_unlock.xml" value="0.251" />
         <entry key="app/src/main/res/drawable/ic_up_arrow.xml" value="0.1735" />
         <entry key="app/src/main/res/drawable/prova.xml" value="0.21302083333333333" />
         <entry key="app/src/main/res/drawable/rounded.xml" value="0.36512820512820515" />
@@ -57,9 +66,12 @@
         <entry key="app/src/main/res/layout/contextual_toolbar.xml" value="0.3572916666666667" />
         <entry key="app/src/main/res/layout/date_time_picker.xml" value="0.3572916666666667" />
         <entry key="app/src/main/res/layout/image_preview.xml" value="0.35625" />
+        <entry key="app/src/main/res/layout/info_password_popup.xml" value="0.35572916666666665" />
         <entry key="app/src/main/res/layout/link_actions_dialog.xml" value="0.17426545086119555" />
         <entry key="app/src/main/res/layout/menu_header.xml" value="0.26268115942028986" />
         <entry key="app/src/main/res/layout/new_category_dialog.xml" value="0.17426545086119555" />
+        <entry key="app/src/main/res/layout/password_dialog.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/password_manager_dialog.xml" value="0.35572916666666665" />
         <entry key="app/src/main/res/layout/slider_item.xml" value="0.18" />
         <entry key="app/src/main/res/layout/storage_warning_dialog.xml" value="0.34556159420289856" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.31536388140161725" />

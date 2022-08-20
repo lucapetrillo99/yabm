@@ -43,6 +43,7 @@
     <string name="started_category_displayed">Categoria visualizzata all\'avvio</string>
     <string name="import_export">Importa/Esporta</string>
     <string name="backup">Backup</string>
+    <string name="handle_password">Gestisci password</string>
     <string name="send_feedback">Invia un feedback</string>
     <string name="info_app">Info App</string>
     <string name="action_title">Scegli l\'azione</string>
@@ -93,4 +94,23 @@
     <string name="move">Move</string>
     <string name="category_selection">Scegli la categoria</string>
     <string name="all_bookmarks_deleted">Tutti i segnalibri verranno eliminati!</string>
+    <string name="password">Password</string>
+    <string name="new_password">Inserisci una password</string>
+    <string name="confirm_password">Conferma password</string>
+    <string name="add_password">Aggiungi una password</string>
+    <string name="change_password">Modifica la password</string>
+    <string name="empty_fields">I campi non possono essere vuoti!</string>
+    <string name="password_updated">Password aggiornata!</string>
+    <string name="impossible_update_password">Impossibile aggiornare la password!</string>
+    <string name="same_previous_password">La password è uguale alla precedente!</string>
+    <string name="passwords_not_match">Le password non corrispondono!</string>
+    <string name="password_added">Password aggiunta!</string>
+    <string name="impossible_add_password">Impossibile aggiungere la password!</string>
+    <string name="wrong_password">Password errata!</string>
+    <string name="lock_with_password">Blocca con password</string>
+    <string name="categories_updated">Categorie aggiornate!</string>
+    <string name="ok">OK</string>
+    <string name="impossible_update_categories">mpossibile aggiungere le categorie!</string>
+    <string name="important">Importante!</string>
+    <string name="password_info">Attenzione una volta impostata la password sarà impossible recuperarla!</string>
 </resources>

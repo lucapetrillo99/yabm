@@ -7,16 +7,43 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Category {
+    public enum CategoryProtection {
+        UNLOCK(0),
+        LOCK(1);
+
+        private final int value;
+
+        CategoryProtection(int value) {
+            this.value = value;
+        }
+
+        public static CategoryProtection castFromInt(int x) {
+            switch(x) {
+                case 0:
+                    return UNLOCK;
+                case 1:
+                    return LOCK;
+            }
+            return null;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
     private String id;
     private String title;
     private String date;
+    private CategoryProtection categoryProtection;
 
     public Category() { }
 
-    public Category(String id, String title, String date) {
+    public Category(String id, String title, String date, CategoryProtection categoryProtection) {
         this.id = id;
         this.title = title;
         this.date = date;
+        this.categoryProtection = categoryProtection;
     }
 
     public String getCategoryId() {
@@ -38,6 +65,18 @@ public class Category {
     public void setDate(String date) { this.date = date; }
 
     public String getDate() { return date; }
+
+    public void setCategoryProtection(CategoryProtection categoryProtection) {
+        this.categoryProtection = categoryProtection;
+    }
+
+    public CategoryProtection getPasswordProtection() {
+        return categoryProtection;
+    }
+
+    public int getPasswordProtectionValue() {
+        return categoryProtection.value;
+    }
 
     public static Comparator<Category> TitleDescendingOrder = (c1, c2) -> c2.getCategoryTitle().compareTo(c1.getCategoryTitle());
 

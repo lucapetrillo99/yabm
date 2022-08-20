@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,8 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.PasswordManagerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,9 +35,9 @@ import java.util.Locale;
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
     private final ArrayList<Category> categories;
-    private DatabaseHandler db;
     private final CategoriesActivity categoriesActivity;
     private final ArrayList<Category> allCategories;
+    private DatabaseHandler db;
     private AlertDialog dialog;
 
     public CategoriesAdapter(ArrayList<Category> categories, CategoriesActivity categoriesActivity) {
@@ -46,6 +49,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     static class categoriesViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageButton modify, delete;
+        ImageView protection;
         CheckBox checkbox;
         View view;
 
@@ -54,6 +58,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             title = itemView.findViewById(R.id.title);
             modify = itemView.findViewById(R.id.modify);
             delete = itemView.findViewById(R.id.delete);
+            protection = itemView.findViewById(R.id.category_protection);
             checkbox = itemView.findViewById(R.id.checkbox);
             view = itemView;
             view.setOnLongClickListener(categoriesActivity);
@@ -72,6 +77,16 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     public void onBindViewHolder(@NonNull categoriesViewHolder holder, int position) {
         db = DatabaseHandler.getInstance(categoriesActivity);
         holder.title.setText(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
+
+        if (!categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
+                equals(categoriesActivity.getString(R.string.default_bookmarks))) {
+            if (categories.get(holder.getAbsoluteAdapterPosition()).getPasswordProtection().
+                    equals(Category.CategoryProtection.LOCK)) {
+                holder.protection.setVisibility(View.VISIBLE);
+            } else {
+                holder.protection.setVisibility(View.GONE);
+            }
+        }
 
         if (categoriesActivity.isContextualMenuEnable) {
             if (categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().
@@ -93,9 +108,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 holder.delete.setVisibility(View.VISIBLE);
             }
         }
-        holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(), true, v));
+        holder.modify.setOnClickListener(v -> newCategoryDialog(holder.getAbsoluteAdapterPosition(),
+                true, v));
         holder.delete.setOnClickListener(v -> confirmDialog(holder.getAbsoluteAdapterPosition(), v));
-        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v, holder.getAbsoluteAdapterPosition()));
+        holder.checkbox.setOnClickListener(v -> categoriesActivity.makeSelection(v,
+                holder.getAbsoluteAdapterPosition()));
 
         if (categoriesActivity.areAllSelected) {
             for (int i = 0; i < categories.size(); i++) {
@@ -123,16 +140,38 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 .create();
         EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
+        CheckBox protection = dialogView.findViewById(R.id.protection);
         if (isModify) {
             title.setText(R.string.modify_category_title);
+            input.setText(categories.get(position).getCategoryTitle());
+            protection.setChecked(categories.get(position).getPasswordProtection() ==
+                    Category.CategoryProtection.LOCK);
         } else {
             title.setText(R.string.new_category_title);
-        }
-        if (isModify) {
-            input.setText(categories.get(position).getCategoryTitle());
-        } else {
             input.setHint(R.string.insert_category_title);
         }
+
+        boolean isChecked = protection.isChecked();
+        protection.setOnClickListener(view -> {
+            if (isModify) {
+                if (isChecked) {
+                    PasswordDialog passwordDialog = new PasswordDialog(categoriesActivity,
+                            result -> protection.setChecked(!result));
+                    passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
+                            "Password dialog");
+                }
+            } else {
+                String password = db.getPassword();
+                if (password == null) {
+                    protection.setChecked(false);
+                    PasswordManagerDialog passwordManagerDialog = new
+                            PasswordManagerDialog(categoriesActivity,
+                            protection::setChecked);
+                    passwordManagerDialog.show(categoriesActivity.getSupportFragmentManager(),
+                            "Password Manager dialog");
+                }
+            }
+        });
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
@@ -144,6 +183,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
                     category.setDate(dateFormat.format(date));
+                    if (protection.isChecked()) {
+                        category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                    } else {
+                        category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                    }
                     boolean result = db.updateCategory(category);
                     if (result) {
                         Toast.makeText(v.getRootView().getContext(),
@@ -161,6 +205,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
                         category.setDate(dateFormat.format(date));
+                        if (protection.isChecked()) {
+                            category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                        } else {
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                        }
                         String categoryId = db.addCategory(category);
                         if (categoryId != null) {
                             dialog.dismiss();
@@ -228,7 +277,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                 filteredCategories.addAll(allCategories);
             } else {
                 for (Category category : allCategories) {
-                    if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    if (category.getCategoryTitle().toLowerCase().contains(constraint.toString().
+                            toLowerCase())) {
                         filteredCategories.add(category);
                     }
                 }

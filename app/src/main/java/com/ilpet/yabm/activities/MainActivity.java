@@ -36,6 +36,7 @@ import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.CategoriesSelectionDialog;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public boolean areAllSelected = false;
     public boolean isArchiveModeEnabled = false;
     private DatabaseHandler db;
-    private ArrayList<Bookmark> bookmarks;
+    private ArrayList<Bookmark> bookmarks = new ArrayList<>();
     private RecyclerView recyclerView;
     private BookmarksAdapter bookmarksAdapter;
     private RecyclerView categoriesRecyclerview;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         super.onCreate(savedInstanceState);
         db = DatabaseHandler.getInstance(getApplicationContext());
         settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
-        String result = settingsManager.getCategory();
+        String categoryToLoad = settingsManager.getCategory();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         contextualToolbar = findViewById(R.id.contextual_toolbar);
@@ -99,8 +100,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             SimpleDateFormat dateFormat = new SimpleDateFormat(
                     "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             Date date = new Date();
-            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks), dateFormat.format(date));
-            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date));
+            Category defaultCategory = new Category(null, getString(R.string.default_bookmarks),
+                    dateFormat.format(date), Category.CategoryProtection.UNLOCK);
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date),
+                    Category.CategoryProtection.UNLOCK);
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);
@@ -120,13 +123,30 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             settingsManager.setFirstAccess(false);
         }
 
-        if (result.equals(getString(R.string.all_bookmarks_title))) {
-            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType()));
+        if (categoryToLoad.equals(getString(R.string.all_bookmarks_title))) {
+            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getBookmarkOrderBy(),
+                    settingsManager.getBookmarkOrderType()));
         } else {
-            bookmarks = new ArrayList<>(db.getBookmarksByCategory(result, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType()));
+            if (db.getCategoryProtectionByTitle(categoryToLoad)) {
+                PasswordDialog passwordDialog = new PasswordDialog(this,
+                        result -> {
+                            if (result) {
+                                bookmarks = new ArrayList<>(db.getBookmarksByCategory(categoryToLoad,
+                                        settingsManager.getBookmarkOrderBy(), settingsManager.
+                                                getBookmarkOrderType()));
+                                setAdapter();
+                            }
+                        });
+                passwordDialog.show(getSupportFragmentManager(),
+                        "Password dialog");
+            } else {
+                bookmarks = new ArrayList<>(db.getBookmarksByCategory(categoryToLoad,
+                        settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType()));
+                setAdapter();
+            }
         }
-        toolbarTitle.setText(result);
-        previousCategory = result;
+        toolbarTitle.setText(categoryToLoad);
+        previousCategory = categoryToLoad;
         archiveBookmark();
         unarchiveBookmark();
 
@@ -134,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         selectedBookmarks = new ArrayList<>();
         removedFromArchive = new ArrayList<>();
         categories = db.getAllCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
-        setAdapter();
 
         fab = findViewById(R.id.add_button);
         fab.setOnClickListener(view -> {
@@ -146,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 removeContextualActionMode();
             }
         });
-        setBookmarksLabel();
         setSortOptions();
     }
 
@@ -238,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 if (isContextualMenuEnable) {
                     removeContextualActionMode();
                 }
+                if (bookmarks.size() > 0)
+                    bookmarks.clear();
                 break;
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
@@ -396,28 +416,44 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public void onResume() {
         super.onResume();
         archiveBookmark();
-        setBookmarksLabel();
         if (previousCategory != null) {
-            String result = db.getCategoryId(previousCategory);
-            if (result != null) {
-                if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
-                } else {
-                    bookmarks = db.getBookmarksByCategory(previousCategory, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
-                }
-            } else {
-                toolbarTitle.setText(R.string.all_bookmarks_title);
+            if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                 bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+            } else {
+                if (db.getCategoryProtectionByTitle(previousCategory)) {
+                    PasswordDialog passwordDialog = new PasswordDialog(this,
+                            result -> {
+                                if (result) {
+                                    bookmarks = new ArrayList<>(db.getBookmarksByCategory(previousCategory,
+                                            settingsManager.getBookmarkOrderBy(), settingsManager.
+                                                    getBookmarkOrderType()));
+                                    setAdapter();
+                                }
+                            });
+                    passwordDialog.show(getSupportFragmentManager(),
+                            "Password dialog");
+                }
             }
         } else {
             SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
-            String result = settingsManager.getCategory();
-            String category = db.getCategoryId(previousCategory);
-            if (category != null) {
+            String categoryToLoad = settingsManager.getCategory();
+            if (categoryToLoad != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                     bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 } else {
-                    bookmarks = db.getBookmarksByCategory(result, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                    if (db.getCategoryProtectionByTitle(previousCategory)) {
+                        PasswordDialog passwordDialog = new PasswordDialog(this,
+                                result -> {
+                                    if (result) {
+                                        bookmarks = new ArrayList<>(db.getBookmarksByCategory(previousCategory,
+                                                settingsManager.getBookmarkOrderBy(), settingsManager.
+                                                        getBookmarkOrderType()));
+                                        setAdapter();
+                                    }
+                                });
+                        passwordDialog.show(getSupportFragmentManager(),
+                                "Password dialog");
+                    }
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
@@ -427,7 +463,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         categories.clear();
         categories = db.getAllCategories(settingsManager.getCategoryOrderBy(), settingsManager.getCategoryOrderType());
         invalidateOptionsMenu();
-        setAdapter();
     }
 
     @Override
@@ -665,7 +700,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             previousCategory = categoryName;
             archiveBookmark();
             unarchiveBookmark();
-            bookmarks.clear();
+            if (bookmarks.size() > 0)
+                bookmarks.clear();
             bookmarks = db.getBookmarksByCategory(categoryName, settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
         }
         setAdapter();

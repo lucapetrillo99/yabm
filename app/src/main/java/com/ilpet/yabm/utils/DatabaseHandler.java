@@ -18,7 +18,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "yabm";
     private static final String TABLE_BOOKMARK = "bookmark";
     private static final String TABLE_CATEGORY = "category";
+    private static final String TABLE_PASSWORD = "password";
     private static final String BOOKMARK_ID = "bookmark_id";
+    private static final String PASSWORD_ID = "password_id";
     private static final String CATEGORY_ID = "category_id";
     private static final String KEY_BOOKMARK_LINK = "link";
     private static final String KEY_BOOKMARK_TITLE = "title";
@@ -30,17 +32,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_BOOKMARK_TYPE = "type";
     private static final String KEY_CATEGORY_TITLE = "title";
     private static final String KEY_DATE = "date";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_USER_PASSWORD = "user_password";
     private static DatabaseHandler instance;
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
-            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE + " TEXT ," +
-            KEY_DATE + " TEXT)";
-    private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE "
-            + TABLE_BOOKMARK + "(" + BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK
-            + " TEXT," + KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," + KEY_BOOKMARK_IMAGE + " TEXT,"
-            + KEY_BOOKMARK_REMINDER + " LONG," + KEY_BOOKMARK_PREVIOUS_CATEGORY + " TEXT," + KEY_BOOKMARK_TYPE + " TEXT,"
-            + KEY_DATE + " TEXT," + KEY_BOOKMARK_CATEGORY + " INTEGER ," + " FOREIGN KEY (" + KEY_BOOKMARK_CATEGORY + ")"
-            + " REFERENCES " + TABLE_CATEGORY + "(" + CATEGORY_ID + "));";
+            + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE +
+            " TEXT ," + KEY_DATE + " TEXT ," + KEY_PASSWORD + " INTEGER)";
+    private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE " + TABLE_BOOKMARK + "(" +
+            BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK + " TEXT," +
+            KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," +
+            KEY_BOOKMARK_IMAGE + " TEXT," + KEY_BOOKMARK_REMINDER + " LONG," +
+            KEY_BOOKMARK_PREVIOUS_CATEGORY + " TEXT," + KEY_BOOKMARK_TYPE + " TEXT," + KEY_DATE +
+            " TEXT," + KEY_BOOKMARK_CATEGORY + " INTEGER ," +
+            " FOREIGN KEY (" + KEY_BOOKMARK_CATEGORY + ")" + " REFERENCES " + TABLE_CATEGORY +
+            "(" + CATEGORY_ID + "));";
+    private static final String CREATE_TABLE_PASSWORD = "CREATE TABLE " + TABLE_PASSWORD
+            + "(" + PASSWORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_USER_PASSWORD + " TEXT)";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,13 +65,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_CATEGORY);
         db.execSQL(CREATE_TABLE_BOOKMARK);
+        db.execSQL(CREATE_TABLE_PASSWORD);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARK);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PASSWORD);
         onCreate(db);
     }
 
@@ -102,6 +111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
             values.put(KEY_DATE, category.getDate());
+            values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
             categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
         }
@@ -129,8 +139,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void removeFromArchive(String bookmarkId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("Select " + KEY_BOOKMARK_PREVIOUS_CATEGORY + " from " + TABLE_BOOKMARK + " where "
-                + BOOKMARK_ID + " = ?", new String[]{bookmarkId});
+        Cursor cursor = db.rawQuery("Select " + KEY_BOOKMARK_PREVIOUS_CATEGORY + " from "
+                + TABLE_BOOKMARK + " where " + BOOKMARK_ID + " = ?", new String[]{bookmarkId});
 
         if (cursor.moveToFirst()) {
             String id = cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_PREVIOUS_CATEGORY));
@@ -166,6 +176,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+                category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -192,6 +204,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+                category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
             } while (cursor.moveToNext());
         }
@@ -207,16 +221,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         " where " + KEY_CATEGORY_TITLE + " = ?",
                 new String[]{context.getString(R.string.archived_bookmarks)});
 
+        int lock = Category.CategoryProtection.LOCK.getValue();
+        Cursor cur = db.rawQuery("Select " + CATEGORY_ID + " from " + TABLE_CATEGORY +
+                        " where " + KEY_PASSWORD + " = ?",
+                new String[]{String.valueOf(lock)});
+
+        ArrayList<String> categoriesLocked = new ArrayList<>();
+        if (cur.moveToFirst()) {
+            do {
+                categoriesLocked.add(cur.getString(cur.getColumnIndexOrThrow(CATEGORY_ID)));
+            } while (cur.moveToNext());
+        }
         if (c.moveToFirst()) {
+            categoriesLocked.add(c.getString(c.getColumnIndexOrThrow(CATEGORY_ID)));
             Cursor cursor;
-            String category = c.getString(c.getColumnIndexOrThrow(CATEGORY_ID));
+            String query;
             if (orderBy != null && orderType != null) {
-                cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where " + KEY_BOOKMARK_CATEGORY + " != ? "
-                        + " order by " + orderBy + " " + orderType, new String[]{category});
+                query = "SELECT * FROM " + TABLE_BOOKMARK + " WHERE " + KEY_BOOKMARK_CATEGORY +
+                        " NOT IN (" + makePlaceholders(categoriesLocked.size()) + ")" +
+                        " order by " + orderBy + " " + orderType;
+
             } else {
-                cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where " + KEY_BOOKMARK_CATEGORY + " != ? ",
-                        new String[]{category});
+                query = "SELECT * FROM " + TABLE_BOOKMARK + " WHERE " + KEY_BOOKMARK_CATEGORY +
+                        " NOT IN (" + makePlaceholders(categoriesLocked.size()) + ")";
             }
+            cursor = db.rawQuery(query, categoriesLocked.toArray(new String[0]));
 
             if (cursor.moveToFirst()) {
                 do {
@@ -237,6 +266,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
         }
         c.close();
+        cur.close();
         return bookmarks;
     }
 
@@ -270,6 +300,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public boolean getCategoryProtectionByTitle(String categoryTitle) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select " + KEY_PASSWORD + " from " + TABLE_CATEGORY +
+                        " where " + KEY_CATEGORY_TITLE + " = ?",
+                new String[]{categoryTitle});
+
+        if (cursor.moveToFirst()) {
+            int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+            if (Category.CategoryProtection.castFromInt(protection).equals(Category.CategoryProtection.LOCK)) {
+                cursor.close();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public ArrayList<Bookmark> getBookmarksByCategory(String category, String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<Bookmark> bookmarks = new ArrayList<>();
@@ -282,7 +331,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String id = c.getString(c.getColumnIndexOrThrow(CATEGORY_ID));
             if (orderBy != null && orderType != null) {
                 cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where "
-                        + KEY_BOOKMARK_CATEGORY + " = ?" + "order by " + orderBy + " " + orderType, new String[]{id});
+                                + KEY_BOOKMARK_CATEGORY + " = ?" + "order by " + orderBy + " " + orderType,
+                        new String[]{id});
             } else {
                 cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK + " where "
                         + KEY_BOOKMARK_CATEGORY + " = ?", new String[]{id});
@@ -321,7 +371,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public boolean deleteCategory(Category category) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle(), null, null);
+        ArrayList<Bookmark> bookmarks = getBookmarksByCategory(category.getCategoryTitle(),
+                null, null);
 
         for (Bookmark bookmark : bookmarks) {
             deleteBookmark(bookmark.getId());
@@ -337,6 +388,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
         values.put(KEY_DATE, category.getDate());
+        values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
                 new String[]{category.getCategoryId()});
 
@@ -389,7 +441,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String args = TextUtils.join(", ", whereArgs);
 
         db.execSQL(String.format("UPDATE %s SET %s =" + 2 + ", %s = " + id + " WHERE %s IN (%s);",
-                TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+                TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID,
+                args));
     }
 
     public void deleteCategories(ArrayList<Category> categories) {
@@ -420,13 +473,72 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String args = TextUtils.join(", ", whereArgs);
             String categoryId = cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID));
-            db.execSQL(String.format("UPDATE %s SET %s =" + categoryId + ", %s = " + null + " WHERE %s IN (%s);",
-                    TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY, BOOKMARK_ID, args));
+            db.execSQL(String.format("UPDATE %s SET %s =" + categoryId + ", %s = " + null +
+                            " WHERE %s IN (%s);",
+                    TABLE_BOOKMARK, KEY_BOOKMARK_CATEGORY, KEY_BOOKMARK_PREVIOUS_CATEGORY,
+                    BOOKMARK_ID, args));
             cursor.close();
             return true;
         } else {
             cursor.close();
             return false;
+        }
+    }
+
+    public boolean insertPassword(String password) {
+        PasswordManager passwordManager = PasswordManager.getInstance();
+        String encryptedPassword = passwordManager.encryptPassword(password);
+
+        if (encryptedPassword == null) {
+            return false;
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            db.insert(TABLE_PASSWORD, null, values);
+            return true;
+        }
+    }
+
+    public String getPassword() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select " + KEY_USER_PASSWORD + " from " + TABLE_PASSWORD,
+                null);
+        if (cursor.moveToFirst()) {
+            String encryptedPassword = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));
+            PasswordManager passwordManager = PasswordManager.getInstance();
+            cursor.close();
+            return passwordManager.decryptPassword(encryptedPassword);
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+    public boolean updatePassword(String newPassword) {
+        PasswordManager passwordManager = PasswordManager.getInstance();
+        String encryptedPassword = passwordManager.encryptPassword(newPassword);
+
+        if (encryptedPassword == null) {
+            return false;
+        } else {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            return db.update(TABLE_PASSWORD, values, null, null) > 0;
+        }
+    }
+
+    private String makePlaceholders(int len) {
+        if (len < 1) {
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
         }
     }
 }

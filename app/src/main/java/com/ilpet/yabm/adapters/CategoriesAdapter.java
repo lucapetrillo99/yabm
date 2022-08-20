@@ -34,8 +34,6 @@ import java.util.Locale;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.categoriesViewHolder>
         implements Filterable {
-    private static final int DELETE_OPTION = 1;
-    private static final int LOCK_UNLOCK_OPTION = 2;
     private final ArrayList<Category> categories;
     private final CategoriesActivity categoriesActivity;
     private final ArrayList<Category> allCategories;
@@ -269,19 +267,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         alertDialog.show();
     }
 
-    public void updateCategories(ArrayList<Category> selectedCategories, int operation,
-                                 Category.CategoryProtection action) {
-        switch (operation) {
-            case DELETE_OPTION:
-                categories.removeAll(selectedCategories);
-                db.deleteCategories(selectedCategories);
-                notifyDataSetChanged();
-                break;
-            case LOCK_UNLOCK_OPTION:
-                db.updateCategories(selectedCategories, action);
-                notifyDataSetChanged();
-                break;
-        }
+    public void deleteCategories(ArrayList<Category> selectedCategories) {
+        categories.removeAll(selectedCategories);
+        db.deleteCategories(selectedCategories);
+        notifyDataSetChanged();
     }
 
     @Override

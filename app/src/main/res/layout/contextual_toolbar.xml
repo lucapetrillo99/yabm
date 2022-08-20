@@ -58,21 +58,10 @@
             android:visibility="gone" />
 
         <ImageButton
-            android:id="@+id/handle_password"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_column="4"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="40dp"
-            android:background="@null"
-            android:gravity="center"
-            android:src="@drawable/ic_lock" />
-
-        <ImageButton
             android:id="@+id/select_all"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_column="5"
+            android:layout_column="4"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="40dp"
             android:background="@null"

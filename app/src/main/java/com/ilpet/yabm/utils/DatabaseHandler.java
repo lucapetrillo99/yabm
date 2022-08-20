@@ -466,21 +466,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void updateCategories(ArrayList<Category> categories, Category.CategoryProtection action) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        for (Category category : categories) {
-            ContentValues values = new ContentValues();
-            values.put(CATEGORY_ID, category.getCategoryId());
-            values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
-            values.put(KEY_DATE, category.getDate());
-            category.setCategoryProtection(action);
-            values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
-            db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
-                    new String[]{String.valueOf(category.getCategoryId())});
-        }
-    }
-
     public boolean insertPassword(String password) {
         PasswordManager passwordManager = PasswordManager.getInstance();
         String encryptedPassword = passwordManager.encryptPassword(password);

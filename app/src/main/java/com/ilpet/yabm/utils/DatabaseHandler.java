@@ -300,6 +300,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public boolean getCategoryProtectionByTitle(String categoryTitle) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select " + KEY_PASSWORD + " from " + TABLE_CATEGORY +
+                        " where " + KEY_CATEGORY_TITLE + " = ?",
+                new String[]{categoryTitle});
+
+        if (cursor.moveToFirst()) {
+            int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+            if (Category.CategoryProtection.castFromInt(protection).equals(Category.CategoryProtection.LOCK)) {
+                cursor.close();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public ArrayList<Bookmark> getBookmarksByCategory(String category, String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<Bookmark> bookmarks = new ArrayList<>();

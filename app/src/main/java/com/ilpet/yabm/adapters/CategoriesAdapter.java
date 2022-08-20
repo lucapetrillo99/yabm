@@ -156,16 +156,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             if (isModify) {
                 if (isChecked) {
                     PasswordDialog passwordDialog = new PasswordDialog(categoriesActivity,
-                            result -> {
-                                if (result) {
-                                    protection.setChecked(false);
-                                } else {
-                                    protection.setChecked(true);
-                                    Toast.makeText(categoriesActivity,
-                                            categoriesActivity.getString(R.string.wrong_password),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
+                            result -> protection.setChecked(!result));
                     passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
                             "Password dialog");
                 }

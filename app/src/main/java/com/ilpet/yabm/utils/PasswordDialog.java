@@ -40,8 +40,8 @@ public class PasswordDialog extends AppCompatDialogFragment {
         dialog.setCanceledOnTouchOutside(false);
 
         dialog.setOnShowListener(dialogInterface -> {
-            Button button = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
+            Button positiveButton = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(view -> {
                 EditText input = dialogView.findViewById(R.id.password_input);
                 String userInput = input.getText().toString();
                 if (!userInput.isEmpty()) {
@@ -58,6 +58,12 @@ public class PasswordDialog extends AppCompatDialogFragment {
                     Toast.makeText(activity, getString(R.string.empty_fields),
                             Toast.LENGTH_LONG).show();
                 }
+            });
+
+            Button negativeButton = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE);
+            negativeButton.setOnClickListener(view -> {
+                passwordListener.getResult(false);
+                dialog.dismiss();
             });
         });
 

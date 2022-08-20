@@ -78,6 +78,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
             if (categories.get(holder.getAbsoluteAdapterPosition()).getPasswordProtection().equals(
                     Category.CategoryProtection.LOCK)) {
                 holder.lockedCategory.setImageResource(R.drawable.ic_lock);
+            } else {
+                holder.lockedCategory.setImageResource(0);
             }
         }
 

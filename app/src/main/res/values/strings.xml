@@ -111,4 +111,6 @@
     <string name="categories_updated">Categorie aggiornate!</string>
     <string name="ok">OK</string>
     <string name="impossible_update_categories">mpossibile aggiungere le categorie!</string>
+    <string name="important">Importante!</string>
+    <string name="password_info">Attenzione una volta impostata la password sarà impossible recuperarla!</string>
 </resources>

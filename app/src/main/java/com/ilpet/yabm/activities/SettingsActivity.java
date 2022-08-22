@@ -18,6 +18,8 @@ import com.ilpet.yabm.utils.PasswordManagerDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String THEME = "theme";
@@ -120,24 +122,25 @@ public class SettingsActivity extends AppCompatActivity {
             SettingsManager categoryManager = new SettingsManager(getApplicationContext(), CATEGORY);
             int checkedItem = 0;
             String startCategory = categoryManager.getCategory();
-            ArrayList<Category> categoryList = new ArrayList<>(db.getAllCategories(null, null));
-            ArrayList<String> list = new ArrayList<>();
-            list.add(getString(R.string.all_bookmarks_title));
-            for (Category category : categoryList) {
-                list.add(category.getCategoryTitle());
-            }
+            ArrayList<Category> categories = new ArrayList<>(db.getAllCategories(null,
+                    null));
+            List<String> categoriesToString = categories.stream()
+                    .map(Category::getCategoryTitle)
+                    .collect(Collectors.toList());
+            categoriesToString.add(0, getString(R.string.all_bookmarks_title));
+            
 
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).equals(startCategory)) {
+            for (int i = 0; i < categoriesToString.size(); i++) {
+                if (categoriesToString.get(i).equals(startCategory)) {
                     checkedItem = i;
                 }
             }
 
-            String[] categories = list.toArray(new String[0]);
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
-            builder.setSingleChoiceItems(categories, checkedItem, (dialog, choice) -> {
-                if (!categoryManager.getCategory().equals(categories[choice])) {
-                    categoryManager.setCategory(categories[choice]);
+            builder.setSingleChoiceItems(categoriesToString.toArray(new String[0]), checkedItem,
+                    (dialog, choice) -> {
+                if (!categoryManager.getCategory().equals(categoriesToString.get(choice))) {
+                    categoryManager.setCategory(categoriesToString.get(choice));
                 }
                 dialog.dismiss();
             });

@@ -306,7 +306,11 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        if (isContextualMenuEnable) {
+            removeContextualActionMode();
+        } else {
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        }
     }
 }

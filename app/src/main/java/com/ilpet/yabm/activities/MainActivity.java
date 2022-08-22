@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if (categoryToLoad.equals(getString(R.string.all_bookmarks_title))) {
             bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getBookmarkOrderBy(),
                     settingsManager.getBookmarkOrderType()));
+            setAdapter();
         } else {
             if (db.getCategoryProtectionByTitle(categoryToLoad)) {
                 PasswordDialog passwordDialog = new PasswordDialog(this,
@@ -419,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         if (previousCategory != null) {
             if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                 bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                setAdapter();
             } else {
                 if (db.getCategoryProtectionByTitle(previousCategory)) {
                     PasswordDialog passwordDialog = new PasswordDialog(this,
@@ -440,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if (categoryToLoad != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                     bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                    setAdapter();
                 } else {
                     if (db.getCategoryProtectionByTitle(previousCategory)) {
                         PasswordDialog passwordDialog = new PasswordDialog(this,
@@ -458,6 +461,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
                 bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                setAdapter();
             }
         }
         categories.clear();

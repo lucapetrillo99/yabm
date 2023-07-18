@@ -82,7 +82,8 @@ public class PasswordManagerDialog extends AppCompatDialogFragment {
                         passwordText.getText().clear();
                         confirmPasswordText.getText().clear();
                     } else {
-                        if (oldPassword.equals(currentPassword)) {
+                        PasswordManager passwordManager = PasswordManager.getInstance();
+                        if (passwordManager.verifyPassword(oldPassword, currentPassword)) {
                             if (password.equals(confirmedPassword)) {
                                 if (!password.equals(oldPassword)) {
                                     if (db.updatePassword(password)) {

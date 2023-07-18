@@ -45,7 +45,8 @@ public class PasswordDialog extends AppCompatDialogFragment {
                 EditText input = dialogView.findViewById(R.id.password_input);
                 String userInput = input.getText().toString();
                 if (!userInput.isEmpty()) {
-                    if (currentPassword.equals(userInput)) {
+                    PasswordManager passwordManager = PasswordManager.getInstance();
+                    if (passwordManager.verifyPassword(userInput, currentPassword)) {
                         passwordListener.getResult(true);
                         dialog.dismiss();
                     } else {

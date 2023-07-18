@@ -487,14 +487,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public boolean insertPassword(String password) {
         PasswordManager passwordManager = PasswordManager.getInstance();
-        String encryptedPassword = passwordManager.encryptPassword(password);
+        String hashPassword = passwordManager.hashPassword(password);
 
-        if (encryptedPassword == null) {
+        if (hashPassword == null) {
             return false;
         } else {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            values.put(KEY_USER_PASSWORD, hashPassword);
             db.insert(TABLE_PASSWORD, null, values);
             return true;
         }
@@ -505,10 +505,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("Select " + KEY_USER_PASSWORD + " from " + TABLE_PASSWORD,
                 null);
         if (cursor.moveToFirst()) {
-            String encryptedPassword = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));
-            PasswordManager passwordManager = PasswordManager.getInstance();
+            String password = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));;
             cursor.close();
-            return passwordManager.decryptPassword(encryptedPassword);
+            return password;
         } else {
             cursor.close();
             return null;
@@ -517,14 +516,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public boolean updatePassword(String newPassword) {
         PasswordManager passwordManager = PasswordManager.getInstance();
-        String encryptedPassword = passwordManager.encryptPassword(newPassword);
+        String hashPassword = passwordManager.hashPassword(newPassword);
 
-        if (encryptedPassword == null) {
+        if (hashPassword == null) {
             return false;
         } else {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(KEY_USER_PASSWORD, encryptedPassword);
+            values.put(KEY_USER_PASSWORD, hashPassword);
             return db.update(TABLE_PASSWORD, values, null, null) > 0;
         }
     }

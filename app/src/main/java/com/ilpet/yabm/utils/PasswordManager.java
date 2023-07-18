@@ -1,16 +1,9 @@
 package com.ilpet.yabm.utils;
 
-import android.util.Base64;
-
-import java.nio.charset.StandardCharsets;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordManager {
-    private static final String INIT_VECTOR = "encryptionIntVec";
-    private static final String SECRET_KEY = "aesEncryptionKey";
+    private static final int BCRYPT_WORK_FACTOR = 12;
     private static PasswordManager instance = null;
 
     private PasswordManager() {
@@ -22,33 +15,12 @@ public class PasswordManager {
 
         return instance;
     }
-
-    public String encryptPassword(String value) {
-        try {
-            IvParameterSpec ivParam = new IvParameterSpec(INIT_VECTOR.getBytes(StandardCharsets.UTF_8));
-            SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParam);
-
-            byte[] encrypted = cipher.doFinal(value.getBytes());
-            return Base64.encodeToString(encrypted, Base64.DEFAULT);
-        } catch (Exception ex) {
-            return null;
-        }
+    public String hashPassword(String password) {
+        String salt = BCrypt.gensalt(BCRYPT_WORK_FACTOR);
+        return BCrypt.hashpw(password, salt);
     }
 
-    public String decryptPassword(String value) {
-        try {
-            IvParameterSpec ivParam = new IvParameterSpec(INIT_VECTOR.getBytes(StandardCharsets.UTF_8));
-            SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParam);
-            byte[] original = cipher.doFinal(Base64.decode(value, Base64.DEFAULT));
-            return new String(original);
-        } catch (Exception ex) {
-            return null;
-        }
+    public boolean verifyPassword(String password, String hashedPassword) {
+        return BCrypt.checkpw(password, hashedPassword);
     }
 }

@@ -5,6 +5,7 @@
     <string name="backup_title">Backup</string>
     <string name="bookmarks_manager_title">Importa/Esporta</string>
     <string name="categories_title">Categorie</string>
+    <string name="category_title">Categoria:</string>
     <string name="modify_category_title">Modifica categoria</string>
     <string name="new_category_title">Nuova categoria</string>
     <string name="all_bookmarks_title">Tutti i segnalibri</string>
@@ -57,10 +58,12 @@
     <string name="warning_description">Per effettuare l\'operazione consenti di accedere alla memoria di archiviazione</string>
     <string name="go_to_settings">Vai a Impostazioni</string>
     <string name="search">Cerca</string>
+    <string name="preview">Anteprima</string>
     <string name="modify">Modifica</string>
     <string name="delete">Elimina</string>
     <string name="modify_bookmark">Modifica segnalibro</string>
     <string name="insert_reminder">Inserisci un promemoria:</string>
+    <string name="reminder">Promemoria:</string>
     <string name="optional">Opzionale *</string>
     <string name="help">Aiuto</string>
     <string name="skip">Salta</string>
@@ -113,4 +116,6 @@
     <string name="impossible_update_categories">mpossibile aggiungere le categorie!</string>
     <string name="important">Importante!</string>
     <string name="password_info">Attenzione una volta impostata la password sarà impossible recuperarla!</string>
+    <string name="description">Descrizione:</string>
+    <string name="title_activity_bookmark_preview">BookmarkPreviewActivity</string>
 </resources>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ilpet.yabm">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -19,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YABM"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".activities.BookmarkPreviewActivity"
+            android:exported="false"
+            android:label="@string/title_activity_bookmark_preview"
+            android:theme="@style/Theme.YABM" />
         <activity
             android:name=".activities.HelpActivity"
             android:exported="false" />
@@ -52,7 +56,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleInstance" />
@@ -60,8 +63,7 @@
         <receiver
             android:name=".utils.AlarmReceiver"
             android:enabled="true"
-            android:exported="true">
-        </receiver>
+            android:exported="true" />
     </application>
 
 </manifest>

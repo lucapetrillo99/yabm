@@ -30,6 +30,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.BookmarkPreviewActivity;
 import com.ilpet.yabm.activities.InsertBookmarkActivity;
 import com.ilpet.yabm.activities.MainActivity;
 import com.ilpet.yabm.classes.Bookmark;
@@ -238,6 +239,14 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 switch (id) {
+                    case R.id.bookmark_preview:
+                        String bookmarkCategory = db.getCategoryById(bookmarks.get(position).getCategory());
+                        Intent activityIntent = new Intent(mainActivity, BookmarkPreviewActivity.class);
+                        activityIntent.putExtra("bookmark", bookmarks.get(position));
+                        activityIntent.putExtra("category", bookmarkCategory);
+                        mainActivity.startActivity(activityIntent);
+                        mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        break;
                     case R.id.modify_bookmark:
                         String category = db.getCategoryById(bookmarks.get(position).getCategory());
                         Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);

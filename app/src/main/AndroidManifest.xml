@@ -57,7 +57,7 @@
             android:launchMode="singleInstance" />
 
         <receiver
-            android:name=".connection.AlarmReceiver"
+            android:name=".utils.AlarmReceiver"
             android:enabled="true"
             android:exported="true">
         </receiver>

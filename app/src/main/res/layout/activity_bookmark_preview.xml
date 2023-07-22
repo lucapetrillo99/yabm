@@ -43,6 +43,8 @@
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:textIsSelectable="true"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true">
@@ -74,6 +76,8 @@
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:textIsSelectable="true"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true">
@@ -105,6 +109,8 @@
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:textIsSelectable="true"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true">
@@ -137,6 +143,8 @@
             android:maxLines="@android:integer/status_bar_notification_info_maxnum"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:textIsSelectable="true"
             android:background="@drawable/custom_background_edit_text"
             android:scrollHorizontally="true">

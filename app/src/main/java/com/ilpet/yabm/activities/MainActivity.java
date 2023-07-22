@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -74,10 +75,15 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private String previousCategory;
     private boolean refreshCategories = false;
     private SettingsManager settingsManager;
+    private static final int SYSTEM_DEFAULT = 0;
+    private static final int LIGHT_MODE = 1;
+    private static final int NIGHT_MODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+        setAppTheme();
         db = DatabaseHandler.getInstance(getApplicationContext());
         settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
         String categoryToLoad = settingsManager.getCategory();
@@ -710,5 +716,20 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         setAdapter();
         drawerLayout.closeDrawers();
+    }
+
+    public void setAppTheme() {
+        SettingsManager settingsManager = new SettingsManager(this, "theme");
+        int theme = settingsManager.getTheme();
+        switch (theme) {
+            case NIGHT_MODE:
+                settingsManager.setTheme(NIGHT_MODE);
+                break;
+            case LIGHT_MODE:
+                settingsManager.setTheme(LIGHT_MODE);
+                break;
+            default:
+                settingsManager.setTheme(SYSTEM_DEFAULT);
+        }
     }
 }

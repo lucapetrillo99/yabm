@@ -31,6 +31,7 @@ import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
+import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
@@ -57,12 +58,14 @@ import java.util.stream.Collectors;
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final long ALARM_START_TIME = -1;
+    private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
     private final HashMap<String, List<String>> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
     private SwitchMaterial exportSwitch;
     private LoadingDialog loadingDialog;
     private DatabaseHandler db;
+    private SettingsManager exportManager;
 
     ActivityResultLauncher<Intent> writeBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -92,6 +95,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());
         loadingDialog = new LoadingDialog(BookmarksManagerActivity.this);
+        exportManager = new SettingsManager(getApplicationContext(), EXPORTING_BOOKMARKS);
 
         importOption = findViewById(R.id.import_option);
         exportOption = findViewById(R.id.export_option);
@@ -109,11 +113,12 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void setSwitch() {
-        exportSwitch.setChecked(false);
+        exportSwitch.setChecked(exportManager.getBookmarksExporting());
     }
 
     private void exportSwitchListener() {
         exportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            exportManager.setBookmarksExporting(isChecked);
         });
     }
 

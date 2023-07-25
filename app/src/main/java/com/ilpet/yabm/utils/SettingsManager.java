@@ -17,6 +17,7 @@ public class SettingsManager {
     private static final String BOOKMARK_ORDER_TYPE = "bookmark_order_type";
     private static final String CATEGORY_ORDER_BY = "category_order_by";
     private static final String CATEGORY_ORDER_TYPE = "category_order_type";
+    private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
@@ -127,5 +128,15 @@ public class SettingsManager {
 
     public String getCategoryOrderType() {
         return settingsManager.getString(CATEGORY_ORDER_TYPE, String.valueOf(SortOrder.ASC));
+    }
+
+    public void setBookmarksExporting(boolean option) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putBoolean(EXPORTING_BOOKMARKS, option);
+        editor.apply();
+    }
+
+    public boolean getBookmarksExporting() {
+        return settingsManager.getBoolean(EXPORTING_BOOKMARKS, false);
     }
 }

@@ -24,12 +24,14 @@
     <string name="insert_category_title">Inserisci la categoria</string>
     <string name="backup_description">Tieni i tuoi segnalibri al sicuro!</string>
     <string name="auto_backup">Backup automatico</string>
-    <string name="auto_backup_description">Se abilitato l\'app creerà automaticamente un file di backup</string>
+    <string name="auto_backup_description">Se abilitato verrà creeto automaticamente un file di backup</string>
     <string name="create_backup">Crea backup</string>
     <string name="restore_backup">Ripristina backup</string>
     <string name="import_export_description">Porta i tuoi segnalilbri sempre con te!</string>
     <string name="import_description">Importa da file .HMTL</string>
     <string name="export_description">Esporta su file .HTML</string>
+    <string name="export_locked_bookmarks">Esporta segnalibri protetti</string>
+    <string name="export_locked_description">Se abilitato verranno esportati i segnalibri protetti da password</string>
     <string name="contact_us">Contattaci:</string>
     <string name="message_title">Scrivi un titolo</string>
     <string name="message_text">Testo</string>

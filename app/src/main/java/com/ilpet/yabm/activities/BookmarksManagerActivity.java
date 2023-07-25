@@ -24,6 +24,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
@@ -59,6 +60,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private final HashMap<String, List<String>> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
+    private SwitchMaterial exportSwitch;
     private LoadingDialog loadingDialog;
     private DatabaseHandler db;
 
@@ -93,7 +95,10 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
         importOption = findViewById(R.id.import_option);
         exportOption = findViewById(R.id.export_option);
+        exportSwitch = findViewById(R.id.export_locked_bookmarks);
 
+        setSwitch();
+        exportSwitchListener();
         importListener();
         exportListener();
         toolbar.setNavigationOnClickListener(v -> {
@@ -101,6 +106,15 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         });
 
+    }
+
+    private void setSwitch() {
+        exportSwitch.setChecked(false);
+    }
+
+    private void exportSwitchListener() {
+        exportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        });
     }
 
     private void importListener() {

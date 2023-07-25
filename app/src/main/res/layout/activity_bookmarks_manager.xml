@@ -49,15 +49,70 @@
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/enable_locked_bookmarks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        tools:ignore="MissingConstraints"
+        android:layout_below="@+id/content_description"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_password">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="@string/export_locked_bookmarks"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:paddingStart="45dp"
+                android:layout_marginEnd="40dp"
+                android:text="@string/export_locked_description"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/export_locked_bookmarks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="40dp">
+        </com.google.android.material.switchmaterial.SwitchMaterial>
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/import_option"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginTop="10dp"
         tools:ignore="MissingConstraints"
-        android:layout_below="@+id/content_description"
+        android:layout_below="@+id/enable_locked_bookmarks"
         android:layout_marginStart="10dp">
 
         <ImageView

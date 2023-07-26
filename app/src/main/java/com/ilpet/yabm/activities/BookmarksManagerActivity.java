@@ -62,7 +62,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private static final long ALARM_START_TIME = -1;
     private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
     private static final String TEMPLATE = "template.html";
-    private Map<String, Elements> importedBookmarks = new HashMap<>();
+    private final Map<String, Elements> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
     private SwitchMaterial exportSwitch;
@@ -81,8 +81,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> importBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             if (result.getData() != null) {
-                Uri uri = result.getData().getData();
-                importOptionsDialog(getBookmarksFromUri(uri));
+                getBookmarksFromUri(result.getData().getData());
+                importOptionsDialog();
             }
         }
     });
@@ -203,19 +203,21 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 String categoryTitle = h3Tag.text();
                 Elements links = h3Tag.parent().select("a[href]");
                 if (links != null) {
-                    boolean categoryExists = categories.stream().anyMatch(category ->
-                            category.getCategoryTitle().equals(categoryTitle));
-                    if (categoryExists) {
-                        importedBookmarks.put(db.getCategoryId(categoryTitle), links);
-                    } else {
-                        Date date = new Date();
-                        Category category = new Category();
-                        category.setCategoryTitle(categoryTitle);
-                        category.setDate(dateFormat.format(date));
-                        category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
-                        String categoryId = db.addCategory(category);
-                        if (categoryId != null) {
-                            importedBookmarks.put(categoryId, links);
+                    if (links.size() > 0) {
+                        boolean categoryExists = categories.stream().anyMatch(category ->
+                                category.getCategoryTitle().equals(categoryTitle));
+                        if (categoryExists) {
+                            importedBookmarks.put(db.getCategoryId(categoryTitle), links);
+                        } else {
+                            Date date = new Date();
+                            Category category = new Category();
+                            category.setCategoryTitle(categoryTitle);
+                            category.setDate(dateFormat.format(date));
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                            String categoryId = db.addCategory(category);
+                            if (categoryId != null) {
+                                importedBookmarks.put(categoryId, links);
+                            }
                         }
                     }
                 }
@@ -226,7 +228,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
-    private void importOptionsDialog(String categoryId) {
+    private void importOptionsDialog() {
         String question;
         Handler handler = new Handler();
 //        int totalSize = 0;
@@ -247,7 +249,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
         builder.setPositiveButton("Sì", (dialogInterface, i) -> {
             loadingDialog.startLoading();
-            importBookmarks(categoryId);
+            importBookmarks();
             handler.postDelayed(() -> {
                 loadingDialog.dismissLoading();
                 Toast.makeText(getApplicationContext(), "Segnalibri importati", Toast.LENGTH_LONG)
@@ -260,20 +262,14 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void importBookmarks(String categoryId) {
+    private void importBookmarks() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         if (importedBookmarks.size() > 0) {
-            for (String bookmarkCategory : importedBookmarks.keySet()) {
-                if (categoryId == null) {
-                    Category category = new Category();
-                    category.setCategoryTitle(bookmarkCategory);
-                    categoryId = db.addCategory(category);
-                    if (categoryId == null) {
-                        categoryId = db.getCategoryId(bookmarkCategory);
-                    }
-                }
-                for (String link : Objects.requireNonNull(importedBookmarks.get(bookmarkCategory))) {
+            for (Map.Entry<String, Elements> entry : importedBookmarks.entrySet()) {
+                for (Element link : entry.getValue()) {
                     Data data = new Data.Builder()
-                            .putString("link", String.valueOf(link))
+                            .putString("link", String.valueOf(link.attr("href")))
                             .build();
 
                     WorkRequest workRequest =
@@ -283,15 +279,18 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
                     WorkManager.getInstance(this).enqueue(workRequest);
 
-                    String finalCategoryId = categoryId;
                     WorkManager.getInstance(this).getWorkInfoByIdLiveData(workRequest.getId())
                             .observe(this, info -> {
                                 if (info != null && info.getState().isFinished()) {
                                     Bookmark bookmark = new Bookmark();
-                                    bookmark.setLink(link);
+                                    bookmark.setLink(String.valueOf(link.attr("href")));
                                     bookmark.setReminder(ALARM_START_TIME);
-                                    bookmark.setCategory(finalCategoryId);
-                                    bookmark.setTitle(info.getOutputData().getString("title"));
+                                    bookmark.setCategory(entry.getKey());
+                                    if (info.getOutputData().getString("title") != null) {
+                                        bookmark.setTitle(info.getOutputData().getString("title"));
+                                    } else {
+                                        bookmark.setTitle(String.valueOf(link.attr("href")));
+                                    }
                                     bookmark.setImage(info.getOutputData().getString("image"));
                                     bookmark.setDescription(info.getOutputData().getString("description"));
                                     String itemType = info.getOutputData().getString("itemType");
@@ -301,8 +300,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
                                         bookmark.setType(Bookmark.ItemType.valueOf(itemType));
                                     }
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat(
-                                            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                                     Date date = new Date();
                                     bookmark.setDate(dateFormat.format(date));
                                     db.addBookmark(bookmark);

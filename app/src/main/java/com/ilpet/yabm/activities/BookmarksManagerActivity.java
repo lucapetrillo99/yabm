@@ -42,12 +42,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,7 +49,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +74,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         if (result.getResultCode() == Activity.RESULT_OK) {
             if (result.getData() != null) {
                 Uri uri = result.getData().getData();
-                writeBookmarksFile(uri);
+                writeBookmarksFile(uri, exportManager.getBookmarksExporting());
             }
         }
     });
@@ -169,7 +162,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
-                ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
+                ArrayList<Bookmark> bookmarks = db.getBookmarks(null, null);
                 if (bookmarks.size() == 0) {
                     Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
                             .show();
@@ -353,8 +346,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
-    private void writeBookmarksFile(Uri uri) {
-        ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
+    private void writeBookmarksFile(Uri uri, boolean exportProtected) {
+        ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
         StringBuilder htmlContent = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open(TEMPLATE)));
@@ -371,11 +364,12 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
         Map<String, List<Bookmark>> bookmarksByCategory = new HashMap<>();
         for (Bookmark bookmark : bookmarks) {
-
-            // if ("Facebook1".equals(bookmark.getCategory())) {
-            //     continue;
-            // }
-
+            if (!exportProtected) {
+                Category category = db.getCategoryById(bookmark.getCategory());
+                if (category.getPasswordProtection() == Category.CategoryProtection.LOCK) {
+                    continue;
+                }
+            }
             bookmarksByCategory.computeIfAbsent(bookmark.getCategory(), k -> new ArrayList<>()).add(bookmark);
         }
 
@@ -385,7 +379,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             String category = entry.getKey();
             List<Bookmark> bookmarksForCategory = entry.getValue();
 
-            String categoryTitle = "\n<DT><H3>" + db.getCategoryById(category) + "</H3>\n";
+            String categoryTitle = "\n<DT><H3>" + db.getCategoryById(category).getCategoryTitle()
+                    + "</H3>\n";
 
             StringBuilder links = new StringBuilder();
             links.append("<DL><p>\n");
@@ -395,11 +390,9 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             }
             links.append("</DL><p>\n");
 
-            // Combine the h3 tag and the unordered list
             StringBuilder categoryContent = new StringBuilder();
             categoryContent.append(categoryTitle).append(links);
 
-            // Insert the category content after the existing head
             htmlContent.insert(insertPosition, categoryContent);
         }
 

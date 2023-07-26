@@ -545,4 +545,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return sb.toString();
         }
     }
+
+    public ArrayList<Bookmark> getAllBookmarks() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ArrayList<Bookmark> bookmarks = new ArrayList<>();
+        Cursor cursor = db.rawQuery("Select  * from " + TABLE_BOOKMARK,
+                new String[]{});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Bookmark bookmark = new Bookmark();
+                bookmark.setId(cursor.getString(cursor.getColumnIndexOrThrow(BOOKMARK_ID)));
+                bookmark.setLink(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_LINK)));
+                bookmark.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_TITLE)));
+                bookmark.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_DESCRIPTION)));
+                bookmark.setImage(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_IMAGE)));
+                bookmark.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_CATEGORY)));
+                bookmark.setReminder(cursor.getLong(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_REMINDER)));
+                String type = cursor.getString(cursor.getColumnIndexOrThrow(KEY_BOOKMARK_TYPE));
+                bookmark.setType(Bookmark.ItemType.valueOf(type));
+                bookmark.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                bookmarks.add(bookmark);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return bookmarks;
+    }
 }

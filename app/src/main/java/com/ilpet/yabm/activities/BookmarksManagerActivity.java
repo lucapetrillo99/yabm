@@ -32,6 +32,7 @@ import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
+import com.ilpet.yabm.utils.PasswordDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
@@ -127,7 +128,17 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     private void exportSwitchListener() {
         exportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            exportManager.setBookmarksExporting(isChecked);
+            if (isChecked) {
+                if (db.getPassword() != null) {
+                    exportManager.setBookmarksExporting(true);
+                } else {
+                    exportSwitch.setChecked(false);
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_password_inserted),
+                            Toast.LENGTH_LONG).show();
+                }
+            } else {
+                exportManager.setBookmarksExporting(false);
+            }
         });
     }
 
@@ -328,13 +339,22 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         intent.setType("text/html");
         intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".html");
 
-        writeBookmarksLauncher.launch(intent);
-
+        if (exportManager.getBookmarksExporting()) {
+            PasswordDialog passwordDialog = new PasswordDialog(this,
+                    result -> {
+                        if (result) {
+                            writeBookmarksLauncher.launch(intent);
+                        }
+                    });
+            passwordDialog.show(getSupportFragmentManager(),
+                    "Password dialog");
+        } else {
+            writeBookmarksLauncher.launch(intent);
+        }
     }
 
     private void writeBookmarksFile(Uri uri) {
         ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
-        ArrayList<Category> categories = db.getAllCategories(null, null);
         StringBuilder htmlContent = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open(TEMPLATE)));

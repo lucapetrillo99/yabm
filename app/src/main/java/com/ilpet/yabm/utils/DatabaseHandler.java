@@ -213,7 +213,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return categories;
     }
 
-    public ArrayList<Bookmark> getAllBookmarks(String orderBy, String orderType) {
+    public ArrayList<Bookmark> getBookmarks(String orderBy, String orderType) {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<Bookmark> bookmarks = new ArrayList<>();
 
@@ -285,16 +285,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public String getCategoryById(String categoryId) {
+    public Category getCategoryById(String categoryId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("Select " + KEY_CATEGORY_TITLE + " from " + TABLE_CATEGORY +
+        Cursor cursor = db.rawQuery("Select *" + " from " + TABLE_CATEGORY +
                         " where " + CATEGORY_ID + " = ?",
                 new String[]{categoryId});
 
         if (cursor.moveToFirst()) {
-            String categoryName = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE));
+            Category category = new Category();
+            category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
+            category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
+            category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+            int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+            category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
             cursor.close();
-            return categoryName;
+            return category;
         } else {
             return null;
         }

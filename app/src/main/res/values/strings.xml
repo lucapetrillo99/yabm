@@ -120,4 +120,5 @@
     <string name="password_info">Attenzione una volta impostata la password sarà impossible recuperarla!</string>
     <string name="description">Descrizione:</string>
     <string name="title_activity_bookmark_preview">BookmarkPreviewActivity</string>
+    <string name="something_wrong">Qualcosa è andato storto</string>
 </resources>

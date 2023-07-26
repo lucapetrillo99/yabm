@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,6 +59,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -59,6 +67,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final long ALARM_START_TIME = -1;
     private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
+    private static final String TEMPLATE = "template.html";
     private final HashMap<String, List<String>> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
@@ -326,43 +335,64 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private void writeBookmarksFile(Uri uri) {
         ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
         ArrayList<Category> categories = db.getAllCategories(null, null);
-        final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-                "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-                "<TITLE>Bookmarks</TITLE>\n" +
-                "<H1>Bookmarks</H1>\n" +
-                "<DL><p>";
-        final String FILE_FOOTER = "</DL><p>";
-        final String INITIAL_FILE_CONTENT = "<DT><A HREF=";
-        final String FINAL_FILE_CONTENT = "</A>";
-        bookmarks.sort(Comparator.comparingInt(bookmark -> Integer.parseInt(bookmark.getCategory())));
+        StringBuilder htmlContent = new StringBuilder();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open(TEMPLATE)));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                htmlContent.append(line).append("\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), (getString(R.string.something_wrong)), Toast.LENGTH_LONG)
+                    .show();
+        }
+
+        Map<String, List<Bookmark>> bookmarksByCategory = new HashMap<>();
+        for (Bookmark bookmark : bookmarks) {
+
+            // if ("Facebook1".equals(bookmark.getCategory())) {
+            //     continue;
+            // }
+
+            bookmarksByCategory.computeIfAbsent(bookmark.getCategory(), k -> new ArrayList<>()).add(bookmark);
+        }
+
+        int insertPosition = htmlContent.indexOf("<DL><p>") + "<DL><p>".length();
+
+        for (Map.Entry<String, List<Bookmark>> entry : bookmarksByCategory.entrySet()) {
+            String category = entry.getKey();
+            List<Bookmark> bookmarksForCategory = entry.getValue();
+
+            String categoryTitle = "\n<DT><H3>" + db.getCategoryById(category) + "</H3>\n";
+
+            StringBuilder links = new StringBuilder();
+            links.append("<DL><p>\n");
+            for (Bookmark bookmark : bookmarksForCategory) {
+                links.append("<DT><A HREF=\"").append(bookmark.getLink()).append("\">")
+                        .append(bookmark.getTitle()).append("</A>\n");
+            }
+            links.append("</DL><p>\n");
+
+            // Combine the h3 tag and the unordered list
+            StringBuilder categoryContent = new StringBuilder();
+            categoryContent.append(categoryTitle).append(links);
+
+            // Insert the category content after the existing head
+            htmlContent.insert(insertPosition, categoryContent);
+        }
+
+        StringBuilder dt = new StringBuilder();
+        dt.append("</DL><p>");
+        htmlContent.insert(htmlContent.length() - 1, dt);
+
         try {
             OutputStream outputStream = getContentResolver().openOutputStream(uri);
-            outputStream.write(FILE_HEADER.getBytes());
-            outputStream.write("\n".getBytes());
-
-            String bookmarkCategoryId = null;
-
-            for (Bookmark bookmark : bookmarks) {
-                if (bookmarkCategoryId == null) {
-                    bookmarkCategoryId = writeObject(categories, outputStream, bookmark);
-                } else {
-                    if (bookmarkCategoryId.equals(bookmark.getCategory())) {
-                        outputStream.write(INITIAL_FILE_CONTENT.getBytes());
-                        outputStream.write('"');
-                        outputStream.write(bookmark.getLink().getBytes());
-                        outputStream.write('"');
-                        outputStream.write(">".getBytes());
-                        outputStream.write(bookmark.getTitle().getBytes());
-                        outputStream.write(FINAL_FILE_CONTENT.getBytes());
-                    } else {
-                        bookmarkCategoryId = writeObject(categories, outputStream, bookmark);
-                    }
-                }
-            }
-            outputStream.write(FILE_FOOTER.getBytes());
+            outputStream.write(htmlContent.toString().getBytes());
             outputStream.close();
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
+            Toast.makeText(getApplicationContext(), (getString(R.string.something_wrong)), Toast.LENGTH_LONG)
                     .show();
         }
     }

@@ -62,7 +62,7 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private static final long ALARM_START_TIME = -1;
     private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
     private static final String TEMPLATE = "template.html";
-    private final HashMap<String, List<String>> importedBookmarks = new HashMap<>();
+    private Map<String, Elements> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
     private SwitchMaterial exportSwitch;
@@ -184,9 +184,11 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
-    private String getBookmarksFromUri(Uri uri) {
-        String categoryId = null;
+    private void getBookmarksFromUri(Uri uri) {
+        ArrayList<Category> categories = db.getAllCategories(null, null);
         StringBuilder stringBuilder = new StringBuilder();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try (InputStream inputStream = getContentResolver().openInputStream(uri);
              BufferedReader reader = new BufferedReader(
                      new InputStreamReader(Objects.requireNonNull(inputStream)))) {
@@ -195,55 +197,44 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 stringBuilder.append(line);
             }
             Document doc = Jsoup.parse(stringBuilder.toString());
-            Elements categoryTitles = doc.select("h3");
-            if (!categoryTitles.isEmpty()) {
-                if (categoryTitles.size() == 1) {
-                    Elements elementsByTag = doc.getElementsByTag("a");
-                    ArrayList<String> links = new ArrayList<>();
-                    for (Element element : elementsByTag) {
-                        links.add(element.attr("href"));
-                    }
-                    importedBookmarks.put(categoryTitles.get(0).text(), links);
-                } else {
-                    for (Element element : categoryTitles) {
-                        if (element.siblingElements().select("a[href]").stream().
-                                map(element1 -> element.siblingElements().select("a[href]")
-                                        .attr("href")).findAny().isPresent()) {
-                            importedBookmarks.put(element.text(), element.siblingElements().select("a[href]").stream().
-                                    map(element1 -> element.siblingElements().select("a[href]").attr("href"))
-                                    .collect(Collectors.toList()));
+            Elements h3Tags = doc.select("h3");
+
+            for (Element h3Tag : h3Tags) {
+                String categoryTitle = h3Tag.text();
+                Elements links = h3Tag.parent().select("a[href]");
+                if (links != null) {
+                    boolean categoryExists = categories.stream().anyMatch(category ->
+                            category.getCategoryTitle().equals(categoryTitle));
+                    if (categoryExists) {
+                        importedBookmarks.put(db.getCategoryId(categoryTitle), links);
+                    } else {
+                        Date date = new Date();
+                        Category category = new Category();
+                        category.setCategoryTitle(categoryTitle);
+                        category.setDate(dateFormat.format(date));
+                        category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                        String categoryId = db.addCategory(category);
+                        if (categoryId != null) {
+                            importedBookmarks.put(categoryId, links);
                         }
                     }
                 }
-            } else {
-                Elements elementsByTag = doc.getElementsByTag("a");
-                ArrayList<String> links = new ArrayList<>();
-                for (Element element : elementsByTag) {
-                    links.add(element.attr("href"));
-                }
-                importedBookmarks.put(getString(R.string.imported), links);
-
-                String queryResult = db.getCategoryId(getString(R.string.imported));
-                if (queryResult == null) {
-                    Category category = new Category();
-                    category.setCategoryTitle(getString(R.string.imported));
-                    categoryId = db.addCategory(category);
-                } else {
-                    categoryId = queryResult;
-                }
             }
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(getApplicationContext(), getString(R.string.something_wrong),
+                    Toast.LENGTH_LONG).show();
         }
-
-        return categoryId;
     }
 
     private void importOptionsDialog(String categoryId) {
         String question;
         Handler handler = new Handler();
-        if (importedBookmarks.size() > 1) {
+//        int totalSize = 0;
+//        for (List<String> list : map.values()) {
+//            totalSize += list.size();
+//        }
+
+        if (importedBookmarks.entrySet().size() > 1) {
             question = " segnalibri?";
         } else {
             question = " segnalibro?";

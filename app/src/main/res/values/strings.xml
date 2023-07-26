@@ -122,4 +122,5 @@
     <string name="title_activity_bookmark_preview">BookmarkPreviewActivity</string>
     <string name="something_wrong">Qualcosa è andato storto</string>
     <string name="no_password_inserted">Non è impostata alcuna password</string>
+    <string name="no_bookmarks_to_export">Non ci sono segnalibri da esportare</string>
 </resources>

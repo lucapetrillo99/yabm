@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         if (categoryToLoad.equals(getString(R.string.all_bookmarks_title))) {
-            bookmarks = new ArrayList<>(db.getAllBookmarks(settingsManager.getBookmarkOrderBy(),
+            bookmarks = new ArrayList<>(db.getBookmarks(settingsManager.getBookmarkOrderBy(),
                     settingsManager.getBookmarkOrderType()));
             setAdapter();
         } else {
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     if (!queryTextFocused) {
                         if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                             bookmarks.clear();
-                            bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                            bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                             setAdapter();
                         } else {
                             bookmarks.clear();
@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         archiveBookmark();
         if (previousCategory != null) {
             if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 setAdapter();
             } else {
                 if (db.getCategoryProtectionByTitle(previousCategory)) {
@@ -447,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             String categoryToLoad = settingsManager.getCategory();
             if (categoryToLoad != null) {
                 if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                    bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                     setAdapter();
                 } else {
                     if (db.getCategoryProtectionByTitle(previousCategory)) {
@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);
-                bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 setAdapter();
             }
         }
@@ -697,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             archiveBookmark();
             unarchiveBookmark();
             bookmarks.clear();
-            bookmarks = db.getAllBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+            bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
         } else {
             if (categoryName.equals(getString(R.string.archived_bookmarks))) {
                 isArchiveModeEnabled = true;

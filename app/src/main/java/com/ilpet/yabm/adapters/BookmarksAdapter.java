@@ -240,7 +240,8 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 int id = item.getItemId();
                 switch (id) {
                     case R.id.bookmark_preview:
-                        String bookmarkCategory = db.getCategoryById(bookmarks.get(position).getCategory());
+                        String bookmarkCategory = db.getCategoryById(bookmarks.get(position)
+                                .getCategory()).getCategoryTitle();
                         Intent activityIntent = new Intent(mainActivity, BookmarkPreviewActivity.class);
                         activityIntent.putExtra("bookmark", bookmarks.get(position));
                         activityIntent.putExtra("category", bookmarkCategory);
@@ -248,7 +249,8 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         break;
                     case R.id.modify_bookmark:
-                        String category = db.getCategoryById(bookmarks.get(position).getCategory());
+                        String category = db.getCategoryById(bookmarks.get(position).getCategory())
+                                .getCategoryTitle();
                         Intent intent = new Intent(mainActivity, InsertBookmarkActivity.class);
                         intent.putExtra("bookmark", bookmarks.get(position));
                         intent.putExtra("category", category);

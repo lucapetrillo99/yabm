@@ -17,7 +17,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.work.Data;
@@ -25,12 +24,15 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.LoadingDialog;
+import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.SettingsManager;
 import com.ilpet.yabm.utils.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
@@ -46,40 +48,46 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-@RequiresApi(api = Build.VERSION_CODES.N)
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
     private static final long ALARM_START_TIME = -1;
-    private final HashMap<String, List<String>> importedBookmarks = new HashMap<>();
+    private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
+    private static final String TEMPLATE = "template.html";
+    private final Map<String, Elements> importedBookmarks = new HashMap<>();
     private RelativeLayout importOption;
     private RelativeLayout exportOption;
+    private SwitchMaterial exportSwitch;
     private LoadingDialog loadingDialog;
     private DatabaseHandler db;
+    private SettingsManager exportManager;
 
-    ActivityResultLauncher<Intent> writeBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                Uri uri = result.getData().getData();
-                writeBookmarksFile(uri);
-            }
-        }
-    });
-    ActivityResultLauncher<Intent> importBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                Uri uri = result.getData().getData();
-                importOptionsDialog(getBookmarksFromUri(uri));
-            }
-        }
-    });
+    ActivityResultLauncher<Intent> writeBookmarksLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            if (result.getData() != null) {
+                                Uri uri = result.getData().getData();
+                                writeBookmarksFile(uri, exportManager.getBookmarksExporting());
+                            }
+                        }
+                    });
+    ActivityResultLauncher<Intent> importBookmarksLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            if (result.getData() != null) {
+                                getBookmarksFromUri(result.getData().getData());
+                                importOptionsDialog();
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +100,14 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         db = DatabaseHandler.getInstance(getApplicationContext());
         loadingDialog = new LoadingDialog(BookmarksManagerActivity.this);
+        exportManager = new SettingsManager(getApplicationContext(), EXPORTING_BOOKMARKS);
 
         importOption = findViewById(R.id.import_option);
         exportOption = findViewById(R.id.export_option);
+        exportSwitch = findViewById(R.id.export_locked_bookmarks);
 
+        setSwitch();
+        exportSwitchListener();
         importListener();
         exportListener();
         toolbar.setNavigationOnClickListener(v -> {
@@ -105,10 +117,39 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     }
 
+    private void setSwitch() {
+        exportSwitch.setChecked(exportManager.getBookmarksExporting());
+    }
+
+    private void exportSwitchListener() {
+        exportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (db.getPassword() != null) {
+                    exportManager.setBookmarksExporting(true);
+                } else {
+                    exportSwitch.setChecked(false);
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_password_inserted),
+                            Toast.LENGTH_LONG).show();
+                }
+            } else {
+                exportManager.setBookmarksExporting(false);
+            }
+        });
+    }
+
     private void importListener() {
         importOption.setOnClickListener(v -> {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSION_REQUEST_STORAGE);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("text/html");
+                    importBookmarksLauncher.launch(intent);
+                }
             } else {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -119,13 +160,17 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void exportListener() {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
-                ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
+                ArrayList<Bookmark> bookmarks = db.getBookmarks(null, null);
                 if (bookmarks.size() == 0) {
-                    Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
+                    Toast.makeText(getApplicationContext(),
+                                    getString(R.string.no_bookmarks_to_export), Toast.LENGTH_LONG)
                             .show();
                 } else {
                     createBookmarksFile();
@@ -145,10 +190,11 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private String getBookmarksFromUri(Uri uri) {
-        String categoryId = null;
+    private void getBookmarksFromUri(Uri uri) {
+        ArrayList<Category> categories = db.getAllCategories(null, null);
         StringBuilder stringBuilder = new StringBuilder();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try (InputStream inputStream = getContentResolver().openInputStream(uri);
              BufferedReader reader = new BufferedReader(
                      new InputStreamReader(Objects.requireNonNull(inputStream)))) {
@@ -157,112 +203,98 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                 stringBuilder.append(line);
             }
             Document doc = Jsoup.parse(stringBuilder.toString());
-            Elements categoryTitles = doc.select("h3");
-            if (!categoryTitles.isEmpty()) {
-                if (categoryTitles.size() == 1) {
-                    Elements elementsByTag = doc.getElementsByTag("a");
-                    ArrayList<String> links = new ArrayList<>();
-                    for (Element element : elementsByTag) {
-                        links.add(element.attr("href"));
-                    }
-                    importedBookmarks.put(categoryTitles.get(0).text(), links);
-                } else {
-                    for (Element element : categoryTitles) {
-                        if (element.siblingElements().select("a[href]").stream().
-                                map(element1 -> element.siblingElements().select("a[href]")
-                                        .attr("href")).findAny().isPresent()) {
-                            importedBookmarks.put(element.text(), element.siblingElements().select("a[href]").stream().
-                                    map(element1 -> element.siblingElements().select("a[href]").attr("href"))
-                                    .collect(Collectors.toList()));
+            Elements h3Tags = doc.select("h3");
+
+            for (Element h3Tag : h3Tags) {
+                String categoryTitle = h3Tag.text();
+                Elements links = h3Tag.parent().select("a[href]");
+                if (links != null) {
+                    if (links.size() > 0) {
+                        boolean categoryExists = categories.stream().anyMatch(category ->
+                                category.getCategoryTitle().equals(categoryTitle));
+                        if (categoryExists) {
+                            importedBookmarks.put(db.getCategoryId(categoryTitle), links);
+                        } else {
+                            Date date = new Date();
+                            Category category = new Category();
+                            category.setCategoryTitle(categoryTitle);
+                            category.setDate(dateFormat.format(date));
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                            String categoryId = db.addCategory(category);
+                            if (categoryId != null) {
+                                importedBookmarks.put(categoryId, links);
+                            }
                         }
                     }
                 }
-            } else {
-                Elements elementsByTag = doc.getElementsByTag("a");
-                ArrayList<String> links = new ArrayList<>();
-                for (Element element : elementsByTag) {
-                    links.add(element.attr("href"));
-                }
-                importedBookmarks.put(getString(R.string.imported), links);
-
-                String queryResult = db.getCategoryId(getString(R.string.imported));
-                if (queryResult == null) {
-                    Category category = new Category();
-                    category.setCategoryTitle(getString(R.string.imported));
-                    categoryId = db.addCategory(category);
-                } else {
-                    categoryId = queryResult;
-                }
             }
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(getApplicationContext(), getString(R.string.something_wrong),
+                    Toast.LENGTH_LONG).show();
         }
-
-        return categoryId;
     }
 
-    private void importOptionsDialog(String categoryId) {
+    private void importOptionsDialog() {
         String question;
         Handler handler = new Handler();
-        if (importedBookmarks.size() > 1) {
-            question = " segnalibri?";
+        int totalSize = 0;
+
+        for (Map.Entry<String, Elements> entry : importedBookmarks.entrySet()) {
+            totalSize += entry.getValue().size();
+        }
+
+        if (totalSize > 1) {
+            question = getString(R.string.bookmarks_question);
         } else {
-            question = " segnalibro?";
+            question = getString(R.string.bookmark_question);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(BookmarksManagerActivity.this);
-        builder.setTitle("Sei sicuro di voler importare " + importedBookmarks.values().stream()
-                .mapToInt(List::size)
-                .sum() + question);
+        builder.setTitle(getString(R.string.import_bookmark_question) + " " + totalSize + " " + question);
 
-        builder.setPositiveButton("Sì", (dialogInterface, i) -> {
+        builder.setPositiveButton(getString(R.string.confirm), (dialogInterface, i) -> {
             loadingDialog.startLoading();
-            importBookmarks(categoryId);
+            importBookmarks();
             handler.postDelayed(() -> {
                 loadingDialog.dismissLoading();
-                Toast.makeText(getApplicationContext(), "Segnalibri importati", Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(getApplicationContext(), getString(R.string.bookmarks_imported),
+                                Toast.LENGTH_LONG).show();
             }, 8000);
         });
-        builder.setNeutralButton("Annulla", (dialog, which) -> importedBookmarks.clear());
+        builder.setNeutralButton(getString(R.string.cancel), (dialog, which) -> importedBookmarks.clear());
 
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
-    private void importBookmarks(String categoryId) {
+    private void importBookmarks() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         if (importedBookmarks.size() > 0) {
-            for (String bookmarkCategory : importedBookmarks.keySet()) {
-                if (categoryId == null) {
-                    Category category = new Category();
-                    category.setCategoryTitle(bookmarkCategory);
-                    categoryId = db.addCategory(category);
-                    if (categoryId == null) {
-                        categoryId = db.getCategoryId(bookmarkCategory);
-                    }
-                }
-                for (String link : Objects.requireNonNull(importedBookmarks.get(bookmarkCategory))) {
+            for (Map.Entry<String, Elements> entry : importedBookmarks.entrySet()) {
+                for (Element link : entry.getValue()) {
                     Data data = new Data.Builder()
-                            .putString("link", String.valueOf(link))
+                            .putString("link", String.valueOf(link.attr("href")))
                             .build();
 
-                    WorkRequest workRequest =
-                            new OneTimeWorkRequest.Builder(Connection.class)
-                                    .setInputData(data)
-                                    .build();
+                    WorkRequest workRequest = new OneTimeWorkRequest.Builder(Connection.class)
+                            .setInputData(data)
+                            .build();
 
                     WorkManager.getInstance(this).enqueue(workRequest);
 
-                    String finalCategoryId = categoryId;
                     WorkManager.getInstance(this).getWorkInfoByIdLiveData(workRequest.getId())
                             .observe(this, info -> {
                                 if (info != null && info.getState().isFinished()) {
                                     Bookmark bookmark = new Bookmark();
-                                    bookmark.setLink(link);
+                                    bookmark.setLink(String.valueOf(link.attr("href")));
                                     bookmark.setReminder(ALARM_START_TIME);
-                                    bookmark.setCategory(finalCategoryId);
-                                    bookmark.setTitle(info.getOutputData().getString("title"));
+                                    bookmark.setCategory(entry.getKey());
+                                    if (info.getOutputData().getString("title") != null) {
+                                        bookmark.setTitle(info.getOutputData().getString("title"));
+                                    } else {
+                                        bookmark.setTitle(String.valueOf(link.attr("href")));
+                                    }
                                     bookmark.setImage(info.getOutputData().getString("image"));
                                     bookmark.setDescription(info.getOutputData().getString("description"));
                                     String itemType = info.getOutputData().getString("itemType");
@@ -272,8 +304,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
                                         bookmark.setType(Bookmark.ItemType.valueOf(itemType));
                                     }
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat(
-                                            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                                     Date date = new Date();
                                     bookmark.setDate(dateFormat.format(date));
                                     db.addBookmark(bookmark);
@@ -288,84 +318,89 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private void createBookmarksFile() {
         final String TITLE = "bookmarks-";
 
-        CharSequence currentTime = DateFormat.format("yyyyMMddHHmm", Calendar.getInstance().getTime());
+        CharSequence currentTime = DateFormat.format("yyyyMMddHHmm",
+                Calendar.getInstance().getTime());
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/html");
         intent.putExtra(Intent.EXTRA_TITLE, TITLE + currentTime + ".html");
 
-        writeBookmarksLauncher.launch(intent);
-
+        if (exportManager.getBookmarksExporting()) {
+            PasswordDialog passwordDialog = new PasswordDialog(this,
+                    result -> {
+                        if (result) {
+                            writeBookmarksLauncher.launch(intent);
+                        }
+                    });
+            passwordDialog.show(getSupportFragmentManager(),
+                    "Password dialog");
+        } else {
+            writeBookmarksLauncher.launch(intent);
+        }
     }
 
-    private void writeBookmarksFile(Uri uri) {
-        ArrayList<Bookmark> bookmarks = db.getAllBookmarks(null, null);
-        ArrayList<Category> categories = db.getAllCategories(null, null);
-        final String FILE_HEADER = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-                "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-                "<TITLE>Bookmarks</TITLE>\n" +
-                "<H1>Bookmarks</H1>\n" +
-                "<DL><p>";
-        final String FILE_FOOTER = "</DL><p>";
-        final String INITIAL_FILE_CONTENT = "<DT><A HREF=";
-        final String FINAL_FILE_CONTENT = "</A>";
-        bookmarks.sort(Comparator.comparingInt(bookmark -> Integer.parseInt(bookmark.getCategory())));
+    private void writeBookmarksFile(Uri uri, boolean exportProtected) {
+        ArrayList<Bookmark> bookmarks = db.getAllBookmarks();
+        StringBuilder htmlContent = new StringBuilder();
         try {
-            OutputStream outputStream = getContentResolver().openOutputStream(uri);
-            outputStream.write(FILE_HEADER.getBytes());
-            outputStream.write("\n".getBytes());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open(TEMPLATE)));
 
-            String bookmarkCategoryId = null;
-
-            for (Bookmark bookmark : bookmarks) {
-                if (bookmarkCategoryId == null) {
-                    bookmarkCategoryId = writeObject(categories, outputStream, bookmark);
-                } else {
-                    if (bookmarkCategoryId.equals(bookmark.getCategory())) {
-                        outputStream.write(INITIAL_FILE_CONTENT.getBytes());
-                        outputStream.write('"');
-                        outputStream.write(bookmark.getLink().getBytes());
-                        outputStream.write('"');
-                        outputStream.write(">".getBytes());
-                        outputStream.write(bookmark.getTitle().getBytes());
-                        outputStream.write(FINAL_FILE_CONTENT.getBytes());
-                    } else {
-                        bookmarkCategoryId = writeObject(categories, outputStream, bookmark);
-                    }
-                }
+            String line;
+            while ((line = reader.readLine()) != null) {
+                htmlContent.append(line).append("\n");
             }
-            outputStream.write(FILE_FOOTER.getBytes());
-            outputStream.close();
+            reader.close();
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Qualcosa è andato storto", Toast.LENGTH_LONG)
+            Toast.makeText(getApplicationContext(), (getString(R.string.something_wrong)), Toast.LENGTH_LONG)
                     .show();
         }
-    }
 
-    private String writeObject(ArrayList<Category> categories, OutputStream outputStream, Bookmark bookmark) throws IOException {
-        String bookmarkCategoryId = writeAndGetCategoryId(categories, outputStream, bookmark);
-        outputStream.write("<DT><A HREF=".getBytes());
-        outputStream.write('"');
-        outputStream.write(bookmark.getLink().getBytes());
-        outputStream.write('"');
-        outputStream.write(">".getBytes());
-        outputStream.write(bookmark.getTitle().getBytes());
-        outputStream.write("</A>".getBytes());
-        return bookmarkCategoryId;
-    }
-
-    private String writeAndGetCategoryId(ArrayList<Category> categories, OutputStream outputStream, Bookmark bookmark) throws IOException {
-        Category category = categories.stream()
-                .filter(category1 -> bookmark.getCategory().equals(category1.getCategoryId()))
-                .findAny()
-                .orElse(null);
-        String categoryId = bookmark.getCategory();
-        outputStream.write("<DT><H3>".getBytes());
-        if (category != null) {
-            outputStream.write(category.getCategoryTitle().getBytes());
-            outputStream.write("</H3>".getBytes());
+        Map<String, List<Bookmark>> bookmarksByCategory = new HashMap<>();
+        for (Bookmark bookmark : bookmarks) {
+            if (!exportProtected) {
+                Category category = db.getCategoryById(bookmark.getCategory());
+                if (category.getPasswordProtection() == Category.CategoryProtection.LOCK) {
+                    continue;
+                }
+            }
+            bookmarksByCategory.computeIfAbsent(bookmark.getCategory(), k -> new ArrayList<>()).add(bookmark);
         }
-        return categoryId;
+
+        int insertPosition = htmlContent.indexOf("<DL><p>") + "<DL><p>".length();
+
+        for (Map.Entry<String, List<Bookmark>> entry : bookmarksByCategory.entrySet()) {
+            String category = entry.getKey();
+            List<Bookmark> bookmarksForCategory = entry.getValue();
+
+            String categoryTitle = "\n<DT><H3>" + db.getCategoryById(category).getCategoryTitle()
+                    + "</H3>\n";
+
+            StringBuilder links = new StringBuilder();
+            links.append("<DL><p>\n");
+            for (Bookmark bookmark : bookmarksForCategory) {
+                links.append("<DT><A HREF=\"").append(bookmark.getLink()).append("\">")
+                        .append(bookmark.getTitle()).append("</A>\n");
+            }
+            links.append("</DL><p>\n");
+
+            StringBuilder categoryContent = new StringBuilder();
+            categoryContent.append(categoryTitle).append(links);
+
+            htmlContent.insert(insertPosition, categoryContent);
+        }
+
+        StringBuilder dt = new StringBuilder();
+        dt.append("</DL><p>");
+        htmlContent.insert(htmlContent.length() - 1, dt);
+
+        try {
+            OutputStream outputStream = getContentResolver().openOutputStream(uri);
+            outputStream.write(htmlContent.toString().getBytes());
+            outputStream.close();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), (getString(R.string.something_wrong)), Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
     @Override

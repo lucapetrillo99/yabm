@@ -2,6 +2,7 @@ package com.ilpet.yabm.adapters;
 
 import static android.view.View.INVISIBLE;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,16 +160,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                             result -> protection.setChecked(!result));
                     passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
                             "Password dialog");
-                }
-            } else {
-                String password = db.getPassword();
-                if (password == null) {
-                    protection.setChecked(false);
-                    PasswordManagerDialog passwordManagerDialog = new
-                            PasswordManagerDialog(categoriesActivity,
-                            protection::setChecked);
-                    passwordManagerDialog.show(categoriesActivity.getSupportFragmentManager(),
-                            "Password Manager dialog");
                 }
             }
         });

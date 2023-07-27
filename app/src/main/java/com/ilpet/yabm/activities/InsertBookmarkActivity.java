@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -248,6 +249,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
+            CheckBox protection = dialogView.findViewById(R.id.protection);
             title.setText(R.string.new_category_title);
             input.setHint("Inserisci la categoria");
 
@@ -261,6 +263,12 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                         Date insertionDate = new Date();
                         category.setDate(dateFormat.format(insertionDate));
+                        if (protection.isChecked()) {
+                            category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                        } else {
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                        }
+
                         String result = db.addCategory(category);
                         if (result != null) {
                             categories.add(category);

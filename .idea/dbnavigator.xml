@@ -12,8 +12,8 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="37bba824-d623-43c0-ba32-500ae85df57c">
-      <console name="Connection" type="STANDARD" schema="" session="Main" />
+    <connection id="6cdf17a0-b995-4f49-a1d8-40591d04186d">
+      <console name="Connection" type="STANDARD" schema="yabm" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -23,8 +23,9 @@
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="37bba824-d623-43c0-ba32-500ae85df57c" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="37bba824-d623-43c0-ba32-500ae85df57c" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.password" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -43,7 +44,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="37bba824-d623-43c0-ba32-500ae85df57c" active="true" signed="true">
+      <connection id="6cdf17a0-b995-4f49-a1d8-40591d04186d" active="true" signed="true">
         <database>
           <name value="Connection" />
           <description value="" />

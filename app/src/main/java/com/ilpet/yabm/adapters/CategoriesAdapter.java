@@ -2,7 +2,6 @@ package com.ilpet.yabm.adapters;
 
 import static android.view.View.INVISIBLE;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.PasswordDialog;
-import com.ilpet.yabm.utils.PasswordManagerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -182,13 +180,15 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     boolean result = db.updateCategory(category);
                     if (result) {
                         Toast.makeText(v.getRootView().getContext(),
-                                "Categoria modificate correttamente!", Toast.LENGTH_LONG).show();
+                                categoriesActivity.getString(R.string.category_modified),
+                                Toast.LENGTH_LONG).show();
                         dialog.dismiss();
                         categories.set(position, category);
                         notifyItemChanged(position);
                     } else {
                         Toast.makeText(v.getRootView().getContext(),
-                                "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                                categoriesActivity.getString(R.string.existing_category),
+                                Toast.LENGTH_LONG).show();
                     }
                     dialog.dismiss();
                 } else {
@@ -209,11 +209,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                             notifyItemInserted(getItemCount());
                         } else {
                             Toast.makeText(v.getRootView().getContext(),
-                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                                    categoriesActivity.getString(R.string.existing_category),
+                                    Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(v.getRootView().getContext(),
-                                "Inserisci il nome di una categoria!", Toast.LENGTH_LONG).show();
+                                categoriesActivity.getString(R.string.empty_category_name),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -229,8 +231,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     private void confirmDialog(int position, View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
 
-        builder.setMessage("Sei sicuro di voler eliminare la categoia?\nTutti i segnalibri " +
-                        "verranno eliminati")
+        builder.setMessage(categoriesActivity.getString(R.string.category_elimination_question))
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
@@ -242,7 +243,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                         categories.remove(position);
                         notifyItemRemoved(position);
                     } else {
-                        Toast.makeText(v.getRootView().getContext(), "Impossibile eliminare la categoria", Toast.LENGTH_LONG).show();
+                        Toast.makeText(v.getRootView().getContext(),
+                                categoriesActivity.getString(R.string.unable_delete_category),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
         AlertDialog alertDialog = builder.create();

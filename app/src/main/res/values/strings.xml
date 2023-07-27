@@ -127,4 +127,23 @@
     <string name="bookmarks_question">segnalibri?</string>
     <string name="bookmarks_imported">Segnalibri importati</string>
     <string name="import_bookmark_question">Sei sicuro di voler importare </string>
+    <string name="empty_link">Inserisci un link!</string>
+    <string name="insert_category">Inserisci la categoria</string>
+    <string name="category_inserted">Categoria inserita correttamente</string>
+    <string name="existing_category">Categoria già presente!</string>
+    <string name="empty_category_name">Inserisci il nome di una categoria!</string>
+    <string name="invalid_date">La data non è valida</string>
+    <string name="invalid_time">L\'orario non è valido</string>
+    <string name="reminder_modified">Promemoria modificato correttamente</string>
+    <string name="reminder_deleted">Promemoria eliminato</string>
+    <string name="bookmark_editing_question">Sei sicuro di voler modificare il segnalibro?</string>
+    <string name="bookmark_inserting_question">Sei sicuro di voler inserire il segnalibro?</string>
+    <string name="bookmark_modified">Segnalibro modificato!</string>
+    <string name="unable_edit_bookmark">Impossibilie modificare il segnalibro!</string>
+    <string name="bookmark_added">Segnalibro aggiunto!</string>
+    <string name="existing_bookmark">Segnalibro già presente!</string>
+    <string name="exit_question">Sei sicuro di voler uscire?\nTutti i cambiamenti andranno persi</string>
+    <string name="category_modified">Categoria modificate correttamente!</string>
+    <string name="category_elimination_question">Sei sicuro di voler eliminare la categoia?\nTutti i segnalibri verranno eliminati</string>
+    <string name="unable_delete_category">Impossibile eliminare la categoria</string>
 </resources>

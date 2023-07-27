@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +54,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
@@ -70,22 +68,26 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private DatabaseHandler db;
     private SettingsManager exportManager;
 
-    ActivityResultLauncher<Intent> writeBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                Uri uri = result.getData().getData();
-                writeBookmarksFile(uri, exportManager.getBookmarksExporting());
-            }
-        }
-    });
-    ActivityResultLauncher<Intent> importBookmarksLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                getBookmarksFromUri(result.getData().getData());
-                importOptionsDialog();
-            }
-        }
-    });
+    ActivityResultLauncher<Intent> writeBookmarksLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            if (result.getData() != null) {
+                                Uri uri = result.getData().getData();
+                                writeBookmarksFile(uri, exportManager.getBookmarksExporting());
+                            }
+                        }
+                    });
+    ActivityResultLauncher<Intent> importBookmarksLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            if (result.getData() != null) {
+                                getBookmarksFromUri(result.getData().getData());
+                                importOptionsDialog();
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,13 +160,17 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void exportListener() {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_STORAGE);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_STORAGE);
         } else {
             exportOption.setOnClickListener(v -> {
                 ArrayList<Bookmark> bookmarks = db.getBookmarks(null, null);
                 if (bookmarks.size() == 0) {
-                    Toast.makeText(getApplicationContext(), "Non ci sono segnalibri da esportare", Toast.LENGTH_LONG)
+                    Toast.makeText(getApplicationContext(),
+                                    getString(R.string.no_bookmarks_to_export), Toast.LENGTH_LONG)
                             .show();
                 } else {
                     createBookmarksFile();
@@ -231,32 +237,31 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private void importOptionsDialog() {
         String question;
         Handler handler = new Handler();
-//        int totalSize = 0;
-//        for (List<String> list : map.values()) {
-//            totalSize += list.size();
-//        }
+        int totalSize = 0;
 
-        if (importedBookmarks.entrySet().size() > 1) {
-            question = " segnalibri?";
+        for (Map.Entry<String, Elements> entry : importedBookmarks.entrySet()) {
+            totalSize += entry.getValue().size();
+        }
+
+        if (totalSize > 1) {
+            question = getString(R.string.bookmarks_question);
         } else {
-            question = " segnalibro?";
+            question = getString(R.string.bookmark_question);
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(BookmarksManagerActivity.this);
-        builder.setTitle("Sei sicuro di voler importare " + importedBookmarks.values().stream()
-                .mapToInt(List::size)
-                .sum() + question);
+        builder.setTitle(getString(R.string.import_bookmark_question) + " " + totalSize + " " + question);
 
-        builder.setPositiveButton("Sì", (dialogInterface, i) -> {
+        builder.setPositiveButton(getString(R.string.confirm), (dialogInterface, i) -> {
             loadingDialog.startLoading();
             importBookmarks();
             handler.postDelayed(() -> {
                 loadingDialog.dismissLoading();
-                Toast.makeText(getApplicationContext(), "Segnalibri importati", Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(getApplicationContext(), getString(R.string.bookmarks_imported),
+                                Toast.LENGTH_LONG).show();
             }, 8000);
         });
-        builder.setNeutralButton("Annulla", (dialog, which) -> importedBookmarks.clear());
+        builder.setNeutralButton(getString(R.string.cancel), (dialog, which) -> importedBookmarks.clear());
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -272,10 +277,9 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                             .putString("link", String.valueOf(link.attr("href")))
                             .build();
 
-                    WorkRequest workRequest =
-                            new OneTimeWorkRequest.Builder(Connection.class)
-                                    .setInputData(data)
-                                    .build();
+                    WorkRequest workRequest = new OneTimeWorkRequest.Builder(Connection.class)
+                            .setInputData(data)
+                            .build();
 
                     WorkManager.getInstance(this).enqueue(workRequest);
 
@@ -314,7 +318,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     private void createBookmarksFile() {
         final String TITLE = "bookmarks-";
 
-        CharSequence currentTime = DateFormat.format("yyyyMMddHHmm", Calendar.getInstance().getTime());
+        CharSequence currentTime = DateFormat.format("yyyyMMddHHmm",
+                Calendar.getInstance().getTime());
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/html");
@@ -396,32 +401,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), (getString(R.string.something_wrong)), Toast.LENGTH_LONG)
                     .show();
         }
-    }
-
-    private String writeObject(ArrayList<Category> categories, OutputStream outputStream, Bookmark bookmark) throws IOException {
-        String bookmarkCategoryId = writeAndGetCategoryId(categories, outputStream, bookmark);
-        outputStream.write("<DT><A HREF=".getBytes());
-        outputStream.write('"');
-        outputStream.write(bookmark.getLink().getBytes());
-        outputStream.write('"');
-        outputStream.write(">".getBytes());
-        outputStream.write(bookmark.getTitle().getBytes());
-        outputStream.write("</A>".getBytes());
-        return bookmarkCategoryId;
-    }
-
-    private String writeAndGetCategoryId(ArrayList<Category> categories, OutputStream outputStream, Bookmark bookmark) throws IOException {
-        Category category = categories.stream()
-                .filter(category1 -> bookmark.getCategory().equals(category1.getCategoryId()))
-                .findAny()
-                .orElse(null);
-        String categoryId = bookmark.getCategory();
-        outputStream.write("<DT><H3>".getBytes());
-        if (category != null) {
-            outputStream.write(category.getCategoryTitle().getBytes());
-            outputStream.write("</H3>".getBytes());
-        }
-        return categoryId;
     }
 
     @Override

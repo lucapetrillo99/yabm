@@ -123,4 +123,8 @@
     <string name="something_wrong">Qualcosa è andato storto</string>
     <string name="no_password_inserted">Non è impostata alcuna password</string>
     <string name="no_bookmarks_to_export">Non ci sono segnalibri da esportare</string>
+    <string name="bookmark_question">segnalibro?</string>
+    <string name="bookmarks_question">segnalibri?</string>
+    <string name="bookmarks_imported">Segnalibri importati</string>
+    <string name="import_bookmark_question">Sei sicuro di voler importare </string>
 </resources>

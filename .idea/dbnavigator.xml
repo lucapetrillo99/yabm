@@ -12,7 +12,7 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="0e12f7ef-bb94-4bc6-997f-8d07c4e0c642">
+    <connection id="37bba824-d623-43c0-ba32-500ae85df57c">
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
@@ -23,11 +23,19 @@
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="0e12f7ef-bb94-4bc6-997f-8d07c4e0c642" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="0e12f7ef-bb94-4bc6-997f-8d07c4e0c642" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="37bba824-d623-43c0-ba32-500ae85df57c" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="37bba824-d623-43c0-ba32-500ae85df57c" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
+  </component>
+  <component name="DBNavigator.Project.MethodExecutionManager">
+    <method-browser />
+    <execution-history>
+      <group-entries value="true" />
+      <execution-inputs />
+    </execution-history>
+    <argument-values-cache />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -35,7 +43,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="0e12f7ef-bb94-4bc6-997f-8d07c4e0c642" active="true" signed="true">
+      <connection id="37bba824-d623-43c0-ba32-500ae85df57c" active="true" signed="true">
         <database>
           <name value="Connection" />
           <description value="" />
@@ -51,7 +59,9 @@
           <database value="" />
           <tns-folder value="" />
           <tns-profile value="" />
-          <files />
+          <files>
+            <file path="$USER_HOME$/.cache/Google/AndroidStudio2022.2/device-explorer/Pixel_3a_API_34_extension_level_7_x86_64/data/data/com.ilpet.yabm/databases/yabm" schema="yabm" />
+          </files>
           <type value="NONE" />
           <user value="" />
           <deprecated-pwd value="" />

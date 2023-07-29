@@ -77,6 +77,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private TextView date;
     private ImageButton modifyRemainder;
     private ImageButton removeRemainder;
+    private CheckBox protection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,7 +249,8 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
-            CheckBox protection = dialogView.findViewById(R.id.protection);
+            protection = dialogView.findViewById(R.id.protection);
+            passwordProtectionListener();
             title.setText(R.string.new_category_title);
             input.setHint(getString(R.string.insert_category));
 
@@ -508,6 +510,16 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         insertBookmark();
                     }
                 });
+    }
+
+    private void passwordProtectionListener() {
+        protection.setOnClickListener(view -> {
+            if (db.getPassword() == null) {
+                Toast.makeText(getApplicationContext(), getString(R.string.no_password_inserted),
+                        Toast.LENGTH_LONG).show();
+                protection.setChecked(false);
+            }
+        });
     }
 
     private void setReminder() {

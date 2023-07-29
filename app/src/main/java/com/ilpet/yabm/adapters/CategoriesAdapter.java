@@ -38,6 +38,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
     private final ArrayList<Category> allCategories;
     private DatabaseHandler db;
     private AlertDialog dialog;
+    private Button okButton;
 
     public CategoriesAdapter(ArrayList<Category> categories, CategoriesActivity categoriesActivity) {
         this.categories = categories;
@@ -150,20 +151,29 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             input.setHint(R.string.insert_category_title);
         }
 
-        boolean isChecked = protection.isChecked();
         protection.setOnClickListener(view -> {
             if (isModify) {
-                if (isChecked) {
+                if (!protection.isChecked()) {
+                    okButton.setClickable(false);
                     PasswordDialog passwordDialog = new PasswordDialog(categoriesActivity,
                             result -> protection.setChecked(!result));
                     passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
                             "Password dialog");
+                    okButton.setClickable(true);
+                }
+            } else {
+                if (db.getPassword() == null) {
+                    Toast.makeText(categoriesActivity.getApplicationContext(),
+                            categoriesActivity.getString(R.string.no_password_inserted),
+                            Toast.LENGTH_LONG).show();
+                    protection.setChecked(false);
                 }
             }
         });
+
         dialog.setOnShowListener(dialogInterface -> {
-            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            button.setOnClickListener(view -> {
+            okButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            okButton.setOnClickListener(view -> {
                 SimpleDateFormat dateFormat = new SimpleDateFormat(
                         "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 Date date = new Date();

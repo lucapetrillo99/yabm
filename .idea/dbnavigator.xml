@@ -20,7 +20,9 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" object-ref="schemas/yabm/tables/bookmark" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />

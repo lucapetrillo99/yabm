@@ -146,4 +146,20 @@
     <string name="category_modified">Categoria modificate correttamente!</string>
     <string name="category_elimination_question">Sei sicuro di voler eliminare la categoia?\nTutti i segnalibri verranno eliminati</string>
     <string name="unable_delete_category">Impossibile eliminare la categoria</string>
+    <string name="removed_from_archive">rimosso dall\'archivio.</string>
+    <string name="bookmark_archived">archiviato.</string>
+    <string name="bookmark_elimination_question">Sei sicuro di voler eliminare il segnalibro?</string>
+    <string name="bookmark_deleted">Segnalibro eliminato</string>
+    <string name="unable_delete_bookmark">Impossibile eliminare il segnalibro</string>
+    <string name="bookmark_delete_question">Sei sicuro di voler eliminare</string>
+    <string name="bookmark_deleted_message">eliminato!</string>
+    <string name="bookmarks_deleted_message">eliminati!</string>
+    <string name="bookmarks_message">Segnalibri</string>
+    <string name="bookmark_message">Segnalibro</string>
+    <string name="bookmarks_archived_message">archiviati!</string>
+    <string name="bookmark_archived_message">archiviato!</string>
+    <string name="bookmarks_restored_message">ripristinati!</string>
+    <string name="bookmark_restored_message">ripristinato!</string>
+    <string name="bookmark_archive_question">Sei sicuro di voler archiviare</string>
+    <string name="bookmark_restore_question">Sei sicuro di voler ripristinare</string>
 </resources>

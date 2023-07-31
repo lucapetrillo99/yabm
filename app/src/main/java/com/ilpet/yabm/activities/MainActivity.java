@@ -423,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public void onResume() {
         super.onResume();
         archiveBookmark();
+        addFilterCategories();
         if (previousCategory != null) {
             if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                 bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());

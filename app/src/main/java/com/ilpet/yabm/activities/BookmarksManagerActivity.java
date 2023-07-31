@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.format.DateFormat;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,6 +53,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BookmarksManagerActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
@@ -236,7 +237,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
 
     private void importOptionsDialog() {
         String question;
-        Handler handler = new Handler();
         int totalSize = 0;
 
         for (Map.Entry<String, Elements> entry : importedBookmarks.entrySet()) {
@@ -255,11 +255,6 @@ public class BookmarksManagerActivity extends AppCompatActivity {
         builder.setPositiveButton(getString(R.string.confirm), (dialogInterface, i) -> {
             loadingDialog.startLoading();
             importBookmarks();
-            handler.postDelayed(() -> {
-                loadingDialog.dismissLoading();
-                Toast.makeText(getApplicationContext(), getString(R.string.bookmarks_imported),
-                                Toast.LENGTH_LONG).show();
-            }, 8000);
         });
         builder.setNeutralButton(getString(R.string.cancel), (dialog, which) -> importedBookmarks.clear());
 
@@ -268,6 +263,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
     }
 
     private void importBookmarks() {
+        AtomicInteger completedBookmarks = new AtomicInteger();
+        AtomicBoolean isToastShown = new AtomicBoolean(false);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         if (importedBookmarks.size() > 0) {
@@ -307,6 +304,16 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                                     Date date = new Date();
                                     bookmark.setDate(dateFormat.format(date));
                                     db.addBookmark(bookmark);
+                                    completedBookmarks.getAndIncrement();
+                                    if (completedBookmarks.get() >= entry.getValue().size()) {
+                                        loadingDialog.dismissLoading();
+                                        if (!isToastShown.get()) {
+                                            Toast.makeText(getApplicationContext(),
+                                                    getString(R.string.bookmarks_imported),
+                                                    Toast.LENGTH_LONG).show();
+                                            isToastShown.set(true);
+                                        }
+                                    }
                                 }
                             });
                 }

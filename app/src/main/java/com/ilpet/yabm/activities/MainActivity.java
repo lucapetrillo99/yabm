@@ -496,6 +496,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             unarchive.setVisibility(View.GONE);
         }
 
+        if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
+            move.setVisibility(View.GONE);
+        }
+
         move.setOnClickListener(v12 -> {
             if (counter > 0) {
                 CategoriesSelectionDialog categoriesSelection =

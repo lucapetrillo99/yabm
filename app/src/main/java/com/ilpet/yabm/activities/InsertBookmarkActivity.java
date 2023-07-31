@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -76,6 +77,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private TextView date;
     private ImageButton modifyRemainder;
     private ImageButton removeRemainder;
+    private CheckBox protection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,8 +192,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             String link = this.link.getText().toString();
             if (link.isEmpty()) {
                 Toast.makeText(getApplicationContext(),
-                        "Inserisci un link!", Toast.LENGTH_LONG)
-                        .show();
+                        getString(R.string.empty_link), Toast.LENGTH_LONG).show();
             } else {
                 confirmDialog(link, db.getCategoryId(category));
             }
@@ -243,13 +244,15 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             final AlertDialog dialog = new AlertDialog.Builder(InsertBookmarkActivity.this)
                     .setView(dialogView)
                     .setPositiveButton(android.R.string.ok, null)
-                    .setNegativeButton("Annulla", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .create();
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
+            protection = dialogView.findViewById(R.id.protection);
+            passwordProtectionListener();
             title.setText(R.string.new_category_title);
-            input.setHint("Inserisci la categoria");
+            input.setHint(getString(R.string.insert_category));
 
             dialog.setOnShowListener(dialogInterface -> {
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -261,20 +264,26 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                         Date insertionDate = new Date();
                         category.setDate(dateFormat.format(insertionDate));
+                        if (protection.isChecked()) {
+                            category.setCategoryProtection(Category.CategoryProtection.LOCK);
+                        } else {
+                            category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
+                        }
+
                         String result = db.addCategory(category);
                         if (result != null) {
                             categories.add(category);
                             filteredCategories.add(category.getCategoryTitle());
                             dialog.dismiss();
                             Toast.makeText(InsertBookmarkActivity.this,
-                                    "Categoria inserita correttamente", Toast.LENGTH_LONG).show();
+                                    getString(R.string.category_inserted), Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(InsertBookmarkActivity.this,
-                                    "Categoria già esistente!", Toast.LENGTH_LONG).show();
+                                    getString(R.string.existing_category), Toast.LENGTH_LONG).show();
                         }
                     } else {
                         Toast.makeText(InsertBookmarkActivity.this,
-                                "Inserisci il nome di una categoria!", Toast.LENGTH_LONG).show();
+                                getString(R.string.empty_category_name), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -343,25 +352,23 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
                         if (result == DATE_ERROR) {
                             Toast.makeText(getApplicationContext(),
-                                    "La data non è valida", Toast.LENGTH_LONG)
-                                    .show();
+                                    getString(R.string.invalid_date), Toast.LENGTH_LONG).show();
 
                         } else if (result == TIME_ERROR) {
                             Toast.makeText(getApplicationContext(),
-                                    "L'orario non è valido", Toast.LENGTH_LONG)
+                                            getString(R.string.invalid_time), Toast.LENGTH_LONG)
                                     .show();
                         } else {
                             date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
                             Toast.makeText(getApplicationContext(),
-                                    "Promemoria modificato correttamente", Toast.LENGTH_LONG)
+                                            getString(R.string.reminder_modified), Toast.LENGTH_LONG)
                                     .show();
                             setRemainder = true;
                             alertDialog.dismiss();
                         }
                     } catch (ParseException e) {
                         Toast.makeText(getApplicationContext(),
-                                "Qualcosa è andato storto!\n Prova più tardi", Toast.LENGTH_LONG)
-                                .show();
+                                getString(R.string.something_wrong), Toast.LENGTH_LONG).show();
                         alertDialog.dismiss();
                     }
                 }
@@ -377,8 +384,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
             optionalField.setVisibility(View.VISIBLE);
             reminderTitle.setText(R.string.new_reminder);
             Toast.makeText(getApplicationContext(),
-                    "Promemoria eliminato", Toast.LENGTH_LONG)
-                    .show();
+                    getString(R.string.reminder_deleted), Toast.LENGTH_LONG).show();
             setRemainder = false;
         });
     }
@@ -403,7 +409,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         Handler handler = new Handler();
         if (isEditMode) {
-            builder.setMessage("Sei sicuro di voler modificare il segnalibro?")
+            builder.setMessage(getString(R.string.bookmark_editing_question))
                     .setCancelable(false)
                     .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                     .setPositiveButton("Sì", (dialogInterface, i) -> {
@@ -412,10 +418,10 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
                     });
         } else {
-            builder.setMessage("Sei sicuro di voler inserire il segnalibro?")
+            builder.setMessage(getString(R.string.bookmark_inserting_question))
                     .setCancelable(false)
-                    .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                    .setPositiveButton("Sì", (dialogInterface, i) -> {
+                    .setNegativeButton(getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.cancel())
+                    .setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
                         loadingDialog.startLoading();
                         getBookmarkInformation(link, categoryId);
                         handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
@@ -506,6 +512,16 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 });
     }
 
+    private void passwordProtectionListener() {
+        protection.setOnClickListener(view -> {
+            if (db.getPassword() == null) {
+                Toast.makeText(getApplicationContext(), getString(R.string.no_password_inserted),
+                        Toast.LENGTH_LONG).show();
+                protection.setChecked(false);
+            }
+        });
+    }
+
     private void setReminder() {
         Intent intent = new Intent(InsertBookmarkActivity.this, AlarmReceiver.class);
         int notificationId = (int) SystemClock.uptimeMillis();
@@ -561,16 +577,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     setReminder();
                 }
                 Toast.makeText(getApplicationContext(),
-                        "Segnalibro modificato!", Toast.LENGTH_LONG)
-                        .show();
+                        getString(R.string.bookmark_modified), Toast.LENGTH_LONG).show();
                 intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 finish();
             } else {
                 Toast.makeText(getApplicationContext(),
-                        "Impossibilie modificare il segnalibro!\nRiprova più tardi",
-                        Toast.LENGTH_LONG).show();
+                        getString(R.string.unable_edit_bookmark), Toast.LENGTH_LONG).show();
             }
         } else {
             queryResult = db.addBookmark(bookmark);
@@ -579,8 +593,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     setReminder();
                 }
                 Toast.makeText(getApplicationContext(),
-                        "Segnalibro aggiunto!", Toast.LENGTH_LONG)
-                        .show();
+                        getString(R.string.bookmark_added), Toast.LENGTH_LONG).show();
                 if (isRunningActivity()) {
                     Intent activityIntent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
                     startActivity(activityIntent);
@@ -589,8 +602,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {
                 Toast.makeText(getApplicationContext(),
-                        "Segnalibro già presente!", Toast.LENGTH_LONG)
-                        .show();
+                        getString(R.string.existing_bookmark), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -598,7 +610,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
     private void exitConfirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno persi")
+        builder.setMessage(getString(R.string.exit_question))
                 .setCancelable(false)
                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
                 .setPositiveButton("Sì", (dialogInterface, i) -> {
@@ -702,12 +714,12 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
                     if (result == DATE_ERROR) {
                         Toast.makeText(getApplicationContext(),
-                                        "La data non è valida", Toast.LENGTH_LONG)
+                                        getString(R.string.invalid_date), Toast.LENGTH_LONG)
                                 .show();
 
                     } else if (result == TIME_ERROR) {
                         Toast.makeText(getApplicationContext(),
-                                        "L'orario non è valido", Toast.LENGTH_LONG)
+                                        getString(R.string.invalid_time), Toast.LENGTH_LONG)
                                 .show();
                     } else {
                         date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
@@ -721,14 +733,14 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                         reminderTitle.setText(R.string.reminder_inserted);
                         date.setText(DateFormat.format("dd/MM/yyyy HH:mm", alarmStartTime));
                         Toast.makeText(getApplicationContext(),
-                                        "Promemoria impostato correttamente", Toast.LENGTH_LONG)
+                                        getString(R.string.reminder_inserted), Toast.LENGTH_LONG)
                                 .show();
                         setRemainder = true;
                         alertDialog.dismiss();
                     }
                 } catch (ParseException e) {
                     Toast.makeText(getApplicationContext(),
-                                    "Qualcosa è andato storto!\n Prova più tardi", Toast.LENGTH_LONG)
+                                    getString(R.string.something_wrong), Toast.LENGTH_LONG)
                             .show();
                     alertDialog.dismiss();
                 }

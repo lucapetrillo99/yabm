@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 
 public class WebViewActivity extends AppCompatActivity {
     private ProgressBar progressBar;
+    private WebView webView;
     private String url;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -26,7 +28,7 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         progressBar = findViewById(R.id.progess_bar);
-        WebView webView = findViewById(R.id.webview);
+        webView = findViewById(R.id.webview);
 
         Intent intent = getIntent();
         if (intent.getExtras() != null) {
@@ -42,19 +44,26 @@ public class WebViewActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
                 progressBar.setProgress(newProgress);
+                if (progressBar.getProgress() == 100) {
+                    progressBar.setVisibility(View.GONE);
+                }
             }
         });
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (isRunningActivity()) {
-            Intent activityIntent = new Intent(WebViewActivity.this, MainActivity.class);
-            startActivity(activityIntent);
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+            if (isRunningActivity()) {
+                Intent activityIntent = new Intent(WebViewActivity.this, MainActivity.class);
+                startActivity(activityIntent);
+            }
+            finish();
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         }
-        finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     private boolean isRunningActivity() {

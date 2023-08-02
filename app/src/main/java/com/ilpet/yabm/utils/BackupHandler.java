@@ -24,8 +24,8 @@ public class BackupHandler {
     }
 
     public BackupHandler(Context context) {
-       this.context = context.getApplicationContext();
-       this.db = DatabaseHandler.getInstance(context);
+        this.context = context.getApplicationContext();
+        this.db = DatabaseHandler.getInstance(context);
     }
 
     public int createBackup(Uri uri) {
@@ -57,9 +57,7 @@ public class BackupHandler {
         final String outFileName = db.getDbPath(context);
 
         try {
-
             InputStream fis = context.getContentResolver().openInputStream(uri);
-
             OutputStream output = new FileOutputStream(outFileName);
 
             byte[] buffer = new byte[1024];
@@ -71,7 +69,6 @@ public class BackupHandler {
             output.flush();
             output.close();
             fis.close();
-
             return RESULT_OK;
 
         } catch (Exception e) {

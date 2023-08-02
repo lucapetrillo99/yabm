@@ -100,10 +100,10 @@ public class BackupActivity extends AppCompatActivity {
                 Uri uri = result.getData().getData();
                 int backupResult = backupHandler.createBackup(uri);
                 if (backupResult == RESULT_OK) {
-                    Toast.makeText(getApplicationContext(), "Backup creato correttamente",
+                    Toast.makeText(getApplicationContext(), getString(R.string.backup_created),
                             Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
+                    Toast.makeText(getApplicationContext(), getString(R.string.unable_create_backup),
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -128,21 +128,22 @@ public class BackupActivity extends AppCompatActivity {
         });
     }
 
-    ActivityResultLauncher<Intent> restoreBackupLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    ActivityResultLauncher<Intent> restoreBackupLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             if (result.getData() != null) {
                 Uri uri = result.getData().getData();
                 if (checkFileExtension(uri)) {
                     int backupResult = backupHandler.restoreBackup(uri);
                     if (backupResult == RESULT_OK) {
-                        Toast.makeText(getApplicationContext(), "Backup ripristinato correttamente",
+                        Toast.makeText(getApplicationContext(), getString(R.string.backup_restored),
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Impossibile ripristinare il backup",
+                        Toast.makeText(getApplicationContext(), getString(R.string.unable_restore_backup),
                                 Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "File selezionato non valido",
+                    Toast.makeText(getApplicationContext(), getString(R.string.file_not_valid),
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -160,8 +161,8 @@ public class BackupActivity extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 View view = inflater.inflate(R.layout.restore_backup_dialog, null);
                 builder.setView(view)
-                        .setTitle("Scegli l'operazione")
-                        .setNegativeButton("Annulla", (dialog, which) -> dialog.dismiss());
+                        .setTitle(getString(R.string.choose_operation))
+                        .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
 
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
@@ -176,16 +177,16 @@ public class BackupActivity extends AppCompatActivity {
                         int result = backupHandler.restoreBackup(uri);
                         if (result == RESULT_OK) {
                             alertDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "Backup ripristinato correttamente",
+                            Toast.makeText(getApplicationContext(), getString(R.string.backup_restored),
                                     Toast.LENGTH_LONG).show();
                         } else {
                             alertDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "Impossibile ripristinare il backup",
+                            Toast.makeText(getApplicationContext(), getString(R.string.unable_restore_backup),
                                     Toast.LENGTH_LONG).show();
                         }
                     } else {
                         alertDialog.dismiss();
-                        Toast.makeText(getApplicationContext(), "Non sono presenti backup da ripristinare",
+                        Toast.makeText(getApplicationContext(), getString(R.string.no_backups),
                                 Toast.LENGTH_LONG).show();
                     }
 
@@ -242,17 +243,17 @@ public class BackupActivity extends AppCompatActivity {
             Uri uri = Uri.fromFile(backupFile);
             int result = backupHandler.createBackup(uri);
             if (result == RESULT_OK) {
-                Toast.makeText(getApplicationContext(), "Backup creato correttamente",
+                Toast.makeText(getApplicationContext(), getString(R.string.backup_created),
                         Toast.LENGTH_LONG).show();
                 scheduleAutoBackup(uri);
                 SettingsManager settingsManager = new SettingsManager(getApplicationContext(), AUTO_BACKUP_URI);
                 settingsManager.setAutoBackupUri(backupFile.getPath());
             } else {
-                Toast.makeText(getApplicationContext(), "Impossibile creare il backup",
+                Toast.makeText(getApplicationContext(), getString(R.string.unable_create_backup),
                         Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Impossibile impostare il backup automatico",
+            Toast.makeText(getApplicationContext(), getString(R.string.unable_set_backup),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -281,7 +282,8 @@ public class BackupActivity extends AppCompatActivity {
         File file = new File(settingsManager.getAutoBackupUri());
         Uri uri = Uri.fromFile(file);
         intent.setData(uri);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
+                0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
@@ -294,4 +296,3 @@ public class BackupActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
-

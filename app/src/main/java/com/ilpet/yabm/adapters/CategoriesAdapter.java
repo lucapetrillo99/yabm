@@ -243,21 +243,23 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
         builder.setMessage(categoriesActivity.getString(R.string.category_elimination_question))
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> {
-                    Category category = new Category();
-                    category.setCategoryId(categories.get(position).getCategoryId());
-                    category.setCategoryTitle(categories.get(position).getCategoryTitle());
-                    boolean result = db.deleteCategory(category);
-                    if (result) {
-                        categories.remove(position);
-                        notifyItemRemoved(position);
-                    } else {
-                        Toast.makeText(v.getRootView().getContext(),
-                                categoriesActivity.getString(R.string.unable_delete_category),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+                .setNegativeButton(categoriesActivity.getString(R.string.cancel),
+                        (dialogInterface, i) -> dialogInterface.cancel())
+                .setPositiveButton(categoriesActivity.getString(R.string.ok),
+                        (dialogInterface, i) -> {
+                            Category category = new Category();
+                            category.setCategoryId(categories.get(position).getCategoryId());
+                            category.setCategoryTitle(categories.get(position).getCategoryTitle());
+                            boolean result = db.deleteCategory(category);
+                            if (result) {
+                                categories.remove(position);
+                                notifyItemRemoved(position);
+                            } else {
+                                Toast.makeText(v.getRootView().getContext(),
+                                        categoriesActivity.getString(R.string.unable_delete_category),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }

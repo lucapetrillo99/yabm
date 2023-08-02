@@ -632,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         switch (operation) {
             case DELETE_OPTION:
-                message = getString(R.string.bookmark_delete_question);
+                message = getString(R.string.delete_question);
                 if (counter > 1) {
                     bookmarkQuestion = getString(R.string.bookmarks_question);
                     deletedQuestion = getString(R.string.bookmarks_deleted_message);

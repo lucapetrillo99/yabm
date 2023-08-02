@@ -34,7 +34,6 @@ public class CategoriesSelectionDialog extends AppCompatDialogFragment {
         this.categoriesSelectionListener = categoriesSelectionListener;
     }
 
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -55,7 +54,7 @@ public class CategoriesSelectionDialog extends AppCompatDialogFragment {
 
         return builder.create();
     }
-    
+
     public interface CategoriesSelectionListener {
         void getResult(boolean result);
     }

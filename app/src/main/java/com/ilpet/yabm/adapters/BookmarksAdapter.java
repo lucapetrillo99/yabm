@@ -212,7 +212,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         holder.title.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(bookmarks.get(position).getLink()));
-            Intent chooser = Intent.createChooser(intent, "Apri con");
+            Intent chooser = Intent.createChooser(intent, mainActivity.getString(R.string.open_with));
             mainActivity.startActivity(chooser);
         });
 
@@ -338,7 +338,8 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             ClipboardManager clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("link", bookmarks.get(position).getLink());
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(mainActivity.getApplicationContext(), "Link copiato negli appunti", Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity.getApplicationContext(), mainActivity.getString(R.string.link_copied),
+                    Toast.LENGTH_LONG).show();
             dialog.dismiss();
         });
 

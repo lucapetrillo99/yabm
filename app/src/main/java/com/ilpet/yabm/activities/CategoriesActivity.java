@@ -268,23 +268,23 @@ public class CategoriesActivity extends AppCompatActivity implements View.OnLong
         String deletedQuestion;
         String categoryMessage;
 
-        message = "Sei sicuro di voler eliminare ";
+        message = getString(R.string.delete_question);
         if (counter > 1) {
-            categoryQuestion = " categorie?";
-            deletedQuestion = " eliminate!";
-            categoryMessage = "Categorie";
+            categoryQuestion = getString(R.string.categories_question);
+            deletedQuestion = getString(R.string.categories_deleted_message);
+            categoryMessage = getString(R.string.categories_message);
         } else {
-            categoryQuestion = " categoria?";
-            deletedQuestion = " eliminata!";
-            categoryMessage = "Categoria";
+            categoryQuestion = getString(R.string.category_question);
+            deletedQuestion = getString(R.string.category_deleted_message);
+            categoryMessage = getString(R.string.category_message);
         }
-        builder.setMessage(message + counter + categoryQuestion + "\n" +
+        builder.setMessage(message + " " + counter + " " + categoryQuestion + "\n" +
                         getString(R.string.all_bookmarks_deleted))
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                .setNegativeButton(getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.cancel())
+                .setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
                     categoriesAdapter.deleteCategories(selectedCategories);
-                    Toast.makeText(getApplicationContext(), categoryMessage + deletedQuestion,
+                    Toast.makeText(getApplicationContext(), categoryMessage + " " + deletedQuestion,
                             Toast.LENGTH_LONG).show();
                     removeContextualActionMode();
                 });

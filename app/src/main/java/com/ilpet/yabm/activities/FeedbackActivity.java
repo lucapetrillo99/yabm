@@ -47,8 +47,8 @@ public class FeedbackActivity extends AppCompatActivity {
         buttonSend.setOnClickListener(v -> {
             String textToSend = text.getText().toString();
             if (textToSend.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Scrivi qualcosa per darci maggiori " +
-                        "informazioni", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.give_us_information),
+                        Toast.LENGTH_LONG).show();
             } else {
                 sendMail();
             }
@@ -62,16 +62,16 @@ public class FeedbackActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{MAIL});
         intent.putExtra(Intent.EXTRA_SUBJECT, subject.getText().toString());
         intent.putExtra(Intent.EXTRA_TEXT, text.getText().toString() + "\n\n\n" + finalInformation);
-        startActivity(Intent.createChooser(intent, "Scegli una applicazione"));
+        startActivity(Intent.createChooser(intent, getString(R.string.choose_an_application)));
     }
 
     private void confirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage("Sei sicuro di voler uscire?\nTutti i cambiamenti andranno persi")
+        builder.setMessage(getString(R.string.exit_question))
                 .setCancelable(false)
-                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton("Sì", (dialogInterface, i) -> {
+                .setNegativeButton(getString(R.string.cancel), (dialogInterface, i) -> dialogInterface.cancel())
+                .setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
                     finish();
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 });

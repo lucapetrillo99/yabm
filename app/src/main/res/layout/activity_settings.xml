@@ -49,13 +49,58 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/browser_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="20dp"
+        tools:ignore="MissingConstraints"
+        android:layout_marginStart="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_open">
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="@string/open_link"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="45dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/open_link_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="40dp">
+        </com.google.android.material.switchmaterial.SwitchMaterial>
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/categories_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginTop="10dp"
         tools:ignore="MissingConstraints"
         android:layout_marginStart="10dp">
 

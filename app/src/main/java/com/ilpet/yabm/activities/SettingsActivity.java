@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class SettingsActivity extends AppCompatActivity {
     private static final String THEME = "theme";
     private static final String CATEGORY = "category";
+    private static final String OPEN_LINK = "open_link_in_app";
     private RelativeLayout themeSetting;
     private RelativeLayout categoriesSetting;
     private RelativeLayout startCategory;
@@ -35,6 +37,8 @@ public class SettingsActivity extends AppCompatActivity {
     private RelativeLayout helpSetting;
     private RelativeLayout appInfo;
     private DatabaseHandler db;
+    private SwitchMaterial openLinkOption;
+    private SettingsManager openLinkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         db = DatabaseHandler.getInstance(getApplicationContext());
+        openLinkManager = new SettingsManager(getApplicationContext(), OPEN_LINK);
 
         themeSetting = findViewById(R.id.theme_setting);
         categoriesSetting = findViewById(R.id.categories_setting);
@@ -56,6 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         sendFeedback = findViewById(R.id.feedback_setting);
         helpSetting = findViewById(R.id.help_setting);
         appInfo = findViewById(R.id.information_setting);
+        openLinkOption = findViewById(R.id.open_link_app);
 
         toolbar.setNavigationIcon(R.drawable.ic_back_button);
         toolbar.setNavigationOnClickListener(v -> {
@@ -65,6 +71,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         appInfoClickListener();
         themeClickListener();
+        setOpenLinkOption();
+        setOpenLinkListener();
         categoriesClickListener();
         starCategoryClickListener();
         importExportClickListener();
@@ -108,6 +116,16 @@ public class SettingsActivity extends AppCompatActivity {
                 dialog.dismiss();
             });
             builder.show();
+        });
+    }
+
+    private void setOpenLinkOption() {
+        openLinkOption.setChecked(openLinkManager.getOpenLink());
+    }
+
+    private void setOpenLinkListener() {
+        openLinkOption.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            openLinkManager.setOpenLink(isChecked);
         });
     }
 

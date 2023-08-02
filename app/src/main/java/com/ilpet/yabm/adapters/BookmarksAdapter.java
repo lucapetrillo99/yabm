@@ -33,9 +33,11 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.BookmarkPreviewActivity;
 import com.ilpet.yabm.activities.InsertBookmarkActivity;
 import com.ilpet.yabm.activities.MainActivity;
+import com.ilpet.yabm.activities.WebViewActivity;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.ImagePreview;
+import com.ilpet.yabm.utils.SettingsManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private static final int NO_DESCRIPTION = 1;
     private static final int NO_IMAGE = 2;
     private static final int NORMAL = 3;
+    private static final String OPEN_LINK = "open_link_in_app";
     private final ArrayList<Bookmark> bookmarks;
     private final MainActivity mainActivity;
     private final ArrayList<Bookmark> allBookmarks;
@@ -150,8 +153,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    @SuppressLint("NonConstantResourceId")
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         setOptions((MainViewHolder) holder, position);
@@ -206,14 +207,23 @@ public class BookmarksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @SuppressLint("NonConstantResourceId")
     private void setOptions(MainViewHolder holder, int position) {
+        SettingsManager openLinkManager = new SettingsManager(mainActivity.getApplicationContext(),
+                OPEN_LINK);
         holder.title.setText(bookmarks.get(position).getTitle());
         holder.link.setText(bookmarks.get(position).getLink());
 
         holder.title.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(bookmarks.get(position).getLink()));
-            Intent chooser = Intent.createChooser(intent, mainActivity.getString(R.string.open_with));
-            mainActivity.startActivity(chooser);
+            if (openLinkManager.getOpenLink()) {
+                Intent intent = new Intent(mainActivity, WebViewActivity.class);
+                intent.putExtra("url", bookmarks.get(position).getLink());
+                mainActivity.startActivity(intent);
+                mainActivity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(bookmarks.get(position).getLink()));
+                Intent chooser = Intent.createChooser(intent, mainActivity.getString(R.string.open_with));
+                mainActivity.startActivity(chooser);
+            }
         });
 
         holder.title.setOnLongClickListener(v -> {

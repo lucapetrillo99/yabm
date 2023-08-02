@@ -18,12 +18,16 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.ilpet.yabm.R;
+import com.ilpet.yabm.activities.WebViewActivity;
 import com.ilpet.yabm.classes.Bookmark;
+
+import java.util.Random;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "BOOKMARKS_CHANNEL";
     private static final String CHANNEL_NAME = "Promemoria Segnalibri";
     private static final String ACTIVITY_PATH = "com.ilpet.yabm.activities.InsertBookmarkActivity";
+    private static final String OPEN_LINK = "open_link_in_app";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -33,11 +37,18 @@ public class AlarmReceiver extends BroadcastReceiver {
             Bookmark bookmark = (Bookmark) args.getSerializable("bookmark");
             String category = intent.getStringExtra("category");
 
-            Intent mainIntent = new Intent(Intent.ACTION_VIEW);
-            mainIntent.setData(Uri.parse(bookmark.getLink()));
+            SettingsManager openLinkManager = new SettingsManager(context, OPEN_LINK);
+            Random random = new Random();
+            Intent mainIntent;
+            if (openLinkManager.getOpenLink()) {
+                mainIntent = new Intent(context, WebViewActivity.class);
+                mainIntent.putExtra("url", bookmark.getLink());
+            } else {
+                mainIntent = new Intent(Intent.ACTION_VIEW);
+                mainIntent.setData(Uri.parse(bookmark.getLink()));
 
-            PendingIntent contentIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE);
-
+            }
+            PendingIntent contentIntent = PendingIntent.getActivity(context, random.nextInt(), mainIntent, PendingIntent.FLAG_IMMUTABLE);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -46,7 +57,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
                 notificationManager = context.getSystemService(NotificationManager.class);
                 notificationManager.createNotificationChannel(channel);
-
             }
 
             Intent modifyIntent = new Intent();
@@ -56,7 +66,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             modifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent modifyPendingIntent =
                     PendingIntent.getActivity(
-                            context, 0, modifyIntent, PendingIntent.FLAG_IMMUTABLE);
+                            context, random.nextInt(), modifyIntent, PendingIntent.FLAG_IMMUTABLE);
 
             Drawable d = ContextCompat.getDrawable(context, R.drawable.ic_app_logo_round);
             Bitmap appIcon = drawableToBitmap(d);

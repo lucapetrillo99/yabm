@@ -181,6 +181,7 @@
     <string name="rights_reserved">Yabm e i suoi loghi sono marchi riservati.\nTutti i diritti sono riservati.</string>
     <string name="open_with">Apri con</string>
     <string name="link_copied">Link copiato negli appunti</string>
+    <string name="open_link">Apri link in app</string>
     <string-array name="themes">
         <item>Default</item>
         <item>Chiaro</item>

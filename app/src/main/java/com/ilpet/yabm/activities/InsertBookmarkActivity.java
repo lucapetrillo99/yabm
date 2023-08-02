@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -407,7 +406,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
     private void confirmDialog(String link, String categoryId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        Handler handler = new Handler();
         if (isEditMode) {
             builder.setMessage(getString(R.string.bookmark_editing_question))
                     .setCancelable(false)
@@ -415,7 +413,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     .setPositiveButton("Sì", (dialogInterface, i) -> {
                         loadingDialog.startLoading();
                         getBookmarkInformation(link, categoryId);
-                        handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
                     });
         } else {
             builder.setMessage(getString(R.string.bookmark_inserting_question))
@@ -424,7 +421,6 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     .setPositiveButton(getString(R.string.ok), (dialogInterface, i) -> {
                         loadingDialog.startLoading();
                         getBookmarkInformation(link, categoryId);
-                        handler.postDelayed(() -> loadingDialog.dismissLoading(), 400);
                     });
         }
 
@@ -576,6 +572,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 if (setRemainder) {
                     setReminder();
                 }
+                loadingDialog.dismissLoading();
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.bookmark_modified), Toast.LENGTH_LONG).show();
                 intent = new Intent(InsertBookmarkActivity.this, MainActivity.class);
@@ -583,6 +580,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 finish();
             } else {
+                loadingDialog.dismissLoading();
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.unable_edit_bookmark), Toast.LENGTH_LONG).show();
             }
@@ -592,6 +590,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 if (setRemainder) {
                     setReminder();
                 }
+                loadingDialog.dismissLoading();
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.bookmark_added), Toast.LENGTH_LONG).show();
                 if (isRunningActivity()) {
@@ -601,6 +600,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                 finish();
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             } else {
+                loadingDialog.dismissLoading();
                 Toast.makeText(getApplicationContext(),
                         getString(R.string.existing_bookmark), Toast.LENGTH_LONG).show();
             }

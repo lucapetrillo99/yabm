@@ -151,7 +151,7 @@
     <string name="bookmark_elimination_question">Sei sicuro di voler eliminare il segnalibro?</string>
     <string name="bookmark_deleted">Segnalibro eliminato</string>
     <string name="unable_delete_bookmark">Impossibile eliminare il segnalibro</string>
-    <string name="bookmark_delete_question">Sei sicuro di voler eliminare</string>
+    <string name="delete_question">Sei sicuro di voler eliminare</string>
     <string name="bookmark_deleted_message">eliminato!</string>
     <string name="bookmarks_deleted_message">eliminati!</string>
     <string name="bookmarks_message">Segnalibri</string>
@@ -162,4 +162,28 @@
     <string name="bookmark_restored_message">ripristinato!</string>
     <string name="bookmark_archive_question">Sei sicuro di voler archiviare</string>
     <string name="bookmark_restore_question">Sei sicuro di voler ripristinare</string>
+    <string name="backup_created">Backup creato correttamente</string>
+    <string name="unable_create_backup">Impossibile creare il backup</string>
+    <string name="backup_restored">Backup ripristinato correttamente</string>
+    <string name="unable_restore_backup">Impossibile ripristinare il backup</string>
+    <string name="file_not_valid">File selezionato non valido</string>
+    <string name="choose_operation">Scegli l\'operazione</string>
+    <string name="no_backups">Non sono presenti backup da ripristinare</string>
+    <string name="unable_set_backup">Impossibile impostare il backup automatico</string>
+    <string name="category_question">categoria?</string>
+    <string name="categories_question">categorie?</string>
+    <string name="category_deleted_message">eliminata!</string>
+    <string name="categories_deleted_message">eliminate!</string>
+    <string name="category_message">Categoria</string>
+    <string name="categories_message">Categorie</string>
+    <string name="choose_an_application">Scegli una applicazione</string>
+    <string name="give_us_information">Scrivi qualcosa per darci maggiori informazioni</string>
+    <string name="rights_reserved">Yabm e i suoi loghi sono marchi riservati.\nTutti i diritti sono riservati.</string>
+    <string name="open_with">Apri con</string>
+    <string name="link_copied">Link copiato negli appunti</string>
+    <string-array name="themes">
+        <item>Default</item>
+        <item>Chiaro</item>
+        <item>Scuro</item>
+    </string-array>
 </resources>

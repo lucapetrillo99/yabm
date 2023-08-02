@@ -92,7 +92,8 @@ public class PasswordManagerDialog extends AppCompatDialogFragment {
                                                 Toast.LENGTH_LONG).show();
                                     } else {
                                         Toast.makeText(activity, activity.getString(R.string.
-                                                impossible_update_password), Toast.LENGTH_LONG).show();
+                                                impossible_update_password),
+                                                Toast.LENGTH_LONG).show();
                                     }
                                     dialog.dismiss();
                                 } else {

@@ -18,7 +18,7 @@ public class Category {
         }
 
         public static CategoryProtection castFromInt(int x) {
-            switch(x) {
+            switch (x) {
                 case 0:
                     return UNLOCK;
                 case 1:

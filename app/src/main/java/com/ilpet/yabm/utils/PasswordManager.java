@@ -15,6 +15,7 @@ public class PasswordManager {
 
         return instance;
     }
+
     public String hashPassword(String password) {
         String salt = BCrypt.gensalt(BCRYPT_WORK_FACTOR);
         return BCrypt.hashpw(password, salt);

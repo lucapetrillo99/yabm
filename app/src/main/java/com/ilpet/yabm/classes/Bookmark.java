@@ -23,7 +23,7 @@ public class Bookmark implements Serializable {
     private ItemType type;
     private String date;
 
-    public Bookmark(String id, String link, String category,String title, String description,
+    public Bookmark(String id, String link, String category, String title, String description,
                     String image, long reminder, ItemType type, String date) {
 
         this.id = id;
@@ -123,7 +123,7 @@ public class Bookmark implements Serializable {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-     return 0;
+        return 0;
     };
 
     public static Comparator<Bookmark> DateAscendingOrder = (b1, b2) -> {

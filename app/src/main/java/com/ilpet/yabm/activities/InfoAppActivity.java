@@ -14,9 +14,6 @@ import android.widget.TextView;
 import com.ilpet.yabm.R;
 
 public class InfoAppActivity extends AppCompatActivity {
-    private static final String RIGHTS_RESERVED = "Yabm e i suoi loghi sono marchi riservati.\n" +
-            "Tutti i diritti sono riservati.";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +21,7 @@ public class InfoAppActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_app);
         TextView appVersion = findViewById(R.id.app_version);
         TextView rightsReserved = findViewById(R.id.rights_reserved);
-        SpannableString spannableString = new SpannableString(RIGHTS_RESERVED);
+        SpannableString spannableString = new SpannableString(getString(R.string.rights_reserved));
         StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
         spannableString.setSpan(boldSpan, 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         rightsReserved.setText(spannableString);

@@ -2,6 +2,7 @@ package com.ilpet.yabm.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -97,7 +98,8 @@ public class SettingsActivity extends AppCompatActivity {
             SettingsManager themeManager = new SettingsManager(getApplicationContext(), THEME);
             int checkedItem = themeManager.getTheme();
 
-            String[] themes = {"Default", "Chiaro", "Scuro"};
+            Resources res = getResources();
+            String[] themes = res.getStringArray(R.array.themes);
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(themes, checkedItem, (dialog, choice) -> {
                 if (themeManager.getTheme() != choice) {
@@ -128,7 +130,7 @@ public class SettingsActivity extends AppCompatActivity {
                     .map(Category::getCategoryTitle)
                     .collect(Collectors.toList());
             categoriesToString.add(0, getString(R.string.all_bookmarks_title));
-            
+
 
             for (int i = 0; i < categoriesToString.size(); i++) {
                 if (categoriesToString.get(i).equals(startCategory)) {
@@ -139,11 +141,11 @@ public class SettingsActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
             builder.setSingleChoiceItems(categoriesToString.toArray(new String[0]), checkedItem,
                     (dialog, choice) -> {
-                if (!categoryManager.getCategory().equals(categoriesToString.get(choice))) {
-                    categoryManager.setCategory(categoriesToString.get(choice));
-                }
-                dialog.dismiss();
-            });
+                        if (!categoryManager.getCategory().equals(categoriesToString.get(choice))) {
+                            categoryManager.setCategory(categoriesToString.get(choice));
+                        }
+                        dialog.dismiss();
+                    });
             builder.show();
         });
     }

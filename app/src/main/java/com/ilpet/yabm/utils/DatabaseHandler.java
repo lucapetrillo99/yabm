@@ -169,7 +169,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + KEY_CATEGORY_TITLE + " != ?", new String[]{context.getString(R.string.archived_bookmarks)});
         }
 
-
         if (cursor.moveToFirst()) {
             do {
                 Category category = new Category();
@@ -510,7 +509,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("Select " + KEY_USER_PASSWORD + " from " + TABLE_PASSWORD,
                 null);
         if (cursor.moveToFirst()) {
-            String password = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));;
+            String password = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_PASSWORD));
             cursor.close();
             return password;
         } else {

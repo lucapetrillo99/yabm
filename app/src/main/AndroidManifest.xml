@@ -21,6 +21,9 @@
         android:theme="@style/Theme.YABM"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activities.WebViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.BookmarkPreviewActivity"
             android:exported="false"
             android:label="@string/title_activity_bookmark_preview"

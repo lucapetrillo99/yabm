@@ -120,12 +120,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setOpenLinkOption() {
-        openLinkOption.setChecked(openLinkManager.getAutoBackup());
+        openLinkOption.setChecked(openLinkManager.getOpenLink());
     }
 
     private void setOpenLinkListener() {
         openLinkOption.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            openLinkManager.setAutoBackup(isChecked);
+            openLinkManager.setOpenLink(isChecked);
         });
     }
 

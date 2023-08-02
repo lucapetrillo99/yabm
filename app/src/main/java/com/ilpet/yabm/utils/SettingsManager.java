@@ -18,6 +18,7 @@ public class SettingsManager {
     private static final String CATEGORY_ORDER_BY = "category_order_by";
     private static final String CATEGORY_ORDER_TYPE = "category_order_type";
     private static final String EXPORTING_BOOKMARKS = "exporting_bookmarks";
+    private static final String OPEN_LINK = "open_link_in_app";
     private static final int SYSTEM_DEFAULT = 0;
     private static final int LIGHT_MODE = 1;
     private static final int NIGHT_MODE = 2;
@@ -138,5 +139,15 @@ public class SettingsManager {
 
     public boolean getBookmarksExporting() {
         return settingsManager.getBoolean(EXPORTING_BOOKMARKS, false);
+    }
+
+    public void setOpenLink(boolean option) {
+        SharedPreferences.Editor editor = settingsManager.edit();
+        editor.putBoolean(OPEN_LINK, option);
+        editor.apply();
+    }
+
+    public boolean getOpenLink() {
+        return settingsManager.getBoolean(OPEN_LINK, false);
     }
 }

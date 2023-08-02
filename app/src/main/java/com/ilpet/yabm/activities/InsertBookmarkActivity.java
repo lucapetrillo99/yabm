@@ -527,7 +527,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("category", category);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                InsertBookmarkActivity.this, 0, intent,
+                InsertBookmarkActivity.this, (int) SystemClock.uptimeMillis(), intent,
                 PendingIntent.FLAG_IMMUTABLE);
         AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);

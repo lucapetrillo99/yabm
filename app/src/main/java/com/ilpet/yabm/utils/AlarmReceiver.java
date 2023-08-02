@@ -21,6 +21,8 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.WebViewActivity;
 import com.ilpet.yabm.classes.Bookmark;
 
+import java.util.Random;
+
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "BOOKMARKS_CHANNEL";
     private static final String CHANNEL_NAME = "Promemoria Segnalibri";
@@ -36,17 +38,17 @@ public class AlarmReceiver extends BroadcastReceiver {
             String category = intent.getStringExtra("category");
 
             SettingsManager openLinkManager = new SettingsManager(context, OPEN_LINK);
-            PendingIntent contentIntent;
+            Random random = new Random();
+            Intent mainIntent;
             if (openLinkManager.getOpenLink()) {
-                Intent mainIntent = new Intent(context, WebViewActivity.class);
+                mainIntent = new Intent(context, WebViewActivity.class);
                 mainIntent.putExtra("url", bookmark.getLink());
-                contentIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE);
             } else {
-                Intent mainIntent = new Intent(Intent.ACTION_VIEW);
+                mainIntent = new Intent(Intent.ACTION_VIEW);
                 mainIntent.setData(Uri.parse(bookmark.getLink()));
-                contentIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_IMMUTABLE);
-            }
 
+            }
+            PendingIntent contentIntent = PendingIntent.getActivity(context, random.nextInt(), mainIntent, PendingIntent.FLAG_IMMUTABLE);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -64,7 +66,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             modifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PendingIntent modifyPendingIntent =
                     PendingIntent.getActivity(
-                            context, 0, modifyIntent, PendingIntent.FLAG_IMMUTABLE);
+                            context, random.nextInt(), modifyIntent, PendingIntent.FLAG_IMMUTABLE);
 
             Drawable d = ContextCompat.getDrawable(context, R.drawable.ic_app_logo_round);
             Bitmap appIcon = drawableToBitmap(d);

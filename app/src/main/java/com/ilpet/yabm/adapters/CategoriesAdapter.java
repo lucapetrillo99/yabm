@@ -2,6 +2,8 @@ package com.ilpet.yabm.adapters;
 
 import static android.view.View.INVISIBLE;
 
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.IconPickerDialog;
 import com.ilpet.yabm.utils.PasswordDialog;
 
 import java.text.SimpleDateFormat;
@@ -141,6 +144,10 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
         CheckBox protection = dialogView.findViewById(R.id.protection);
+        ImageButton addIcon = dialogView.findViewById(R.id.add_icon);
+        ImageButton removeIcon = dialogView.findViewById(R.id.remove_icon);
+        final Drawable[] selectedIcon = new Drawable[1];
+
         if (isModify) {
             title.setText(R.string.modify_category_title);
             input.setText(categories.get(position).getCategoryTitle());
@@ -169,6 +176,22 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     protection.setChecked(false);
                 }
             }
+        });
+
+        addIcon.setOnClickListener(view -> {
+            IconPickerDialog iconPickerDialog = new IconPickerDialog(categoriesActivity);
+            iconPickerDialog.setOnIconSelectedListener(icon -> {
+                selectedIcon[0] = icon;
+                removeIcon.setVisibility(View.VISIBLE);
+                addIcon.setImageDrawable(icon);
+            });
+            iconPickerDialog.show(categoriesActivity.getSupportFragmentManager(), "icon_picker_dialog");
+        });
+
+        removeIcon.setOnClickListener(view -> {
+            selectedIcon[0] = null;
+            addIcon.setImageResource(R.drawable.ic_add);
+            removeIcon.setVisibility(View.GONE);
         });
 
         dialog.setOnShowListener(dialogInterface -> {

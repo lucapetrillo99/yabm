@@ -182,6 +182,8 @@
     <string name="open_with">Apri con</string>
     <string name="link_copied">Link copiato negli appunti</string>
     <string name="open_link">Apri link in app</string>
+    <string name="choose_icon">Scegli un\'icona:</string>
+    <string name="choose_icon_title">Scegli un\'icona</string>
     <string-array name="themes">
         <item>Default</item>
         <item>Chiaro</item>

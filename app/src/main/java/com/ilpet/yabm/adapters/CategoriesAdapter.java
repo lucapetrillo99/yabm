@@ -145,6 +145,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         CheckBox protection = dialogView.findViewById(R.id.protection);
         ImageButton addIcon = dialogView.findViewById(R.id.add_icon);
         final Drawable[] selectedIcon = new Drawable[1];
+        selectedIcon[0] = addIcon.getDrawable();
 
         if (isModify) {
             title.setText(R.string.modify_category_title);
@@ -167,6 +168,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
                             "Password dialog");
                     okButton.setClickable(true);
+                } else {
+                    if (db.getPassword() == null) {
+                        Toast.makeText(categoriesActivity.getApplicationContext(),
+                                categoriesActivity.getString(R.string.no_password_inserted),
+                                Toast.LENGTH_LONG).show();
+                        protection.setChecked(false);
+                    }
                 }
             } else {
                 if (db.getPassword() == null) {

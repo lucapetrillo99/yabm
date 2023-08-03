@@ -107,9 +107,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             Date date = new Date();
             Category defaultCategory = new Category(null, getString(R.string.default_bookmarks),
-                    dateFormat.format(date), Category.CategoryProtection.UNLOCK);
-            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), dateFormat.format(date),
+                    ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.ic_default_icon), dateFormat.format(date),
                     Category.CategoryProtection.UNLOCK);
+            Category archiveCategory = new Category(null, getString(R.string.archived_bookmarks), ContextCompat
+                    .getDrawable(getApplicationContext(), R.drawable.ic_archive),
+                    dateFormat.format(date), Category.CategoryProtection.UNLOCK);
             ArrayList<Category> appCategories = new ArrayList<>();
             appCategories.add(defaultCategory);
             appCategories.add(archiveCategory);
@@ -306,84 +309,84 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         ItemTouchHelper.SimpleCallback simpleCallback =
                 new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView,
+                                          @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
-                int position = viewHolder.getAbsoluteAdapterPosition();
+                        int position = viewHolder.getAbsoluteAdapterPosition();
 
-                switch (direction) {
-                    case ItemTouchHelper.LEFT:
-                        if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
-                            Bookmark unarchivedBookmark = bookmarks.get(position);
-                            removedFromArchive.add(bookmarks.get(position));
-                            bookmarksAdapter.removeBookmark(position);
-                            bookmarks.remove(position);
-                            bookmarksAdapter.notifyItemRemoved(position);
+                        switch (direction) {
+                            case ItemTouchHelper.LEFT:
+                                if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
+                                    Bookmark unarchivedBookmark = bookmarks.get(position);
+                                    removedFromArchive.add(bookmarks.get(position));
+                                    bookmarksAdapter.removeBookmark(position);
+                                    bookmarks.remove(position);
+                                    bookmarksAdapter.notifyItemRemoved(position);
 
-                            Snackbar.make(recyclerView, unarchivedBookmark.getLink() + " "
-                                            + getString(R.string.removed_from_archive), Snackbar.LENGTH_LONG)
-                                    .setAction(getString(R.string.cancel), v -> {
-                                        removedFromArchive.remove(removedFromArchive.lastIndexOf(unarchivedBookmark));
-                                        bookmarks.add(position, unarchivedBookmark);
-                                        bookmarksAdapter.notifyItemInserted(position);
-                                    }).show();
-                            setBookmarksLabel();
-                        } else {
-                            Bookmark archivedBookmark = bookmarks.get(position);
-                            archivedUrl.add(bookmarks.get(position));
-                            bookmarks.remove(position);
-                            bookmarksAdapter.removeBookmark(position);
-                            bookmarksAdapter.notifyItemRemoved(position);
+                                    Snackbar.make(recyclerView, unarchivedBookmark.getLink() + " "
+                                                    + getString(R.string.removed_from_archive), Snackbar.LENGTH_LONG)
+                                            .setAction(getString(R.string.cancel), v -> {
+                                                removedFromArchive.remove(removedFromArchive.lastIndexOf(unarchivedBookmark));
+                                                bookmarks.add(position, unarchivedBookmark);
+                                                bookmarksAdapter.notifyItemInserted(position);
+                                            }).show();
+                                    setBookmarksLabel();
+                                } else {
+                                    Bookmark archivedBookmark = bookmarks.get(position);
+                                    archivedUrl.add(bookmarks.get(position));
+                                    bookmarks.remove(position);
+                                    bookmarksAdapter.removeBookmark(position);
+                                    bookmarksAdapter.notifyItemRemoved(position);
 
-                            Snackbar.make(recyclerView, archivedBookmark.getLink() + " "
-                                            + getString(R.string.bookmark_archived), Snackbar.LENGTH_LONG)
-                                    .setAction(getString(R.string.cancel), v -> {
-                                        archivedUrl.remove(archivedUrl.lastIndexOf(archivedBookmark));
-                                        bookmarks.add(position, archivedBookmark);
-                                        bookmarksAdapter.notifyItemInserted(position);
-                                    }).show();
-                            setBookmarksLabel();
+                                    Snackbar.make(recyclerView, archivedBookmark.getLink() + " "
+                                                    + getString(R.string.bookmark_archived), Snackbar.LENGTH_LONG)
+                                            .setAction(getString(R.string.cancel), v -> {
+                                                archivedUrl.remove(archivedUrl.lastIndexOf(archivedBookmark));
+                                                bookmarks.add(position, archivedBookmark);
+                                                bookmarksAdapter.notifyItemInserted(position);
+                                            }).show();
+                                    setBookmarksLabel();
+                                }
+                                break;
+                            case ItemTouchHelper.RIGHT:
+                                confirmDialog(bookmarks.get(position).getId(), position);
+                                setBookmarksLabel();
+                                break;
                         }
-                        break;
-                    case ItemTouchHelper.RIGHT:
-                        confirmDialog(bookmarks.get(position).getId(), position);
-                        setBookmarksLabel();
-                        break;
-                }
-            }
+                    }
 
-            @Override
-            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
-                    new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
-                            .addSwipeRightActionIcon(R.drawable.ic_delete)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
-                            .addSwipeLeftActionIcon(R.drawable.ic_unarchive_30)
-                            .create()
-                            .decorate();
+                    @Override
+                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                            @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        if (toolbarTitle.getText().toString().equals(getString(R.string.archived_bookmarks))) {
+                            new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                    .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
+                                    .addSwipeRightActionIcon(R.drawable.ic_delete)
+                                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
+                                    .addSwipeLeftActionIcon(R.drawable.ic_unarchive_30)
+                                    .create()
+                                    .decorate();
 
-                } else {
-                    new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
-                            .addSwipeRightActionIcon(R.drawable.ic_delete)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
-                            .addSwipeLeftActionIcon(R.drawable.ic_archive_30)
-                            .create()
-                            .decorate();
+                        } else {
+                            new RecyclerViewSwipeDecorator.Builder(MainActivity.this, c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                    .addSwipeRightBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.red))
+                                    .addSwipeRightActionIcon(R.drawable.ic_delete)
+                                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.orange_dead))
+                                    .addSwipeLeftActionIcon(R.drawable.ic_archive_30)
+                                    .create()
+                                    .decorate();
 
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                        }
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
-            }
-        };
+                    }
+                };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }

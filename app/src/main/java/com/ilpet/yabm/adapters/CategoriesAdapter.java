@@ -3,7 +3,6 @@ package com.ilpet.yabm.adapters;
 import static android.view.View.INVISIBLE;
 
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,7 +144,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         TextView title = dialogView.findViewById(R.id.title);
         CheckBox protection = dialogView.findViewById(R.id.protection);
         ImageButton addIcon = dialogView.findViewById(R.id.add_icon);
-        ImageButton removeIcon = dialogView.findViewById(R.id.remove_icon);
         final Drawable[] selectedIcon = new Drawable[1];
 
         if (isModify) {
@@ -153,6 +151,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             input.setText(categories.get(position).getCategoryTitle());
             protection.setChecked(categories.get(position).getPasswordProtection() ==
                     Category.CategoryProtection.LOCK);
+            addIcon.setImageDrawable(categories.get(position).getCategoryImage());
+            selectedIcon[0] = categories.get(position).getCategoryImage();
         } else {
             title.setText(R.string.new_category_title);
             input.setHint(R.string.insert_category_title);
@@ -182,16 +182,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
             IconPickerDialog iconPickerDialog = new IconPickerDialog(categoriesActivity);
             iconPickerDialog.setOnIconSelectedListener(icon -> {
                 selectedIcon[0] = icon;
-                removeIcon.setVisibility(View.VISIBLE);
                 addIcon.setImageDrawable(icon);
             });
             iconPickerDialog.show(categoriesActivity.getSupportFragmentManager(), "icon_picker_dialog");
-        });
-
-        removeIcon.setOnClickListener(view -> {
-            selectedIcon[0] = null;
-            addIcon.setImageResource(R.drawable.ic_add);
-            removeIcon.setVisibility(View.GONE);
         });
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -204,6 +197,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     Category category = new Category();
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
+                    category.setCategoryImage(selectedIcon[0]);
                     category.setDate(dateFormat.format(date));
                     if (protection.isChecked()) {
                         category.setCategoryProtection(Category.CategoryProtection.LOCK);
@@ -228,6 +222,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        category.setCategoryImage(selectedIcon[0]);
                         category.setDate(dateFormat.format(date));
                         if (protection.isChecked()) {
                             category.setCategoryProtection(Category.CategoryProtection.LOCK);
@@ -263,7 +258,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
     private void confirmDialog(int position, View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
-
         builder.setMessage(categoriesActivity.getString(R.string.category_elimination_question))
                 .setCancelable(false)
                 .setNegativeButton(categoriesActivity.getString(R.string.cancel),

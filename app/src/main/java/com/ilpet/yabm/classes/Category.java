@@ -1,5 +1,7 @@
 package com.ilpet.yabm.classes;
 
+import android.graphics.drawable.Drawable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -34,14 +36,18 @@ public class Category {
 
     private String id;
     private String title;
+    private Drawable image;
     private String date;
     private CategoryProtection categoryProtection;
 
-    public Category() { }
+    public Category() {
+    }
 
-    public Category(String id, String title, String date, CategoryProtection categoryProtection) {
+    public Category(String id, String title, Drawable image, String date,
+                    CategoryProtection categoryProtection) {
         this.id = id;
         this.title = title;
+        this.image = image;
         this.date = date;
         this.categoryProtection = categoryProtection;
     }
@@ -54,6 +60,10 @@ public class Category {
         return title;
     }
 
+    public Drawable getCategoryImage() {
+        return image;
+    }
+
     public void setCategoryId(String id) {
         this.id = id;
     }
@@ -62,9 +72,17 @@ public class Category {
         this.title = title;
     }
 
-    public void setDate(String date) { this.date = date; }
+    public void setCategoryImage(Drawable image) {
+        this.image = image;
+    }
 
-    public String getDate() { return date; }
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getDate() {
+        return date;
+    }
 
     public void setCategoryProtection(CategoryProtection categoryProtection) {
         this.categoryProtection = categoryProtection;

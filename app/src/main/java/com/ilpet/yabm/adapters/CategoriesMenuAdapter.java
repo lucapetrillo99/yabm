@@ -1,5 +1,6 @@
 package com.ilpet.yabm.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -8,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -32,6 +32,7 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     private final Resources.Theme theme;
     private boolean unlock = false;
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     public CategoriesMenuAdapter(ArrayList<Category> categories, MainActivity mainActivity, String startCategory) {
         this.categories = categories;
         this.mainActivity = mainActivity;
@@ -41,19 +42,21 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
         theme.resolveAttribute(R.attr.backgroundColor, typedValue, true);
         Category category = new Category();
         category.setCategoryTitle(mainActivity.getString(R.string.all_bookmarks_title));
+        category.setCategoryImage(mainActivity.getDrawable(R.drawable.ic_all));
         categories.add(0, category);
     }
 
     static class categoriesMenuViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         RelativeLayout relativeLayout;
-        ImageView lockedCategory;
+        ImageView lockedCategory, categoryImage;
 
         public categoriesMenuViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.category_setting_title);
             relativeLayout = itemView.findViewById(R.id.menu_item);
             lockedCategory = itemView.findViewById(R.id.lock);
+            categoryImage = itemView.findViewById(R.id.category_image);
         }
     }
 
@@ -72,6 +75,8 @@ public class CategoriesMenuAdapter extends RecyclerView.Adapter<CategoriesMenuAd
     public void onBindViewHolder(@NonNull categoriesMenuViewHolder holder, int position) {
         holder.title.setText(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle());
         holder.relativeLayout.setBackgroundColor(color);
+        holder.categoryImage.setImageDrawable(categories.get(holder.getAbsoluteAdapterPosition()).getCategoryImage());
+
 
         if (!categories.get(holder.getAbsoluteAdapterPosition()).getCategoryTitle().equals(
                 mainActivity.getString(R.string.all_bookmarks_title))) {

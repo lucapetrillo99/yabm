@@ -5,12 +5,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -31,6 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_BOOKMARK_PREVIOUS_CATEGORY = "prev_category";
     private static final String KEY_BOOKMARK_TYPE = "type";
     private static final String KEY_CATEGORY_TITLE = "title";
+    private static final String KEY_CATEGORY_IMAGE = "image";
     private static final String KEY_DATE = "date";
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_USER_PASSWORD = "user_password";
@@ -38,7 +46,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private final Context context;
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY
             + "(" + CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," + KEY_CATEGORY_TITLE +
-            " TEXT ," + KEY_DATE + " TEXT ," + KEY_PASSWORD + " INTEGER)";
+            " TEXT ," + KEY_DATE + " TEXT ," + KEY_CATEGORY_IMAGE + " BLOB ," + KEY_PASSWORD +
+            " INTEGER)";
     private static final String CREATE_TABLE_BOOKMARK = "CREATE TABLE " + TABLE_BOOKMARK + "(" +
             BOOKMARK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_BOOKMARK_LINK + " TEXT," +
             KEY_BOOKMARK_TITLE + " TEXT," + KEY_BOOKMARK_DESCRIPTION + " TEXT," +
@@ -110,12 +119,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
             values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
+            Drawable image = category.getCategoryImage();
+            values.put(KEY_CATEGORY_IMAGE, drawableToByteArray(image));
             values.put(KEY_DATE, category.getDate());
             values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
             categoryId = String.valueOf(db.insert(TABLE_CATEGORY, null, values));
             cursor.close();
         }
-
         return categoryId;
     }
 
@@ -175,6 +185,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                byte[] drawableByteArray = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_CATEGORY_IMAGE));
+                category.setCategoryImage(byteArrayToDrawable(drawableByteArray));
                 int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
                 category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
@@ -203,6 +215,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
                 category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
                 category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+                byte[] drawableByteArray = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_CATEGORY_IMAGE));
+                category.setCategoryImage(byteArrayToDrawable(drawableByteArray));
                 int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
                 category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
                 categories.add(category);
@@ -295,6 +309,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             category.setCategoryId(cursor.getString(cursor.getColumnIndexOrThrow(CATEGORY_ID)));
             category.setCategoryTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_TITLE)));
             category.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+            byte[] drawableByteArray = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_CATEGORY_IMAGE));
+            category.setCategoryImage(byteArrayToDrawable(drawableByteArray));
             int protection = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
             category.setCategoryProtection(Category.CategoryProtection.castFromInt(protection));
             cursor.close();
@@ -391,6 +407,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(CATEGORY_ID, category.getCategoryId());
         values.put(KEY_CATEGORY_TITLE, category.getCategoryTitle());
+        Drawable image = category.getCategoryImage();
+        values.put(KEY_CATEGORY_IMAGE, drawableToByteArray(image));
         values.put(KEY_DATE, category.getDate());
         values.put(KEY_PASSWORD, category.getPasswordProtectionValue());
         int result = db.update(TABLE_CATEGORY, values, CATEGORY_ID + " = ?",
@@ -542,6 +560,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 sb.append(",?");
             }
             return sb.toString();
+        }
+    }
+
+    private byte[] drawableToByteArray(Drawable drawable) {
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(),
+                drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                        : Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    private Drawable byteArrayToDrawable(byte[] image) {
+        if (image != null) {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+            return new BitmapDrawable(context.getResources(), bitmap);
+        } else {
+            return null;
         }
     }
 

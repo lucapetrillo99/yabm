@@ -12,20 +12,20 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="6cdf17a0-b995-4f49-a1d8-40591d04186d">
-      <console name="Connection" type="STANDARD" schema="yabm" session="Main" />
+    <connection id="b5d698e6-9e4c-4802-b5b8-30edafb296f7">
+      <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
-    <last-used-providers />
+    <last-used-providers>
+      <object-type object-type="TABLE" editor-provider="DATA" />
+    </last-used-providers>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.bookmark" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.password" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="6cdf17a0-b995-4f49-a1d8-40591d04186d" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="b5d698e6-9e4c-4802-b5b8-30edafb296f7" dataset="yabm.category" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -44,7 +44,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="6cdf17a0-b995-4f49-a1d8-40591d04186d" active="true" signed="true">
+      <connection id="b5d698e6-9e4c-4802-b5b8-30edafb296f7" active="true" signed="true">
         <database>
           <name value="Connection" />
           <description value="" />
@@ -61,7 +61,7 @@
           <tns-folder value="" />
           <tns-profile value="" />
           <files>
-            <file path="$USER_HOME$/.cache/Google/AndroidStudio2022.2/device-explorer/Pixel_3a_API_34_extension_level_7_x86_64/data/data/com.ilpet.yabm/databases/yabm" schema="yabm" />
+            <file path="$USER_HOME$/Desktop/yabm" schema="yabm" />
           </files>
           <type value="NONE" />
           <user value="" />

@@ -2,6 +2,7 @@ package com.ilpet.yabm.adapters;
 
 import static android.view.View.INVISIBLE;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.IconPickerDialog;
 import com.ilpet.yabm.utils.PasswordDialog;
 
 import java.text.SimpleDateFormat;
@@ -141,11 +143,17 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
         EditText input = dialogView.findViewById(R.id.user_input);
         TextView title = dialogView.findViewById(R.id.title);
         CheckBox protection = dialogView.findViewById(R.id.protection);
+        ImageButton addIcon = dialogView.findViewById(R.id.add_icon);
+        final Drawable[] selectedIcon = new Drawable[1];
+        selectedIcon[0] = addIcon.getDrawable();
+
         if (isModify) {
             title.setText(R.string.modify_category_title);
             input.setText(categories.get(position).getCategoryTitle());
             protection.setChecked(categories.get(position).getPasswordProtection() ==
                     Category.CategoryProtection.LOCK);
+            addIcon.setImageDrawable(categories.get(position).getCategoryImage());
+            selectedIcon[0] = categories.get(position).getCategoryImage();
         } else {
             title.setText(R.string.new_category_title);
             input.setHint(R.string.insert_category_title);
@@ -160,6 +168,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     passwordDialog.show(categoriesActivity.getSupportFragmentManager(),
                             "Password dialog");
                     okButton.setClickable(true);
+                } else {
+                    if (db.getPassword() == null) {
+                        Toast.makeText(categoriesActivity.getApplicationContext(),
+                                categoriesActivity.getString(R.string.no_password_inserted),
+                                Toast.LENGTH_LONG).show();
+                        protection.setChecked(false);
+                    }
                 }
             } else {
                 if (db.getPassword() == null) {
@@ -169,6 +184,15 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     protection.setChecked(false);
                 }
             }
+        });
+
+        addIcon.setOnClickListener(view -> {
+            IconPickerDialog iconPickerDialog = new IconPickerDialog(categoriesActivity);
+            iconPickerDialog.setOnIconSelectedListener(icon -> {
+                selectedIcon[0] = icon;
+                addIcon.setImageDrawable(icon);
+            });
+            iconPickerDialog.show(categoriesActivity.getSupportFragmentManager(), "icon_picker_dialog");
         });
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -181,6 +205,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     Category category = new Category();
                     category.setCategoryId(categories.get(position).getCategoryId());
                     category.setCategoryTitle(input.getText().toString());
+                    category.setCategoryImage(selectedIcon[0]);
                     category.setDate(dateFormat.format(date));
                     if (protection.isChecked()) {
                         category.setCategoryProtection(Category.CategoryProtection.LOCK);
@@ -205,6 +230,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        category.setCategoryImage(selectedIcon[0]);
                         category.setDate(dateFormat.format(date));
                         if (protection.isChecked()) {
                             category.setCategoryProtection(Category.CategoryProtection.LOCK);
@@ -240,7 +266,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ca
 
     private void confirmDialog(int position, View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
-
         builder.setMessage(categoriesActivity.getString(R.string.category_elimination_question))
                 .setCancelable(false)
                 .setNegativeButton(categoriesActivity.getString(R.string.cancel),

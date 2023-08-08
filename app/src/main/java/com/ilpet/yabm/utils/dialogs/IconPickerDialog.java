@@ -53,7 +53,7 @@ public class IconPickerDialog extends DialogFragment {
         toolbarTitle.setText(getString(R.string.choose_icon_title));
 
         RecyclerView iconRecyclerView = view.findViewById(R.id.icon_recycler_view);
-        iconRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 6));
+        iconRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 5));
 
         IconAdapter iconAdapter = new IconAdapter(activity);
         iconRecyclerView.setAdapter(iconAdapter);

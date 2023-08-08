@@ -54,11 +54,13 @@
 
     <ImageButton
         android:id="@+id/add_icon"
-        android:layout_width="wrap_content"
+        android:layout_width="35dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/ic_default_icon"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
         android:background="@null"
         app:tint="?strokeColor"
         android:layout_marginEnd="15dp">

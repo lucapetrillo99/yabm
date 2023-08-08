@@ -29,7 +29,7 @@ import com.ilpet.yabm.adapters.CategoriesAdapter;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
 import com.ilpet.yabm.utils.SettingsManager;
-import com.ilpet.yabm.utils.StoragePermissionDialog;
+import com.ilpet.yabm.utils.dialogs.StoragePermissionDialog;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;

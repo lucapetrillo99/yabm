@@ -45,7 +45,7 @@ import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.AlarmReceiver;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.LoadingDialog;
+import com.ilpet.yabm.utils.dialogs.LoadingDialog;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

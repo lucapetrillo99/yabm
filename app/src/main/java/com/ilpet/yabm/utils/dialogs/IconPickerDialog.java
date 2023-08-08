@@ -1,4 +1,4 @@
-package com.ilpet.yabm.utils;
+package com.ilpet.yabm.utils.dialogs;
 
 import android.app.Dialog;
 import android.graphics.drawable.Drawable;

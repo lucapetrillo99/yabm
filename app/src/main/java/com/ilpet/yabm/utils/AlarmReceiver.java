@@ -68,14 +68,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                     PendingIntent.getActivity(
                             context, random.nextInt(), modifyIntent, PendingIntent.FLAG_IMMUTABLE);
 
-            Drawable d = ContextCompat.getDrawable(context, R.drawable.ic_app_logo_round);
-            Bitmap appIcon = drawableToBitmap(d);
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_stat_name)
                     .setContentTitle(bookmark.getTitle())
                     .setShowWhen(true)
-                    .setLargeIcon(appIcon)
                     .setContentText(bookmark.getLink())
                     .setContentIntent(contentIntent)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)

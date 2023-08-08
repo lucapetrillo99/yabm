@@ -16,7 +16,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.PasswordManagerDialog;
+import com.ilpet.yabm.utils.dialogs.PasswordManagerDialog;
 import com.ilpet.yabm.utils.SettingsManager;
 
 import java.util.ArrayList;

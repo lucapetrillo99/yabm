@@ -1,5 +1,6 @@
 package com.ilpet.yabm.adapters;
 
+import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +22,13 @@ import java.util.List;
 public class IconAdapter extends RecyclerView.Adapter<IconAdapter.ViewHolder> {
     private final List<Icon> iconList;
     private OnItemClickListener clickListener;
-    private final CategoriesActivity activity;
+    private final Activity activity;
 
     public interface OnItemClickListener {
         void onItemClick(Drawable icon);
     }
 
-    public IconAdapter(CategoriesActivity activity) {
+    public IconAdapter(Activity activity) {
         this.activity = activity;
         this.iconList = loadIconPack();
     }

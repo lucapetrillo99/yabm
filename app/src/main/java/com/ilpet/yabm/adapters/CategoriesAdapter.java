@@ -24,8 +24,8 @@ import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.CategoriesActivity;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.IconPickerDialog;
-import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.dialogs.IconPickerDialog;
+import com.ilpet.yabm.utils.dialogs.PasswordDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

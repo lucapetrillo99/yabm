@@ -23,19 +23,20 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:src="@drawable/name_logo_160"
+        android:src="@drawable/logo_100"
         app:tint="?attr/strokeColor">
     </ImageView>
 
-    <TextView
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="@string/extended_app_name"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold">
-    </TextView>
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:src="@drawable/slogan"
+        app:tint="?attr/strokeColor">
+    </ImageView>
 
     <TextView
         android:id="@+id/app_version"
@@ -50,7 +51,7 @@
         android:id="@+id/rights_reserved"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="50dp"
         android:textAlignment="center"
         android:textSize="15sp">
     </TextView>

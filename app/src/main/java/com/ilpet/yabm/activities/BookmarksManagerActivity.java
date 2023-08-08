@@ -29,10 +29,10 @@ import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
-import com.ilpet.yabm.utils.LoadingDialog;
-import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.dialogs.LoadingDialog;
+import com.ilpet.yabm.utils.dialogs.PasswordDialog;
 import com.ilpet.yabm.utils.SettingsManager;
-import com.ilpet.yabm.utils.StoragePermissionDialog;
+import com.ilpet.yabm.utils.dialogs.StoragePermissionDialog;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

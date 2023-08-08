@@ -1,4 +1,4 @@
-package com.ilpet.yabm.utils;
+package com.ilpet.yabm.utils.dialogs;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.classes.Bookmark;
 import com.ilpet.yabm.classes.Category;
+import com.ilpet.yabm.utils.DatabaseHandler;
 
 import java.util.ArrayList;
 import java.util.List;

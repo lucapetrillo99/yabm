@@ -1,4 +1,4 @@
-package com.ilpet.yabm.utils;
+package com.ilpet.yabm.utils.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordManager;
 
 import java.util.Objects;
 

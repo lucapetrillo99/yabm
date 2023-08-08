@@ -30,7 +30,7 @@ import com.ilpet.yabm.utils.AlarmReceiver;
 import com.ilpet.yabm.utils.BackupHandler;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.utils.SettingsManager;
-import com.ilpet.yabm.utils.StoragePermissionDialog;
+import com.ilpet.yabm.utils.dialogs.StoragePermissionDialog;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.ilpet.yabm.utils;
+package com.ilpet.yabm.utils.dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.ilpet.yabm.R;
+import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.PasswordManager;
 
 public class PasswordDialog extends AppCompatDialogFragment {
     private final Activity activity;

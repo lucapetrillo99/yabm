@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ilpet.yabm.R;
 import com.ilpet.yabm.activities.MainActivity;
 import com.ilpet.yabm.classes.Category;
-import com.ilpet.yabm.utils.PasswordDialog;
+import com.ilpet.yabm.utils.dialogs.PasswordDialog;
 
 import java.util.ArrayList;
 

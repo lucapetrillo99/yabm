@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -220,6 +221,8 @@ public class BookmarksManagerActivity extends AppCompatActivity {
                             Category category = new Category();
                             category.setCategoryTitle(categoryTitle);
                             category.setDate(dateFormat.format(date));
+                            category.setCategoryImage(AppCompatResources.getDrawable(getApplicationContext(),
+                                    R.drawable.ic_imported));
                             category.setCategoryProtection(Category.CategoryProtection.UNLOCK);
                             String categoryId = db.addCategory(category);
                             if (categoryId != null) {

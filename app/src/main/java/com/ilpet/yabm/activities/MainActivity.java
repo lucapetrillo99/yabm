@@ -442,8 +442,30 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
                 bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
                 setAdapter();
+            } else if (db.getCategoryProtectionByTitle(previousCategory)) {
+                PasswordDialog passwordDialog = new PasswordDialog(this,
+                        result -> {
+                            if (result) {
+                                bookmarks = new ArrayList<>(db.getBookmarksByCategory(previousCategory,
+                                        settingsManager.getBookmarkOrderBy(), settingsManager.
+                                                getBookmarkOrderType()));
+                                setAdapter();
+                            }
+                        });
+                passwordDialog.show(getSupportFragmentManager(),
+                        "Password dialog");
             } else {
-                if (db.getCategoryProtectionByTitle(previousCategory)) {
+                bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                setAdapter();
+            }
+        } else {
+            SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
+            String categoryToLoad = settingsManager.getCategory();
+            if (categoryToLoad != null) {
+                if (categoryToLoad.equals(getString(R.string.all_bookmarks_title))) {
+                    bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                    setAdapter();
+                } else if (db.getCategoryProtectionByTitle(categoryToLoad)) {
                     PasswordDialog passwordDialog = new PasswordDialog(this,
                             result -> {
                                 if (result) {
@@ -455,29 +477,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                             });
                     passwordDialog.show(getSupportFragmentManager(),
                             "Password dialog");
-                }
-            }
-        } else {
-            SettingsManager settingsManager = new SettingsManager(getApplicationContext(), CATEGORY);
-            String categoryToLoad = settingsManager.getCategory();
-            if (categoryToLoad != null) {
-                if (previousCategory.equals(getString(R.string.all_bookmarks_title))) {
-                    bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
-                    setAdapter();
                 } else {
-                    if (db.getCategoryProtectionByTitle(previousCategory)) {
-                        PasswordDialog passwordDialog = new PasswordDialog(this,
-                                result -> {
-                                    if (result) {
-                                        bookmarks = new ArrayList<>(db.getBookmarksByCategory(previousCategory,
-                                                settingsManager.getBookmarkOrderBy(), settingsManager.
-                                                        getBookmarkOrderType()));
-                                        setAdapter();
-                                    }
-                                });
-                        passwordDialog.show(getSupportFragmentManager(),
-                                "Password dialog");
-                    }
+                    bookmarks = new ArrayList<>(db.getBookmarksByCategory(categoryToLoad,
+                            settingsManager.getBookmarkOrderBy(), settingsManager.
+                                    getBookmarkOrderType()));
+                    setAdapter();
                 }
             } else {
                 toolbarTitle.setText(R.string.all_bookmarks_title);

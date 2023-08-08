@@ -455,7 +455,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 passwordDialog.show(getSupportFragmentManager(),
                         "Password dialog");
             } else {
-                bookmarks = db.getBookmarks(settingsManager.getBookmarkOrderBy(), settingsManager.getBookmarkOrderType());
+                bookmarks = new ArrayList<>(db.getBookmarksByCategory(previousCategory,
+                        settingsManager.getBookmarkOrderBy(), settingsManager.
+                                getBookmarkOrderType()));
                 setAdapter();
             }
         } else {

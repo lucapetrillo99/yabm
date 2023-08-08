@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -45,6 +46,7 @@ import com.ilpet.yabm.classes.Category;
 import com.ilpet.yabm.utils.AlarmReceiver;
 import com.ilpet.yabm.utils.Connection;
 import com.ilpet.yabm.utils.DatabaseHandler;
+import com.ilpet.yabm.utils.dialogs.IconPickerDialog;
 import com.ilpet.yabm.utils.dialogs.LoadingDialog;
 
 import java.text.ParseException;
@@ -248,10 +250,22 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
 
             final EditText input = dialogView.findViewById(R.id.user_input);
             TextView title = dialogView.findViewById(R.id.title);
+            ImageButton addIcon = dialogView.findViewById(R.id.add_icon);
             protection = dialogView.findViewById(R.id.protection);
             passwordProtectionListener();
+            final Drawable[] selectedIcon = new Drawable[1];
+            selectedIcon[0] = addIcon.getDrawable();
             title.setText(R.string.new_category_title);
             input.setHint(getString(R.string.insert_category));
+
+            addIcon.setOnClickListener(dialogInterface -> {
+                IconPickerDialog iconPickerDialog = new IconPickerDialog(InsertBookmarkActivity.this);
+                iconPickerDialog.setOnIconSelectedListener(icon -> {
+                    selectedIcon[0] = icon;
+                    addIcon.setImageDrawable(icon);
+                });
+                iconPickerDialog.show(getSupportFragmentManager(), "icon_picker_dialog");
+            });
 
             dialog.setOnShowListener(dialogInterface -> {
                 Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -259,6 +273,7 @@ public class InsertBookmarkActivity extends AppCompatActivity implements Adapter
                     if (!input.getText().toString().isEmpty()) {
                         Category category = new Category();
                         category.setCategoryTitle(input.getText().toString());
+                        category.setCategoryImage(selectedIcon[0]);
                         SimpleDateFormat dateFormat = new SimpleDateFormat(
                                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                         Date insertionDate = new Date();

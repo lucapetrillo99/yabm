@@ -1,5 +1,6 @@
 package com.ilpet.yabm.utils.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,7 +22,7 @@ import com.ilpet.yabm.adapters.IconAdapter;
 
 public class IconPickerDialog extends DialogFragment {
     private OnIconSelectedListener listener;
-    private final CategoriesActivity activity;
+    private final Activity activity;
 
     public interface OnIconSelectedListener {
         void onIconSelected(Drawable icon);
@@ -32,7 +33,7 @@ public class IconPickerDialog extends DialogFragment {
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.DialogAnimation);
     }
 
-    public IconPickerDialog(CategoriesActivity activity) {
+    public IconPickerDialog(Activity activity) {
         this.activity = activity;
     }
 
